@@ -11,7 +11,7 @@ from components.classifier_only import load_model_from_file, predict
 # Load the trained model
 model = load_model_from_file('assets\ml-model\efficientNetB7_v0-5.h5')
 
-class Tite(App):
+class ETBX_scan_image(App):
     def build(self):
 
         #main layout
@@ -81,4 +81,4 @@ class Tite(App):
         pass
 
 if __name__ == "__main__":
-    Tite().run()
+    ETBX_scan_image().run()
