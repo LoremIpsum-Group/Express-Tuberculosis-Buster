@@ -77,7 +77,7 @@ class ETBX_scan_image(App):
         #self.result_class.text = "TestTest " 
         #self.result_perc.text = "Test " 
         self.result_class.text = "Predicted Class: " + predicted_class
-        self.result_perc.text = "Predicted Score: " + str(scoree)
+        self.result_perc.text = "Predicted Score: " + str(scoree) + " %"
         pass
 
 if __name__ == "__main__":

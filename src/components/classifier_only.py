@@ -17,7 +17,7 @@ def load_model_from_file(filename):
 
 # Prediction function
 def predict(model, image_path):
-    #kailangan kasi naka array si img
+    # kailangan kasi naka array si img
     image_array = get_img_array(image_path)
 
     prediction = model.predict(image_array)
@@ -27,9 +27,6 @@ def predict(model, image_path):
         predicted_class = "tuberculosis"
     else:
         predicted_class = "non-tb"
-    
-    predicted_score_rounded = "{:.2f}".format(prediction[0][0])
-    
-    return predicted_class, predicted_score_rounded
 
-	
+    predicted_score_rounded = round(prediction[0][0], 1)
+    return predicted_class, predicted_score_rounded
