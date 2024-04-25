@@ -1,0 +1,51 @@
+<LoginTextInput@TextInput>
+    multiline: False
+    height: 30
+    size_hint: .25, .25
+    pos_hint: {'center_x' : 0.5, 'center_y' : 0.5}
+    background_color: 1, 1, 1, 1
+
+<HoverLabel@Label+HoverBehavior>
+    color: (0,0,0,1)
+    
+    on_enter: self.color = 0, 0, 1, 1
+
+    on_leave: self.color = 0, 0, 0, 1
+            
+BoxLayout:
+    orientation: 'vertical'
+    background_color: [1, 1, 1, 1]
+    padding: 10
+    spacing: 10
+    
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: '[b][i]ETBx[/i][/b]'
+        font_size: 60
+        color: [0, 0, 1, 1]
+        markup: True
+
+    LoginTextInput
+        text: 'Email'
+    
+    LoginTextInput
+        text: 'Password'
+        password: True
+
+    HoverLabel:
+        text: 'Forgot Password'
+        
+    
+    HoverLabel:
+        text: 'Create Account' 
+        
+    
+    Button:
+        text: 'Login'
+        background_color: 0, 0, 1, 1
