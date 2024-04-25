@@ -1,0 +1,9 @@
+{
+    "conventionalCommits.scopes": [
+        "Fix Function",
+        "Create Function",
+        "Adjust UI",
+        "Additional info",
+        "Additional feature"
+    ]
+}
