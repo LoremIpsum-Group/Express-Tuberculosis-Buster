@@ -29,11 +29,13 @@ FloatLayout:
         pos_hint: {"y": 0.30}
 
     LoginTextInput
+        id: email_input
         hint_text: "Email"
         icon_left: "email"
         pos_hint: {"x": 0.35, "y": 0.60}
     
     LoginTextInput
+        id: password_input
         hint_text: "Password"
         password: True 
         icon_left: "lock"
@@ -53,5 +55,7 @@ FloatLayout:
         pos_hint: {"center_x": 0.5, "center_y" : 0.25}
         size_hint: 0.2, 0.1
         border: (20, 20, 20, 20)
+        on_press: app.login()
+
    
         
