@@ -1,9 +1,8 @@
 from kivy.core.window import Window
-from kivy.uix.boxlayout import BoxLayout
 from kivymd.app import MDApp
-from kivymd.uix.label import MDLabel
-from kivymd.uix.screen import MDScreen
 from kivymd.uix.button import MDRaisedButton
+
+from kivy.lang import Builder
 
 class MyButton(MDRaisedButton):
     """
@@ -51,55 +50,6 @@ class MainDashboard(MDApp):
         self.theme_cls.primary_palette = "Blue"
         self.icon = "assets\lung-temporary-logo.ico"
 
-        screen = MDScreen()
-
-        main_layout = BoxLayout(orientation='horizontal')
-
-        right_side = BoxLayout(orientation='vertical')
-
-        message = MDLabel(
-                text='Welcome to ETBx!',
-                halign='center',
-                valign='middle',
-                font_style = 'H1',
-                theme_text_color = 'Custom',
-                text_color = (0,0,1,1))
-        
-        right_side.add_widget(message)
-
-        left_side = BoxLayout(
-                    orientation='vertical',
-                    pos_hint ={'x': 0, 'center_y': 0.3},
-                    size_hint=(None, None),
-                    width=300,
-                    spacing = 70)
-
-        button1 = MyButton(
-                text="Hello, This is the first button",
-                size_hint=(.9, None),
-                height=50,        
-        )
-
-        button2 = MyButton(
-                text="Hello, This is the second button",
-                size_hint=(.9, None),
-                height=50
-        )
-
-        button3 = MyButton(
-                text="Hello, This is the third button",
-                size_hint=(.9, None),
-                height=50
-        )
-
-        left_side.add_widget(button1)
-        left_side.add_widget(button2)
-        left_side.add_widget(button3)
-
-        main_layout.add_widget(left_side)
-        main_layout.add_widget(right_side)
-
-        screen.add_widget(main_layout)
-        return screen
+        return Builder.load_file('m_dashb.kv')
 
 MainDashboard().run()

@@ -1,0 +1,58 @@
+<HoverLabel@Label+HoverBehavior>
+    color: (0,0,0,1)
+    on_enter: self.color = 1, 0, 1, 1
+    on_leave: self.color = 1, 1, 1, 1
+
+BoxLayout:
+    orientation: "horizontal"
+    
+    BoxLayout:
+        orientation: "vertical"
+        size_hint: .35, 1
+        pos_hint: {"x": 0, "center_y": .76}
+        spacing: 90 
+        canvas:
+            Color:
+                rgb: 0, 0, 1, 1
+            Rectangle:
+                size: self.size
+
+        HoverLabel:
+            text: '[b]Scan Image[/b]'
+            font_size: 27
+            color: [1,1,1,1]
+            markup: True
+            size_hint_y: None
+            height: self.texture_size[1]
+            pos_hint: {"x": .17, "y": 1}
+        HoverLabel:
+            text: '[b]View Patient[/b]'
+            font_size: 27
+            color: [1,1,1,1]
+            markup: True
+            size_hint_y: None
+            height: self.texture_size[1]
+            pos_hint: {"x": .15, "y": 1}
+        HoverLabel:
+            text: '[b]Manage Patient[/b]'
+            font_size: 27
+            color: [1,1,1,1]
+            markup: True
+            size_hint_y: None
+            height: self.texture_size[1]
+            pos_hint: {"x": .05, "y": 1}    
+
+        
+        
+
+        
+    BoxLayout:
+
+        Label: 
+            text: '[b]Welcome \nto [/b][i]ETBX[/i]!'
+            font_size: 90
+            color: [0,0,1,1]
+            markup: True
+            pos_hint: {"x": -2, "center_y": .50}
+
+            
