@@ -1,23 +1,19 @@
-<LoginTextInput@TextInput>
+<LoginTextInput@MDTextField>
     multiline: False
-    height: 30
-    size_hint: .25, .25
+    size_hint_x: .30
     pos_hint: {'center_x' : 0.5, 'center_y' : 0.5}
     background_color: 1, 1, 1, 1
+    padding: 10, 10,
+    mode: "rectangle"
 
 <HoverLabel@Label+HoverBehavior>
     color: (0,0,0,1)
-    
     on_enter: self.color = 0, 0, 1, 1
-
     on_leave: self.color = 0, 0, 0, 1
             
-BoxLayout:
-    orientation: 'vertical'
+FloatLayout:
     background_color: [1, 1, 1, 1]
-    padding: 10
-    spacing: 10
-    
+
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
@@ -30,22 +26,32 @@ BoxLayout:
         font_size: 60
         color: [0, 0, 1, 1]
         markup: True
+        pos_hint: {"y": 0.30}
 
     LoginTextInput
-        text: 'Email'
+        hint_text: "Email"
+        icon_left: "email"
+        pos_hint: {"x": 0.35, "y": 0.60}
     
     LoginTextInput
-        text: 'Password'
-        password: True
+        hint_text: "Password"
+        password: True 
+        icon_left: "lock"
+        pos_hint: {"x": 0.35, "y": 0.49}
 
     HoverLabel:
-        text: 'Forgot Password'
-        
+        text: 'Forgot Password?'
+        pos_hint: {"x": 0.08, "y": -0.04}
     
     HoverLabel:
         text: 'Create Account' 
-        
-    
+        pos_hint: {"center_y": 0.145}
+
     Button:
         text: 'Login'
         background_color: 0, 0, 1, 1
+        pos_hint: {"center_x": 0.5, "center_y" : 0.25}
+        size_hint: 0.2, 0.1
+        border: (20, 20, 20, 20)
+   
+        
