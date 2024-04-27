@@ -1,7 +1,9 @@
-from kivy.app import App 
+from kivymd.app import MDApp 
 from kivymd.uix.behaviors import HoverBehavior
+from kivymd.uix.textfield import MDTextField
 
-class ETBxApp(App):
+
+class ETBxApp(MDApp):
     pass 
 
 
