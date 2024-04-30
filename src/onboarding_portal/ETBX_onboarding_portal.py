@@ -3,6 +3,10 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from ETBX_login_portal import LoginScreen
 from kivymd.app import MDApp
 
+
+'''
+MainAppp class  builds application
+'''
 class MainApp(MDApp):
     def build(self):
         self.screen_manager = ScreenManager()
