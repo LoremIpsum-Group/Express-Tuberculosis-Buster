@@ -67,7 +67,7 @@ class MainDashboard(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Blue"
         self.icon = "assets\lung-temporary-logo.ico"
-        Builder.load_file("m_dashb_2.kv")
+        Builder.load_file("main_dashb.kv")
 
         self.screen_manager = ScreenManager(transition=NoTransition())
         self.screen_manager.add_widget(MainMenu(name="main_menu"))
