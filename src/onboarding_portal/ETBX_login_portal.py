@@ -42,10 +42,10 @@ class LoginScreen(Screen):
                 if account: 
                     if account[0] == password: 
                         print("Credentials Valid! Switching Screen")  
-                        def switch_screen(dt):
-                            app.root.screen_manager.current = 'signup'
-                        print("Credentials Valid! Switching Screen")
-                        Clock.schedule_once(switch_screen, 0.1)  
+                        #def switch_screen(dt):
+                        #    app.root.screen_manager.current = 'signup'
+                        #print("Credentials Valid! Switching Screen")
+                        #Clock.schedule_once(switch_screen, 0.1)  
                         # popup = Popup(title='Test popup', content=Label(text='Login Successful'), auto_dismiss=False)
                         # popup.open()
                     else: 
