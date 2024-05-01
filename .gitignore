@@ -1,4 +1,5 @@
 *.h5
 __pycache__/
-.venv
 .SANDBOX_FOLDER
+.venv
+first_db.db
