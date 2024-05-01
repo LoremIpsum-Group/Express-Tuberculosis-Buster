@@ -12,6 +12,7 @@ class MainApp(MDApp):
         self.screen_manager = ScreenManager()
         login_screen = LoginScreen(name='login')
         self.screen_manager.add_widget(login_screen)
+
         return self.screen_manager
     
     def login(self, screen): 
