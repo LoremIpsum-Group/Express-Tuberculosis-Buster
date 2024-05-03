@@ -14,7 +14,7 @@ class WindowManager(ScreenManager):
 
 class ETBxApp(MDApp):
     def build(self):
-        return Builder.load_file("etbx_pass.kv")
+        return Builder.load_file("onboarding_portal/onboarding_kivy_files/etbx_pass.kv")
     
 
 ETBxApp().run()

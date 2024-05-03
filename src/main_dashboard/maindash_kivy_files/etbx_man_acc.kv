@@ -1,0 +1,10 @@
+#:kivy 2.3.0
+<ManageAccount>:
+    name: 'manage_account'
+    MDLabel:
+        text: 'MANAGE ACCOUNT TEST'
+        halign: 'center'
+    MDRectangleFlatButton:
+        text: 'Back'
+        pos_hint: {'center_x':0.5,'center_y':0.1}
+        on_press: root.manager.current = 'main_menu'  

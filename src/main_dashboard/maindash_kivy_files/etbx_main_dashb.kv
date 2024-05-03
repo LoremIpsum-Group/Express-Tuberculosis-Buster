@@ -5,13 +5,7 @@
     on_enter: self.color = 0.8, 0.2, 1, 1
     on_leave: self.color = 1, 1, 1, 1
 
-ScreenManager:
-    MainMenu:
-    ScanImage:
-    ViewRecords:
-    ManageUsers:
-
-<MainMenu>:
+<MainDashboard>:
     name: "main_menu"
 
     BoxLayout:
@@ -54,7 +48,7 @@ ScreenManager:
             pos_hint: {'x':0.5, 'y':0.7}
             color: [1,1,1,1]
             size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'manage_users'
+            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'manage_account'
     
     BoxLayout:
         id: main_area
@@ -77,36 +71,3 @@ ScreenManager:
             color: [0,0,1,1]
             markup: True
             pos_hint: {"x": 0, "center_y": .50}
-
-    
-<ScanImage>:
-    name: 'scan_img'
-    MDLabel:
-        text: 'SCANNING IMAGE TEST'
-        halign: 'center'
-    MDRectangleFlatButton:
-        text: 'Back'
-        pos_hint: {'center_x':0.5,'center_y':0.1}
-        on_press: root.manager.current = 'main_menu'
-        
-<ViewRecords>:
-    name: 'view_rec'
-    MDLabel:
-        text: 'VIEW RECORDS TEST'
-        halign: 'center'
-    MDRectangleFlatButton:
-        text: 'Back'
-        pos_hint: {'center_x':0.5,'center_y':0.1}
-        on_press: root.manager.current = 'main_menu'
-
-<ManageUsers>:
-    name: 'manage_users'
-    MDLabel:
-        text: 'MANAGE USERS TEST'
-        halign: 'center'
-    MDRectangleFlatButton:
-        text: 'Back'
-        pos_hint: {'center_x':0.5,'center_y':0.1}
-        on_press: root.manager.current = 'main_menu'        
-
-

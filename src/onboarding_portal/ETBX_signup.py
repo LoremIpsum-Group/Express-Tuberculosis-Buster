@@ -9,7 +9,7 @@ import sqlite3
 
 from kivy.lang import Builder
 
-Builder.load_file("etbx_signup.kv")
+Builder.load_file("onboarding_portal/onboarding_kivy_files/etbx_signup.kv")
 
 class SignupScreen(Screen):
     def __init__(self, **kwargs):
@@ -50,6 +50,7 @@ class SignupScreen(Screen):
                     conn.commit()
                     conn.close()
                     self.show_popup('Signup successful')
+                    
             else:
                 self.show_popup('Passwords do not match')
                 conn.close()

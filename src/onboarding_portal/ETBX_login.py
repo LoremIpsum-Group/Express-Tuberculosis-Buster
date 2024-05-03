@@ -7,7 +7,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 
-Builder.load_file('etbx_login.kv')
+Builder.load_file('onboarding_portal/onboarding_kivy_files/etbx_login.kv')
 
 class LoginScreen(Screen):
     def __init__(self, **kwargs):
@@ -43,7 +43,7 @@ class LoginScreen(Screen):
             conn.close()  
             if account: 
                 if account[0] == password: 
-                    self.manager.current = 'signup'
+                    self.manager.current = 'main_menu'
                     self.ids.email_input.text = ''
                     self.ids.password_input.text = ''
                     
