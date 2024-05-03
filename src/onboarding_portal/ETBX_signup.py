@@ -49,8 +49,14 @@ class SignupScreen(Screen):
                     c.execute('INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)', (full_name, email, password))
                     conn.commit()
                     conn.close()
-                    self.show_popup('Signup successful')
+                    self.show_popup("Signup Success!")
                     
+                    self.ids.full_name_input.text = ''
+                    self.ids.email_input.text = ''
+                    self.ids.password_input.text = ''
+                    self.ids.confirm_password.text = ''
+
+                    self.manager.current = 'login'
             else:
                 self.show_popup('Passwords do not match')
                 conn.close()
