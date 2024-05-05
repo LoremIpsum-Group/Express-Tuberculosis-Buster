@@ -6,7 +6,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.lang import Builder
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_main_dashb.kv")
-class MyButton(MDRaisedButton): #not currently used
+class MyButton(MDRaisedButton): # CURRENTLY ONLY USED FOR THE TEMPORARY LOGOUT BUTTON, for removal if ever
     """
     A custom button class that changes the system cursor to 'hand' when the mouse is over the button.
 
