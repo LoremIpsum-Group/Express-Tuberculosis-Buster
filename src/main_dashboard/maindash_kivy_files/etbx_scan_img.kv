@@ -29,7 +29,7 @@
             pos_hint: {'x':0.45, "y": 1}     
             color: [0,0,0,1]       
             size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'main_menu'
+            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'main_dashb'
             canvas.before:
                 Color:
                     #rgba: 0.3, 0.4, 0.9, 1  
@@ -57,14 +57,6 @@
             color: [1,1,1,1]
             size_hint: None, None
             on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'manage_account'
-
-        MyButton: #The only one using the MyButton custom class in main dashboard, for removal!!
-            markup: True
-            text: "[b]Log Out \n(Uncertain Feature!)[/b]"
-            font_size: 15
-            size: 0.3, 0.1
-            pos_hint: {"x": 0.3, "y": 0.3}
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'login'
     
     BoxLayout:
         id: main_area

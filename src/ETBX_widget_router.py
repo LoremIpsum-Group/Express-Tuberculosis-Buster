@@ -1,4 +1,5 @@
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
+from kivy.core.window import Window
 
 from onboarding_portal.ETBX_login import LoginScreen
 from onboarding_portal.ETBX_signup import SignupScreen
@@ -14,7 +15,7 @@ from kivymd.app import MDApp
 class MainApp(MDApp):
     
     def build(self):
-
+        Window.maximize()
         self.screen_manager = ScreenManager(transition=FadeTransition())
         self.screen_manager.add_widget(LoginScreen(name='login'))
         self.screen_manager.add_widget(SignupScreen(name='signup'))
@@ -30,4 +31,4 @@ if __name__ == '__main__':
     MainApp().run()
 
 
-#helloo 
+# helloo
