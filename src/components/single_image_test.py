@@ -1,4 +1,4 @@
-from components.dependencies_loading import tf, np, cv2, plt, IMAGE_HEIGHT, IMAGE_WIDTH, last_conv_layer_name, load_model
+from dependencies_loading import tf, np, cv2, plt, IMAGE_HEIGHT, IMAGE_WIDTH, last_conv_layer_name, load_model
 
 from grad_CAM_test import get_img_array, make_gradcam_heatmap, superimpose_heatmap
 
@@ -72,5 +72,5 @@ def single_image_test(testing_image_path, model):
 
 print("single testing function initializing success")
 
-model = load_model('assets\ml-model\efficientNetB7_v0-5.h5')
+model = load_model('assets/ml-model/efficientnetB3_V0_6_1.h5')
 single_image_test("assets\\x-ray.jpg", model)
