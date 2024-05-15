@@ -20,7 +20,6 @@ class MainApp(MDApp):
         self.screen_manager.add_widget(MainDashboard(name="main_dashb"))
         self.screen_manager.add_widget(ScanImage(name="scan_img"))
         self.screen_manager.add_widget(ViewRecords(name="view_rec"))
-        self.screen_manager.add_widget(ScanResult(name="scan_result"))
         return self.screen_manager
 
 

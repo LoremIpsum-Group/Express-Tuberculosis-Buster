@@ -6,6 +6,7 @@ from kivy.uix.popup import Popup
 
 import sqlite3
 
+import bcrypt
 
 from kivy.lang import Builder
 
@@ -30,10 +31,12 @@ class SignupScreen(Screen):
     def signup_button(self): 
         conn = sqlite3.connect('first_db.db')
         c = conn.cursor()   
-        full_name = self.ids.full_name_input.text
-        email = self.ids.email_input.text
-        password = self.ids.password_input.text
-        confirm_password = self.ids.confirm_password.text
+        full_name = self.ids.full_name_input.text.strip()
+        email = self.ids.email_input.text.strip()
+        password = self.ids.password_input.text.strip()
+        confirm_password = self.ids.confirm_password.text.strip()
+
+        
 
         if not full_name or not email or not password or not confirm_password:
             self.show_popup('Please fill in all fields')
@@ -46,7 +49,13 @@ class SignupScreen(Screen):
                 if result:
                     self.show_popup('Email already used')
                 else:
-                    c.execute('INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)', (full_name, email, password))
+
+                    #stores the password in hashed form
+                    bytePwd = password.encode('utf-8')
+                    mySalt = bcrypt.gensalt()
+                    hash = bcrypt.hashpw(bytePwd, mySalt)
+
+                    c.execute('INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)', (full_name, email, hash))
                     conn.commit()
                     conn.close()
                     self.show_popup("Signup Success!")
@@ -55,7 +64,7 @@ class SignupScreen(Screen):
                     self.ids.email_input.text = ''
                     self.ids.password_input.text = ''
                     self.ids.confirm_password.text = ''
-
+                    print(f"Hashed Password: {hash}") #testing hashed password
                     self.manager.current = 'login'
             else:
                 self.show_popup('Passwords do not match')

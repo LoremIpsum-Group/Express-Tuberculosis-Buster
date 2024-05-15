@@ -7,6 +7,8 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 
+import bcrypt #note: install bcrypt version 3.2.0
+
 Builder.load_file('onboarding_portal/onboarding_kivy_files/etbx_login.kv')
 
 class LoginScreen(Screen):
@@ -34,18 +36,24 @@ class LoginScreen(Screen):
     def login_button(self): 
         conn = sqlite3.connect('first_db.db')
         c = conn.cursor()   
-        email = self.ids.email_input.text
-        password = self.ids.password_input.text
+        email = self.ids.email_input.text.strip()
+        password = self.ids.password_input.text.strip()
 
         if email != '' and password != '':
             c.execute('SELECT password FROM users WHERE email =?', [email])
-            account = c.fetchone() 
+            hashed_account = c.fetchone() 
             conn.close()  
-            if account: 
-                if account[0] == password: 
+            if hashed_account:
+                bytePwd = password.encode('utf-8')
+                if bcrypt.checkpw(bytePwd, hashed_account[0]):
                     self.manager.current = 'main_menu'
                     self.ids.email_input.text = ''
                     self.ids.password_input.text = ''
+                    print(f"Hashed Password: {hashed_account}") #testing hashed password
+
+
+                #if account[0] == password: #non-hashed password
+                    
                     
                 else: 
                     self.show_popup('Invalid Password')
