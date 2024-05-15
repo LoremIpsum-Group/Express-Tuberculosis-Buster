@@ -3,3 +3,4 @@ __pycache__/
 .SANDBOX_FOLDER
 .venv
 first_db.db
+src/components/view_record_main.db
