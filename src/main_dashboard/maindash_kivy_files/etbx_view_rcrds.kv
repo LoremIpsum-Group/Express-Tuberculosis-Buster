@@ -28,7 +28,7 @@
             pos_hint: {'x':0.45, "y": 1}     
             color: [1,1,1,1]       
             size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'main_dashb'
+            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_img'
            
         HoverLabel:
             markup: True
@@ -37,16 +37,17 @@
             pos_hint: {'x':0.43, 'y':0.6}
             color: [1,1,1,1]
             size_hint: None, None           
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'main_dashb'
+            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'view_rec'
 
+        # For testing
         HoverLabel:
             markup: True
-            text: '[b]Manage \nAccount[/b]'
+            text: '[b]Scan Result[/b]'
             font_size: 27   
             pos_hint: {'x':0.5, 'y':0.7}
             color: [1,1,1,1]
             size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'manage_account'
+            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_result'
     
     BoxLayout:
         id: main_area
@@ -73,9 +74,15 @@
                 height: '30dp'
                 background_normal: '' 
                 background_color: [0,0,1,1]
+                on_press: root.search_button()
         
+        
+            
         Label:
             id: search_result
             text:'Search Results Area'
             color: [0,0,0,1]
+
+
+      
       

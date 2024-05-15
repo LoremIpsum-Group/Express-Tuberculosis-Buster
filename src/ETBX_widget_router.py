@@ -1,6 +1,5 @@
-from kivy.uix.screenmanager import ScreenManager, FadeTransition
+from kivy.uix.screenmanager import ScreenManager, NoTransition, FadeTransition
 from kivy.core.window import Window
-
 
 from main_dashboard.ETBX_main_dashboard import MainDashboard
 from main_dashboard.ETBx_scan_image import ScanImage
@@ -14,7 +13,7 @@ class MainApp(MDApp):
     
     def build(self):
         Window.maximize()
-        self.screen_manager = ScreenManager(transition=FadeTransition())
+        self.screen_manager = ScreenManager(transition=NoTransition())
         self.screen_manager.add_widget(MainDashboard(name='main_menu'))
         self.screen_manager.add_widget(ScanImage(name='scan_img'))
         self.screen_manager.add_widget(ViewRecords(name='view_rec'))

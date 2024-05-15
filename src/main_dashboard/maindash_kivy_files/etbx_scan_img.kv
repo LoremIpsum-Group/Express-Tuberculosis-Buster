@@ -27,18 +27,9 @@
             text: '[b]Scan Image[/b]'
             font_size: 27
             pos_hint: {'x':0.45, "y": 1}     
-            color: [0,0,0,1]       
+            color: [1,1,1,1]       
             size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'main_dashb'
-            canvas.before:
-                Color:
-                    #rgba: 0.3, 0.4, 0.9, 1  
-                    rgba: 1, 1, 1, 1  
-                RoundedRectangle:
-                    
-                    pos: (self.x*.70, self.y*1.02) 
-                    size: (180, 70)
-                    radius: [5,5,5,5]
+            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_img'
 
         HoverLabel:
             markup: True
@@ -49,14 +40,15 @@
             size_hint: None, None           
             on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'view_rec'
 
-        HoverLabel:
-            markup: True
-            text: '[b]Manage \nAccount[/b]'
-            font_size: 27   
-            pos_hint: {'x':0.5, 'y':0.7}
-            color: [1,1,1,1]
-            size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'manage_account'
+        # For testing
+        # HoverLabel:
+        #     markup: True
+        #     text: '[b]Scan Result[/b]'
+        #     font_size: 27   
+        #     pos_hint: {'x':0.5, 'y':0.7}
+        #     color: [1,1,1,1]
+        #     size_hint: None, None
+        #     on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_result'
     
     BoxLayout:
         id: main_area
