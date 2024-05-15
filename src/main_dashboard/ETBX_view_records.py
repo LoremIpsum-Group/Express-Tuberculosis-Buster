@@ -16,20 +16,29 @@ class ViewRecords(Screen):
         conn = sqlite3.connect('src/components/view_record_main.db')
         c = conn.cursor()
         c.execute("""CREATE TABLE IF NOT EXISTS main_table (  
-                result_ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                patient_ID INTEGER NOT NULL,
-                date_of_scan TEXT NOT NULL,
-                result TEXT NOT NULL, 
-                percentage TEXT NOT NULL)
+                result_ID INTEGER,
+                patient_ID INTEGER,
+                date_of_scan TEXT,
+                result TEXT, 
+                percentage TEXT, 
+                UNIQUE(patient_ID, date_of_scan, result, percentage))
                 """)
+        
+        # working table but keeps on adding
+        # c.execute("""CREATE TABLE IF NOT EXISTS main_table (  
+        #         result_ID INTEGER NOT NULL,
+        #         patient_ID INTEGER NOT NULL,
+        #         date_of_scan TEXT NOT NULL,
+        #         result TEXT NOT NULL, 
+        #         percentage TEXT NOT NULL)
+        #         """)
         
         c.execute(
                     '''
-                    INSERT INTO main_table (result_ID, patient_ID, date_of_scan, result, percentage)
+                    INSERT OR IGNORE INTO main_table (result_ID, patient_ID, date_of_scan, result, percentage)
                     VALUES ("1728", "1106", "2021-1-1-", "Non-TB", "0.00"),
                            ("1729", "1106", "2021-2-1", "Tuberculosis", "75.00"),
                            ("1730", "1106", "2021-3-1-", "Non-TB", "49.00");
-
                     '''
                 )
 
