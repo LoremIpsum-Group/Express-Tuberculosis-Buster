@@ -21,7 +21,7 @@ class MainApp(MDApp):
         self.screen_manager.add_widget(MainDashboard(name="main_dashb"))
         self.screen_manager.add_widget(ScanImage(name="scan_img"))
         self.screen_manager.add_widget(ViewRecords(name="view_rec"))
-        self.screen_manager.add_widget(ManageAccount(name="manage_account"))
+        self.screen_manager.add_widget(ManageAccount(name="manage_account")) 
         self.screen_manager.add_widget(LoginScreen(name="login"))
         return self.screen_manager
 
