@@ -73,4 +73,4 @@ def single_image_test(testing_image_path, model):
 print("single testing function initializing success")
 
 model = load_model('assets/ml-model/efficientnetB3_V0_6_1.h5')
-single_image_test("assets\\x-ray.jpg", model)
+single_image_test("assets/sample-images/Tuberculosis-699.png", model)

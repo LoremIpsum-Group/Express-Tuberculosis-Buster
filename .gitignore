@@ -3,4 +3,5 @@ __pycache__/
 .SANDBOX_FOLDER
 .venv
 first_db.db
+assets/sample-images/MCUCXR*
 src/components/view_record_main.db
