@@ -22,23 +22,33 @@
                 size: self.size
        # AnchorLayout:
             #anchor_y: 'top'  # This will position the buttons at the top of the BoxLayout
-        HoverLabel:
+        Button:
             markup: True
             text: '[b]Scan Image[/b]'
-            font_size: 27
-            pos_hint: {'x':0.45, "y": 1}     
-            color: [1,1,1,1]       
-            size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_img'
 
-        HoverLabel:
+            pos_hint: {'x':0.5, "y": 1}     
+            color: 0, 0, 1, 1 
+            background_color: (1, 1, 1, 1)
+            background_normal: ''
+            background_down: ''     
+            size_hint_x: 0.5
+            size_hint_y: None
+            on_press:
+                root.manager.current = 'scan_img'
+
+        Button:
             markup: True
             text: '[b]View Patient[/b]'
-            font_size: 27   
-            pos_hint: {'x':0.43, 'y':0.6}
+             
+            pos_hint: {'x':0.5, 'y':0.6}
             color: [1,1,1,1]
-            size_hint: None, None           
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'view_rec'
+            background_normal: ''
+            background_down: ''
+            background_color: 0, 0, 1, 1
+            size_hint_x: 0.5
+            size_hint_y: None           
+            on_press:
+                root.manager.current = 'view_rec'
 
         # For testing
         # HoverLabel:
@@ -56,23 +66,35 @@
         size_hint_x: 0.75
         pos_hint: {'x':0.25}
 
+        canvas.before:
+            Color: 
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
         BoxLayout:
             orientation: 'vertical'
             padding: 10
             spacing: 10
-            RelativeLayout:    
+            
+
+            FloatLayout:
                 Image:
                     id: image
                     pos_hint: {'center_x': .5, 'y': -.4}
-                    size_hint: 1, 1
-
+                    border: [10, 10, 10, 10]
+                    size_hint: 0.33, 0.98
+                    allow_stretch: True
+                    keep_ratio: True
+            
             BoxLayout:
                 orientation: 'horizontal'
                 spacing: 100
 
                 Button:
                     size_hint: .2, .2
-                    text: "Load Image"
+                    text: "Upload Image"
                     background_color: 0, 128/255, 1, 1
                     on_press: root.load_image()
 
