@@ -12,7 +12,7 @@ from components.core_functions.grad_CAM_new import get_gradCAM, get_gradCAM_NONS
 
 import matplotlib.pyplot as plt
 
-# Load the trained model
+#Load the trained model
 model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
 model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
 

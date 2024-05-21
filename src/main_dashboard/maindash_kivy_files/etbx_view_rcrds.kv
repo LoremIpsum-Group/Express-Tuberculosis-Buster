@@ -39,7 +39,6 @@
         Button:
             markup: True
             text: '[b]View Patient[/b]'
-        
             pos_hint: {'x':0.50, 'y':0.6}
             color: [0, 0, 1, 1]
             size_hint_x: 0.5
@@ -79,7 +78,12 @@
             height: '80dp'
             padding: {'10dp', '20dp'}  # Apply padding only to the top and bottom
 
-            
+            canvas.before:
+                Color: 
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
             TextInput:
                 id: search_input
                 hint_text: 'Enter patient id here'
@@ -102,6 +106,7 @@
         height: '80dp'  # Adjust the height as needed
         pos_hint: {'x': .27, 'y': 0.49}  # Align this layout directly below search_section
    
+
         # MDRectangleFlatButton:
         #     id: search_result
         #     text:'Search Results Area'
@@ -111,6 +116,7 @@
         #     #x':0.2, 'y':0.8
 
         BoxLayout:
+           
             id: search_result_layout
             orientation: 'vertical'
             size_hint_y: None
