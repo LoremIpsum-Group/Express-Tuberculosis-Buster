@@ -2,28 +2,51 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 
-from components.classifier_only import load_model_from_file, predict
+from components.core_functions.load_models import load_model_efficientNet, load_model_unet
+from components.core_functions.preprocessing_only import get_img_array, get_img_array_OLD
+
+
+from components.core_functions.segmentation_only import segment_image
+from components.core_functions.classifier_only import predict
+from components.core_functions.grad_CAM_new import get_gradCAM, get_gradCAM_NONSEGMENTED
+
+import matplotlib.pyplot as plt
 
 # Load the trained model
-model = load_model_from_file('assets\ml-model\efficientnetB3_V0_6_1.h5')
+model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
+model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
-
-
 
 class ScanResult(Screen):
     def update_result(self, image_path):
         global xrayRes
         xrayRes = image_path
         self.ids.res_img.source = xrayRes
-        predicted_class, predicted_score = predict(model, image_path)
-        if predicted_class == "tuberculosis":
-            predicted_class = "TB Positive: "
-        else:
-            predicted_class = "Non-TB: "    
-        scoree = round(float(predicted_score) * 100, 2)
-        #self.ids.percent_bar.size = (self.parent.width * 0.35 * predicted_score, self.parent.height * 0.03)
-        self.ids.result_classnPerc.text = predicted_class + str(scoree) + " %"
+
+        # !CORE FUNCTIONALITIES - START
+        # Get segmented/masked image
+        original_image, masked_image, mask_result = segment_image(
+             model_segmentation, image_path
+        )
+
+        # Get Score from segmented image
+        predicted_class, predicted_score = predict(model_classifier, masked_image)
+
+        # Superimpose heatmap of segmented image onto original image
+        superimposed_img = get_gradCAM(model_classifier, original_image, masked_image)
+       
+        # !CORE FUNCTIONALITIES - end
+        # *DEBUGGING PURPOSES, removable any time
+        # preprocessed_img = get_img_array_OLD(masked_image)
+        # predicted_class, predicted_score = predict(model_classifier, preprocessed_img)
+        # superimposed_img = get_gradCAM_NONSEGMENTED(model_classifier, original_image)
+        plt.imshow(superimposed_img)
+        plt.axis('off')  # Turn off axis
+        plt.show()
+
+        # self.ids.percent_bar.size = self.parent.width * 0.35 * predicted_score, self.parent.height * 0.03
+        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) + " %\n segmented datatype: " + str(masked_image.dtype)
 
     def change_img(self, instance):
         if instance == self.ids.x_ray:
