@@ -24,17 +24,12 @@
             #anchor_y: 'top'  # This will position the buttons at the top of the BoxLayout
         Button:
             markup: True
-            text: '[b]Scan Image[/b]'
-
-            pos_hint: {'x':0.5, "y": 1}     
-            color: 0, 0, 1, 1 
-            background_color: (1, 1, 1, 1)
-            background_normal: ''
-            background_down: ''     
-            size_hint_x: 0.5
-            size_hint_y: None
-            on_press:
-                root.manager.current = 'scan_img'
+            text: '[b]Upload Image[/b]'
+            font_size: 27
+            pos_hint: {'x':0.45, "y": 1}     
+            color: [1,1,1,1]       
+            size_hint: None, None
+            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_img'
 
         Button:
             markup: True
