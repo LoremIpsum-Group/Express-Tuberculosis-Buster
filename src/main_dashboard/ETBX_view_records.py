@@ -6,6 +6,14 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 
+from kivymd.uix.button import MDRectangleFlatButton
+
+#tkinter popup
+# from tkinter import *
+# from tkinter import ttk
+# win = Tk()
+
+
 import sqlite3
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_view_rcrds.kv")
@@ -57,18 +65,51 @@ class ViewRecords(Screen):
         elif not search_input.isdigit():
             self.show_popup("Please enter a valid ID number")
 
+
+        #testing of multiple clickable tables per match result
         else:
             c.execute("SELECT result, date_of_scan FROM main_table WHERE patient_ID = ?", (search_input,))
             results = c.fetchall()
             if results:
-                self.ids.search_result.text =""
                 for result in results:
-                    self.ids.search_result.text += f"Result: {result[0]:<20} Date of Scan: {result[1]}\n\n"
-            else:
-                self.ids.search_result.text ="No ID found"                
-                #if want popup style na warning
-                # self.show_popup("No ID found")
 
+                    button = MDRectangleFlatButton(
+                        text=f"Result: {result[0]:<20} Date of Scan: {result[1]}\n\n",
+                        theme_text_color="Custom",
+                        text_color=[0, 0, 0, 1],
+                        size_hint=(0.3, 0.1)
+                    )
+
+                    self.ids.search_result_layout.add_widget(button)
+
+                   
+            else:
+                no_results_label = Label(text="No ID found")
+                self.ids.search_result_layout.add_widget(no_results_label)
+
+
+        #working code 
+        # else:
+        #     c.execute("SELECT result, date_of_scan FROM main_table WHERE patient_ID = ?", (search_input,))
+        #     results = c.fetchall()
+        #     if results:
+        #         self.ids.search_result.text =""
+        #         for result in results:
+        #             self.ids.search_result.text += f"Result: {result[0]:<20} Date of Scan: {result[1]}\n\n"
+        #     else:
+        #         self.ids.search_result.text ="No ID found"              
+        #         #if want popup style na warning
+        #         # self.show_popup("No ID found")
+    
+    
+    
+    
+    #tkinter popup
+    # def open_popup(self):
+    #     top= Toplevel(win)
+    #     top.geometry("750x250")
+    #     top.title("Child Window")
+    #     Label(top, text= "Select from the two", font=('Mistral 18 bold')).place(x=150,y=80)
        
        
 
@@ -83,6 +124,11 @@ class ViewRecords(Screen):
 
     def dismiss_popup(self, instance):
         self.popup.dismiss()    
+
+   
+
+
+# win.mainloop()
 
 
     #pass
