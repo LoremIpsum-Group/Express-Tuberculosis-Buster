@@ -75,19 +75,25 @@
 
 
         MDRectangleFlatButton:
+            id: x_ray
             text: 'X-ray'
             size_hint_x: 0.06
             pos_hint: {'center_x': 0.22,'center_y': 0.10}
+            on_press: root.change_img(self)
         
         MDRectangleFlatButton:
+            id: pre_proc
             text: 'Pre-Proc'
             size_hint_x: 0.06
             pos_hint: {'center_x': 0.29,'center_y': 0.10}
+            on_press: root.change_img(self)
         
         MDRectangleFlatButton:
+            id: grad_cam
             text: 'Grad-Cam'
             size_hint_x: 0.06
             pos_hint: {'center_x': 0.36,'center_y': 0.10}
+            on_press: root.change_img(self)
         
         MDRectangleFlatButton:
             text: 'Back'
