@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 from keras.models import load_model
 from keras.preprocessing.image import load_img, img_to_array
@@ -13,4 +14,6 @@ import matplotlib.pyplot as plt
 
 IMAGE_HEIGHT = 300
 IMAGE_WIDTH = 300
-last_conv_layer_name = "block6f_expand_conv"
+
+# valid options: top_conv, block3a_project_conv, block6f_expand_conv, block7a_expand_conv, block6a_project_conv
+last_conv_layer_name = "block6a_project_conv"
