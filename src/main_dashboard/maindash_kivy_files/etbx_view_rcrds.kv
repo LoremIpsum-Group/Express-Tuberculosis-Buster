@@ -1,7 +1,7 @@
 #:kivy 2.3.0
-<HoverLabel@Label+HoverBehavior>
-    on_enter: self.color = 0.8, 0.2, 1, 1
-    on_leave: self.color = 0, 0, 0, 1
+# <HoverLabel@Label+HoverBehavior>
+#     on_enter: self.color = 0.8, 0.2, 1, 1
+#     on_leave: self.color = 0, 0, 0, 1
 
 <ViewRecords>:
     name: "main_menu"
@@ -21,24 +21,34 @@
                 size: self.size
        # AnchorLayout:
             #anchor_y: 'top'  # This will position the buttons at the top of the BoxLayout
-        HoverLabel:
+        
+        Button:
             markup: True
-            text: '[b]Scan Image[/b]'
-            font_size: 27
-            pos_hint: {'x':0.45, "y": 1}     
-            color: [1,1,1,1]       
-            size_hint: None, None
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_img'
-           
-        HoverLabel:
+            text: '[b]Scan Image[/b]          
+            pos_hint: {'x':0.50, 'y': 1}
+            color: [1, 1, 1, 1]
+            background_color: (0,0,1,1)
+            size_hint_x: 0.5
+            size_hint_y: None
+            background_normal: ''
+            background_down: ''
+            on_press:
+                root.manager.current = 'scan_img'  
+
+       
+        Button:
             markup: True
             text: '[b]View Patient[/b]'
-            font_size: 27   
-            pos_hint: {'x':0.43, 'y':0.6}
-            color: [1,1,1,1]
-            size_hint: None, None           
-            on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'view_rec'
-
+        
+            pos_hint: {'x':0.50, 'y':0.6}
+            color: [0, 0, 1, 1]
+            size_hint_x: 0.5
+            size_hint_y: None
+            background_normal: ''
+            background_down: ''
+            on_press:
+                root.manager.current = 'view_rec'    
+                        
         # For testing
         # HoverLabel:
         #     markup: True
@@ -48,13 +58,21 @@
         #     color: [1,1,1,1]
         #     size_hint: None, None
         #     on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_result'
+                          
     
     BoxLayout:
         id: main_area
         orientation: 'vertical'
         size_hint_x: 0.75
+
         pos_hint: {'x':0.25, 'y':0.8}
-        
+        canvas.before:
+            Color: 
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
         BoxLayout:
             id: search_section
             size_hint_y: None
