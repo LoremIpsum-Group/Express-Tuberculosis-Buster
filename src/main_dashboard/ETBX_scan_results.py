@@ -41,6 +41,9 @@ class ScanResult(Screen):
         # preprocessed_img = get_img_array_OLD(masked_image)
         # predicted_class, predicted_score = predict(model_classifier, preprocessed_img)
         # superimposed_img = get_gradCAM_NONSEGMENTED(model_classifier, original_image)
+        # * Replace here the image you want to display, temporary ONLY!!!!!
+        # Good results: normal 2551, tuberculosis 640
+
         plt.imshow(superimposed_img)
         plt.axis('off')  # Turn off axis
         plt.show()

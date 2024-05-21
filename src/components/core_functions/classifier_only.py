@@ -7,14 +7,6 @@ from components.core_functions.dependencies_loading import(
 
 from components.core_functions.preprocessing_only import get_img_array
 
-# Preprocessing function, size changeable if another model used kunwari si b3
-# NOT IN USE, PREPROCCESSING NOW MOVED IN PREPROCESSING ONLY FILE
-def get_img_array(img_path, size=(300, 300,3)):
-    img = load_img(img_path, target_size=size)
-    array = img_to_array(img)
-    array = np.expand_dims(array, axis=0)
-    return array
-
 # Load model from file
 def load_model_from_file(filename):
     model = load_model(filename)
