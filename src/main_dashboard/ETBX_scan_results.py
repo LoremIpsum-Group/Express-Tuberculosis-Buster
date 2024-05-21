@@ -5,7 +5,7 @@ from kivymd.uix.button import MDRaisedButton
 from components.classifier_only import load_model_from_file, predict
 
 # Load the trained model
-model = load_model_from_file('assets\ml-model\efficientNetB7_v0-5.h5')
+model = load_model_from_file('assets\ml-model\efficientnetB3_V0_6_1.h5')
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
 
@@ -22,7 +22,7 @@ class ScanResult(Screen):
         else:
             predicted_class = "Non-TB: "    
         scoree = round(float(predicted_score) * 100, 2)
-        #self.ids.percent_bar.size = self.parent.width * 0.35 * predicted_score, self.parent.height * 0.03
+        #self.ids.percent_bar.size = (self.parent.width * 0.35 * predicted_score, self.parent.height * 0.03)
         self.ids.result_classnPerc.text = predicted_class + str(scoree) + " %"
 
     def change_img(self, instance):

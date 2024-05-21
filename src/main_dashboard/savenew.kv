@@ -1,0 +1,105 @@
+#:kivy 2.3.0
+
+FloatLayout: 
+    
+    Label:
+        text: "[b]Saving new Patient[/b]\n[b][size=24][color=#bbb]Records of Result ID:[/size][/color][/b]"
+        pos_hint: {"center_x": 0.25, "center_y": 0.90}
+        color: 0, 0, 1, 1
+        font_size: 40
+        halign: "left"
+        valign: "center"
+        markup: True
+    
+    Label:
+        text: "[b]Patient Information[/b]"
+        color: 0, 0, 1, 1
+        pos_hint: {"center_x": 0.5, "center_y": 0.80}
+        font_size: 
+        markup: True
+
+    MDTextField: 
+        hint_text: "Patient ID" 
+        mode: "rectangle"
+        size_hint: 0.2, 0.09
+        pos_hint: {"center_x": 0.39, "center_y": 0.70}
+         
+    MDTextField:
+        hint_text: "First Name"
+        mode: "rectangle"
+        size_hint: 0.2, 0.09
+        pos_hint: {"center_x": 0.39, "center_y": 0.60}
+
+    MDTextField:
+        hint_text: "Last Name"
+        mode: "rectangle"
+        size_hint: 0.2, 0.09
+        pos_hint: {"center_x": 0.61, "center_y": 0.60}
+    
+    MDTextField:
+        hint_text: "Age" 
+        mode: "rectangle"
+        size_hint: 0.2, 0.09
+        pos_hint: {"center_x": 0.39, "center_y": 0.50}
+
+    MDTextField:
+        id: field 
+        hint_text: "Birthdate"
+        icon_right: "calendar"
+        mode: "rectangle"
+        size_hint: 0.2, 0.09
+        pos_hint: {"center_x": 0.61, "center_y": 0.50}
+        on_focus: app.show_date_picker(self.focus)
+
+         
+
+    BoxLayout: 
+        spacing: 10
+        orientation: "horizontal" 
+        size_hint: 0.2, 0.2 
+        pos_hint: {"center_x": 0.395, "center_y": 0.40}
+
+        Label:
+            text: "Sex: "
+            color: 0, 0, 0, 1
+
+        Label:
+            text: "Male"
+            color: 0, 0, 0, 1
+        
+        CheckBox:
+            group: "sex"
+            color: 0, 0, 1, 1
+
+        Label:
+            text: "Female"
+            color: 0, 0, 0, 1
+
+        CheckBox:
+            group: "sex" 
+            color: 0, 0, 1, 1
+
+    MDTextField:
+        hint_text: "Address"
+        mode: "rectangle"
+        size_hint: 0.42, 0.09
+        pos_hint: {"center_x": 0.501, "center_y": 0.30}
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint: 0.4, 0.4
+        pos_hint: {"center_x": 0.5, "center_y": 0.25}
+        padding: 20
+        spacing: 20
+
+        Button:
+            text: "Save"
+            background_normal: ""
+            background_color: 0, 0, 1, 1
+            size_hint: 0.2, 0.2
+
+        Button:
+            text: "Back"
+            background_normal: ""
+            background_color: 0, 0, 1, 1
+            size_hint: 0.2, 0.2
