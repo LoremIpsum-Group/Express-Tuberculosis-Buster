@@ -1,8 +1,5 @@
 #:kivy 2.3.0
-#currently not in use
-<HoverLabel@Label+HoverBehavior>
-    on_enter: self.color = 0.8, 0.2, 1, 1
-    on_leave: self.color = 0, 0, 0, 1
+
 
 <ScanImage>:
     name: "main_menu"
@@ -36,7 +33,7 @@
 
         Button:
             markup: True
-            text: '[b]View Patient[/b]'
+            text: '[b]View Records[/b]'
              
             pos_hint: {'x':0.5, 'y':0.6}
             color: [1,1,1,1]
@@ -78,26 +75,44 @@
             
 
             FloatLayout:
+                Label: 
+                    text: "[b]Upload Image[/b]"
+                    markup: True
+                    font_size: 35
+                    pos_hint: {'center_x': 0.20,'center_y': 0.95}
+                    color: 0, 0, 1, 1
+                Label: 
+                    text: "[i]Supported Formats: jpg, jpeg, png[/i]"
+                    markup: True
+                    font_size: 26
+                    pos_hint: {'center_x': 0.25,'center_y': 0.90}
+                    color: 192/255, 192/255, 192/255, 1    
                 Image:
                     id: image
-                    pos_hint: {'center_x': .5, 'y': -.4}
-                    border: [10, 10, 10, 10]
-                    size_hint: 0.33, 0.98
-                    allow_stretch: True
-                    keep_ratio: True
-            
-            BoxLayout:
-                orientation: 'horizontal'
-                spacing: 100
-
+                    size_hint: .45, .65
+                    pos_hint: {'center_x': 0.35,'center_y': 0.40}
+                    source: "assets/jpg.png"
+                    # id: image
+                    # pos_hint: {'center_x': .5, 'y': -.4}
+                    # border: [10, 10, 10, 10]
+                    # size_hint: 0.33, 0.98
+                    # allow_stretch: True
+                    # keep_ratio: True
+                Image:
+                    size_hint: .03, .03
+                    pos_hint: {'center_x': 0.76,'center_y': 0.60}
+                    source: "assets/jpg.png"
                 Button:
-                    size_hint: .2, .2
                     text: "Upload Image"
+                    size_hint: .13, .05
+                    pos_hint: {'center_x': 0.84,'center_y': 0.60}
+                    background_normal: ''
                     background_color: 0, 128/255, 1, 1
                     on_press: root.load_image()
 
-                Button:
-                    size_hint: .2, .2
-                    text: "Process"
-                    background_color: 0, 128/255, 1, 1
+                MDRectangleFlatButton:
+                    text: "[b]Process Image[/b]"
+                    font_size: 30
+                    size_hint: .18, .06
+                    pos_hint: {'center_x': 0.83,'center_y': 0.32}
                     on_press: root.process_image()

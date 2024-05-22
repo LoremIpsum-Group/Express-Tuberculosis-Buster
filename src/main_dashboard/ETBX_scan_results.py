@@ -17,7 +17,7 @@ import base64
 from PIL import Image
 
 import sqlite3 
-from scan_result_data import ScanResultData
+from .scan_result_data import ScanResultData
 
 #Load the trained model
 model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
