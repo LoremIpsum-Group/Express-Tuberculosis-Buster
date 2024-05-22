@@ -76,27 +76,30 @@
             size_hint: .35, .35
             pos_hint: {'center_x': 0.755, 'center_y': 0.43}
 
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 20
+            size_hint: 0.20, 0.20
+            pos_hint: {'center_x': 0.28, 'center_y': 0.15}
 
-        MDRectangleFlatButton:
-            id: x_ray
-            text: 'X-ray'
-            size_hint_x: 0.06
-            pos_hint: {'center_x': 0.22,'center_y': 0.10}
-            on_press: root.change_img(self)
-        
-        MDRectangleFlatButton:
-            id: pre_proc
-            text: 'Pre-Proc'
-            size_hint_x: 0.06
-            pos_hint: {'center_x': 0.29,'center_y': 0.10}
-            on_press: root.change_img(self)
-        
-        MDRectangleFlatButton:
-            id: grad_cam
-            text: 'Grad-Cam'
-            size_hint_x: 0.06
-            pos_hint: {'center_x': 0.36,'center_y': 0.10}
-            on_press: root.change_img(self)
+            MDRectangleFlatButton:
+                id: x_ray
+                text: 'X-ray'
+                size_hint_x: 0.6
+                on_press: root.change_img(self)
+            
+            MDRectangleFlatButton:
+                id: pre_proc
+                text: 'Pre-Proc'
+                size_hint_x: 0.6
+                on_press: root.change_img(self)
+            
+            MDRectangleFlatButton:
+                id: grad_cam
+                text: 'Grad-Cam'
+                size_hint_x: 0.6
+                on_press: root.change_img(self)
         
         MDRectangleFlatButton:
             text: 'Back'
@@ -104,10 +107,26 @@
             pos_hint: {'center_x':0.95,'center_y':0.95}
             on_press: root.manager.current = 'scan_img'
         
-        MDRectangleFlatButton:
-            text: 'Full View'
-            size_hint_x: 0.06
-            pos_hint: {'center_x': 0.90,'center_y': 0.21}         
-            on_press: root.full_view()
 
-    
+        BoxLayout:
+            spacing: 20
+            orientation: 'horizontal'
+            size_hint: 0.2 , 0.2 
+            pos_hint: {'center_x': 0.7, 'center_y': 0.29} 
+
+            MDRectangleFlatButton:
+                text: 'Save to Existing Patient'
+                size_hint_x: 0.06
+                on_press: root.manager.current = 'save_existing'
+            
+            MDRectangleFlatButton:
+                text: 'Save to New Patient'
+                size_hint_x: 0.06
+                on_press: root.manager.current = 'save_new'
+
+
+            MDRectangleFlatButton:
+                text: 'Full View'
+                size_hint_x: 0.06    
+                on_press: root.full_view()
+        

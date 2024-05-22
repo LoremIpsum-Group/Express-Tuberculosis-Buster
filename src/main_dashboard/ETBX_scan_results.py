@@ -6,7 +6,6 @@ from kivy.properties import NumericProperty
 from components.core_functions.load_models import load_model_efficientNet, load_model_unet
 from components.core_functions.preprocessing_only import get_img_array, get_img_array_OLD
 
-
 from components.core_functions.segmentation_only import segment_image
 from components.core_functions.classifier_only import predict
 from components.core_functions.grad_CAM_new import get_gradCAM, get_gradCAM_NONSEGMENTED
@@ -17,12 +16,16 @@ import io
 import base64
 from PIL import Image
 
-# Load the trained model
+import sqlite3 
+from scan_result_data import ScanResultData
+
+#Load the trained model
 model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
 model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
 
+#scan_results = ScanResultData() 
 class ScanResult(Screen):
     """
     Represents a screen for displaying scan results.
@@ -34,6 +37,32 @@ class ScanResult(Screen):
         update_result(image_path): Updates the scan result with the provided image path.
         change_img(instance): Changes the displayed image based on the selected instance.
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        conn = sqlite3.connect('src/components/view_record_main.db')
+        c = conn.cursor()
+        c.execute("""CREATE TABLE IF NOT EXISTS RESULTS (  
+                result_ID INTEGER PRIMARY KEY,
+                patient_ID INTEGER,
+                date_of_scan TEXT,
+                result TEXT, 
+                percentage TEXT, 
+                UNIQUE(patient_ID, date_of_scan, result, percentage)
+                FOREIGN KEY(patient_ID) REFERENCES PATIENT(patient_ID))
+                """)
+        
+        # working table but keeps on adding
+        # c.execute("""CREATE TABLE IF NOT EXISTS main_table (  
+        #         result_ID INTEGER NOT NULL,
+        #         patient_ID INTEGER NOT NULL,
+        #         date_of_scan TEXT NOT NULL,
+        #         result TEXT NOT NULL, 
+        #         percentage TEXT NOT NULL)
+        #         """)
+     
+        conn.commit()
+        conn.close()
 
     def update_result(self, image_path):
         """

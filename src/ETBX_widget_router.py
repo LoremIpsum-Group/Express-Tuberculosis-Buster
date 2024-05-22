@@ -7,6 +7,9 @@ from main_dashboard.ETBX_view_records import ViewRecords
 from main_dashboard.ETBX_manage_account import ManageAccount
 from main_dashboard.ETBX_scan_results import ScanResult   
 
+
+from main_dashboard.ETBX_save_new import SaveNew
+from main_dashboard.ETBX_save_existing import SaveExisting
 from kivymd.app import MDApp
 
 class MainApp(MDApp):
@@ -19,7 +22,8 @@ class MainApp(MDApp):
         self.screen_manager.add_widget(ViewRecords(name='view_rec'))
         self.screen_manager.add_widget(ManageAccount(name='manage_account'))
         self.screen_manager.add_widget(ScanResult(name='scan_result'))
-
+        self.screen_manager.add_widget(SaveNew(name='save_new'))
+        self.screen_manager.add_widget(SaveExisting(name='save_existing'))
         return self.screen_manager
 
 if __name__ == '__main__':
