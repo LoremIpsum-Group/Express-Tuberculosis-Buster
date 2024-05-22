@@ -1,6 +1,8 @@
 #:kivy 2.3.0
 #:kivy 2.3.0
 <ScanResult>:
+    percentage: 0 
+    percentage_color: (0, 0, 0, 0)
     name: 'scan_result'
     padding: 10
     spacing : 10
@@ -10,6 +12,7 @@
         pos_hint: {'center_x': 0.30,'center_y': 0.47}  
         
     FloatLayout:
+
         canvas.before:
             # Total Percentage
             Color:
@@ -20,11 +23,11 @@
             
             # Actual Percentage
             Color:
-                rgba: 1, 0, 0, 1  # Red color for filled portion
+                rgba: root.percentage_color 
             
             RoundedRectangle:
                 pos: self.x + self.width * 0.58, self.y + self.height * 0.63
-                size: self.parent.width * 0.35 * 0.89, self.parent.height * 0.03 # 75% filled
+                size: self.parent.width * 0.35 * (root.percentage / 100), self.parent.height * 0.03 # 75% filled
 
    
         Label:

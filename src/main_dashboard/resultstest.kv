@@ -1,0 +1,35 @@
+#:kivy 2.3.0 
+
+FloatLayout:
+    percentage: 0.34
+    canvas.before:
+        # Total Percentage
+        Color:
+            rgba: 0.8, 0.8, 0.8, 1  # Gray color for total length
+        RoundedRectangle:
+            pos: self.x + self.width * 0.33, self.y + self.height * 0.50
+            size: self.width * 0.35, self.height * 0.03
+        
+        # Actual Percentage
+        Color:
+            rgba: 1, 0, 0, 1  # Red color for filled portion
+        
+        RoundedRectangle:
+            pos: self.x + self.width * 0.33, self.y + self.height * 0.50
+            size: self.width * 0.35 * self.percentage, self.height * 0.03
+    
+    BoxLayout: 
+        orientation: "horizontal"
+        Button:
+            text: "Increase"
+            size_hint: 0.1, 0.1
+            pos_hint: {"center_x": 0.50, "center_y": 0.4}
+            on_press: 
+                root.percentage = 1.0 if (root.percentage + 0.1 > 1.0) else root.percentage + 0.1
+
+        Button:
+            text: "Decrease"
+            size_hint: 0.1, 0.1
+            pos_hint: {"center_x": 0.55, "center_y": 0.4}
+            on_press:
+                root.percentage = 0.0 if (root.percentage - 0.1 < 0.0) else root.percentage - 0.1

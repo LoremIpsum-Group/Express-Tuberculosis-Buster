@@ -1,6 +1,7 @@
 from kivy.uix.screenmanager import Screen   
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
+from kivy.properties import NumericProperty
 
 from components.core_functions.load_models import load_model_efficientNet, load_model_unet
 from components.core_functions.preprocessing_only import get_img_array, get_img_array_OLD
@@ -48,7 +49,18 @@ class ScanResult(Screen):
         plt.axis('off')  # Turn off axis
         plt.show()
 
-        # self.ids.percent_bar.size = self.parent.width * 0.35 * predicted_score, self.parent.height * 0.03
+        bar_color = None
+        if (predicted_score <= 25):
+            bar_color = (0, 1, 0, 1)
+        elif (predicted_score <= 49):
+            bar_color = (1, 1, 0, 1)
+        elif (predicted_score <= 74):
+            bar_color = (1, 0.5, 0, 1)
+        else:
+            bar_color = (1, 0, 0, 1)
+
+        self.percentage = int(predicted_score)
+        self.percentage_color = bar_color
         self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) + " %\n segmented datatype: " + str(masked_image.dtype)
 
     def change_img(self, instance):
