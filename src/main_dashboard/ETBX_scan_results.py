@@ -3,29 +3,29 @@ from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 from kivy.properties import NumericProperty
 
-from components.core_functions.load_models import load_model_efficientNet, load_model_unet
-from components.core_functions.preprocessing_only import get_img_array, get_img_array_OLD
+from components.core_functions import (
+    load_model_efficientNet,
+    load_model_unet,
+    segment_image,
+    predict,
+    get_gradCAM,
+    sqlite3,
+    io,
+    plt,
+    np,
+    Image,
+    base64
+)
 
-from components.core_functions.segmentation_only import segment_image
-from components.core_functions.classifier_only import predict
-from components.core_functions.grad_CAM_new import get_gradCAM, get_gradCAM_NONSEGMENTED
+# from scan_result_data import ScanResultData
 
-import matplotlib.pyplot as plt
-import numpy as np
-import io
-import base64
-from PIL import Image
-
-import sqlite3 
-from .scan_result_data import ScanResultData
-
-#Load the trained model
+# Load the trained model
 model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
 model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
 
-#scan_results = ScanResultData() 
+# scan_results = ScanResultData()
 class ScanResult(Screen):
     """
     Represents a screen for displaying scan results.
