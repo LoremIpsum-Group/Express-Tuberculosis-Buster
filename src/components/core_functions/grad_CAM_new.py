@@ -134,6 +134,8 @@ def get_gradCAM(model_classifier, original_image, masked_image):
     # activating again the classifier
     model_classifier.layers[-1].activation = tf.keras.activations.sigmoid
 
+    superimposed_img = cv2.resize(superimposed_img, (512,512) )
+
     return superimposed_img
 
 

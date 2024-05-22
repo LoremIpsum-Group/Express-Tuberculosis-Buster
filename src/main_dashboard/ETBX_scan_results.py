@@ -17,7 +17,7 @@ import io
 import base64
 from PIL import Image
 
-#Load the trained model
+# Load the trained model
 model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
 model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
 
@@ -45,13 +45,13 @@ class ScanResult(Screen):
         Returns:
             None
         """
-        global xrayRes, superimposed_img, masked_image
-        xrayRes = image_path
-        self.ids.res_img.source = xrayRes
+        global xray_orig, xray_orig_resized, superimposed_img, masked_image
+        xray_orig = image_path
+        self.ids.res_img.source = xray_orig
 
         # !CORE FUNCTIONALITIES - START
         # Get segmented/masked image
-        original_image, masked_image, mask_result = segment_image(
+        xray_orig_resized, masked_image, mask_result = segment_image(
              model_segmentation, image_path
         )
 
@@ -59,7 +59,7 @@ class ScanResult(Screen):
         predicted_class, predicted_score = predict(model_classifier, masked_image)
 
         # Superimpose heatmap of segmented image onto original image
-        superimposed_img = get_gradCAM(model_classifier, original_image, masked_image)
+        superimposed_img = get_gradCAM(model_classifier, xray_orig_resized, masked_image)
 
         # !CORE FUNCTIONALITIES - end
         # *DEBUGGING PURPOSES, removable any time
@@ -98,11 +98,11 @@ class ScanResult(Screen):
         6. Convert the string into a data URL by adding the prefix 'data:image/png;base64,'. A data URL is a URI scheme that allows you to include data in-line in web pages as if they were external resources.
         """
         if instance == self.ids.x_ray:
-            self.ids.res_img.source = xrayRes
+            self.ids.res_img.source = xray_orig
 
         elif instance == self.ids.grad_cam:
-            img = Image.fromarray(((1.0 - superimposed_img) * 255).astype(np.uint8))
-            img = img.convert("RGB")
+            img = Image.fromarray((superimposed_img) .astype(np.uint8))
+            #img = img.convert("RGB")            
 
             with io.BytesIO() as output:
                 img.save(output, format="PNG")
@@ -124,3 +124,21 @@ class ScanResult(Screen):
 
         else:
             pass
+
+    def full_view(self):
+        original_img = plt.imread(xray_orig)
+        # Create a new figure with 2 subplots
+        fig, axs = plt.subplots(1, 2)
+
+        # Display the original image in the first subplot
+        axs[0].imshow(original_img, cmap="gray")
+        axs[0].set_title('Original Image')
+        axs[0].axis('off')  # Hide axes
+
+        # Display the superimposed image in the second subplot
+        axs[1].imshow(superimposed_img)
+        axs[1].set_title('Superimposed Image')
+        axs[1].axis('off')  # Hide axes
+
+        # Show the figure
+        plt.show()
