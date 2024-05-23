@@ -17,7 +17,21 @@ from components.core_functions import (
     base64
 )
 
-# from scan_result_data import ScanResultData
+class ScanResultData: 
+    """
+        A class that stores information about results of scanned X-ray 
+        for database storage 
+    """
+
+    def __init__(self):
+        self.results = None 
+        self.percentage = None 
+        self.orig_img = None 
+        self.preproc_img = None
+        self.gradcam_img = None 
+        self.notes = None 
+
+scan_result = ScanResultData() 
 
 # Load the trained model
 model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
@@ -42,15 +56,22 @@ class ScanResult(Screen):
         super().__init__(**kwargs)
         conn = sqlite3.connect('src/components/view_record_main.db')
         c = conn.cursor()
-        c.execute("""CREATE TABLE IF NOT EXISTS RESULTS (  
-                result_ID INTEGER PRIMARY KEY,
-                patient_ID INTEGER,
-                date_of_scan TEXT,
-                result TEXT, 
-                percentage TEXT, 
-                UNIQUE(patient_ID, date_of_scan, result, percentage)
-                FOREIGN KEY(patient_ID) REFERENCES PATIENT(patient_ID))
-                """)
+        c.execute(
+            """ 
+            CREATE TABLE IF NOT EXISTS RESULTS (
+                result_id INTEGER PRIMARY KEY, 
+                patient_id INTEGER, 
+                date_of_scan TEXT NOT NULL, 
+                result TEXT NOT NULL,
+                percentage REAL, 
+                orig_image BLOB NOT NULL, 
+                preproc_image BLOB NOT NULL, 
+                grad_cam_image BLOB NOT NULL, 
+                notes TEXT, 
+                FOREIGN KEY(patient_id) REFERENCES PATIENT(patient_id)
+            )
+        """
+        )
         
         # working table but keeps on adding
         # c.execute("""CREATE TABLE IF NOT EXISTS main_table (  
@@ -115,6 +136,13 @@ class ScanResult(Screen):
         self.percentage = int(predicted_score)
         self.percentage_color = bar_color
         self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) + " %\n segmented datatype: " + str(masked_image.dtype)
+
+        scan_result.results = predicted_class
+        scan_result.percentage = predicted_score
+        scan_result.orig_img = xray_orig
+        scan_result.preproc_img = masked_image 
+        scan_result.gradcam_img = superimposed_img
+        scan_result.notes = self.ids.notes.text
 
     def change_img(self, instance):
         """

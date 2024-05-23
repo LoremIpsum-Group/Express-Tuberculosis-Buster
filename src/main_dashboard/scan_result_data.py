@@ -1,9 +1,14 @@
 class ScanResultData: 
-    def __init__(self, result, percentage, orig_img, preproc_img, gradcam_img, notes):
-        self.result = result
-        self.percentage = percentage
-        self.orig_img = orig_img
-        self.preproc_img = preproc_img
-        self.gradcam_img = gradcam_img
-        self.notes = notes
+    """
+        A class that stores information about results of scanned X-ray 
+        for database storage 
+    """
+
+    def __init__(self):
+        self.results = None 
+        self.percentage = None 
+        self.orig_img = None 
+        self.preproc_img = None
+        self.gradcam_img = None 
+        self.notes = None 
     

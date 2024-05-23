@@ -5,9 +5,10 @@ from kivy.metrics import dp
 
 
 from kivymd.uix.pickers import MDDatePicker
+from main_dashboard.ETBX_scan_results import scan_result
 
 import sqlite3
- 
+import datetime
 
 Builder.load_file("main_dashboard/save_new.kv")
 class SaveNew(Screen): 
@@ -17,7 +18,8 @@ class SaveNew(Screen):
         conn = sqlite3.connect('src/components/view_record_main.db')
         cur = conn.cursor()
 
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS PATIENT (
                     patient_ID INTEGER PRIMARY KEY,
                     first_name TEXT,
@@ -28,7 +30,9 @@ class SaveNew(Screen):
                     address TEXT,
                     UNIQUE(patient_ID)
             )
-        """)
+            
+            """
+        )
 
         conn.commit()
         conn.close()
@@ -61,12 +65,16 @@ class SaveNew(Screen):
         age = int(self.ids.age.text)
         birthdate = self.ids.birthdate.text
         address = self.ids.address.text
+        scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
         if (self.ids.male.active):
             sex = 'Male'
         elif (self.ids.female.active):
             sex = 'Female'
-            
+        
+        with open(scan_result.orig_img, 'rb') as file:
+            xray_orig = file.read()
+
         conn = sqlite3.connect("src/components/view_record_main.db")
         cur = conn.cursor()
         
@@ -75,6 +83,16 @@ class SaveNew(Screen):
             INSERT INTO PATIENT (patient_ID, first_name, last_name, sex, age, date_of_birth, address)
             VALUES ({patient_id}, '{first_name}', '{last_name}', '{sex}', {age}, '{birthdate}', '{address}');
             """
+        )
+
+        cur.execute(
+            """
+            INSERT INTO RESULTS (patient_ID, date_of_scan, result, percentage, orig_image, preproc_image, grad_cam_image, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (patient_id, scan_date, scan_result.results, scan_result.percentage, 
+             xray_orig, scan_result.preproc_img, scan_result.gradcam_img, 
+             scan_result.notes)
         )
 
         conn.commit()
