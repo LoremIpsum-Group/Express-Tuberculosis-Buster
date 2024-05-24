@@ -1,0 +1,54 @@
+#:kivy 2.3.0
+BoxLayout:
+    orientation: 'vertical'
+    size_hint: 0.4, 0.4 
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    Label:
+        id: header
+        text: ''
+        color: 0, 0, 1, 1
+
+    BoxLayout:
+        orientation: 'horizontal'
+
+        Label:
+            id: patient_name
+            text: ''
+            color: 0, 0, 1, 1
+        Label:
+            id: patient_sex
+            text: ''
+            color: 0, 0, 1, 1
+
+    BoxLayout:
+        orientation: 'horizontal'
+
+        Label:
+            id: patient_age
+            text: ''
+            color: 0, 0, 1, 1
+        Label:
+            id: patient_birthdate
+            text: ''
+            color: 0, 0, 1, 1
+        
+    # BoxLayout:
+    #     size_hint: 0.4, 0.4
+    #     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    #     orientation: "horizontal"
+    #     padding: 10
+    #     spacing: 10
+
+    #     Button:
+    #         text: "Save"
+    #         size_hint: 0.2, 0.2
+    #         background_normal: ''
+    #         background_color: 0, 0, 1, 1
+    #         on_press: root.save_record() 
