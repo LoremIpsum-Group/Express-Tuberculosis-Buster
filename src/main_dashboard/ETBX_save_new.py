@@ -2,9 +2,12 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivy.app import App
 from kivy.metrics import dp 
-
-
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label 
+from kivy.uix.button import Button
+from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.pickers import MDDatePicker
+from kivy.graphics import Color, Rectangle
 from main_dashboard.ETBX_scan_results import scan_result
 
 import sqlite3
@@ -94,7 +97,38 @@ class SaveNew(Screen):
              xray_orig, scan_result.preproc_img, scan_result.gradcam_img, 
              scan_result.notes)
         )
+        
+        if cur.lastrowid is not None:
+            self.clear_fields() 
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+            conn.close()
+            self.show_popup()
+
+   
+    
+    def clear_fields(self):
+        self.ids.patient_id.text = ''
+        self.ids.first_name.text = ''
+        self.ids.last_name.text = ''
+        self.ids.age.text = ''
+        self.ids.birthdate.text = ''
+        self.ids.address.text = ''
+        self.manager.get_screen('scan_result').ids.notes.text = ''
+
+        
+    def show_popup(self):
+        content = BoxLayout(orientation='vertical')
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+        
+        content.add_widget(Label(text="Record saved successfully!", color=(0, 0, 1, 1)))
+        content.add_widget(Button(text="Close", on_press=self.close_popup))
+        self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
+        self.popup.open()
+    
+    def close_popup(self, instance):
+        self.popup.dismiss()
+        self.manager.current = 'scan_img'
 
