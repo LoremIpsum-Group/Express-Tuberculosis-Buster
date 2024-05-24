@@ -20,11 +20,11 @@ class SaveExisting(Screen):
         self.save_record_btn = Button(
             text="Save Record", 
             background_normal='',
-            background_color=(0, 0, 1 ,1),
+            background_color=(0, 0, 1, 1),
             on_press=self.save_record,
             size_hint_x=0.06,
             size_hint_y=0.06,
-            pos_hint={'center_x': 0.5, 'center_y': 0.30}
+            pos_hint={'center_x': 0.5, 'center_y': 0.25}
         )
         conn = sqlite3.connect('src/components/view_record_main.db')
         cur = conn.cursor()
@@ -87,19 +87,22 @@ class SaveExisting(Screen):
             self.save_record_btn.parent.remove_widget(self.save_record_btn)
 
         self.add_widget(self.save_record_btn)
-        patient_info_layout.ids.header.text = f'Patient ID {patient_id} found!'
-        patient_info_layout.ids.patient_name.text = f'Name: {patient_name}'
-        patient_info_layout.ids.patient_sex.text = f'Sex: {patient_sex}'
-        patient_info_layout.ids.patient_age.text = f'Age: {patient_age}'
-        patient_info_layout.ids.patient_birthdate.text = f'Birthdate: {patient_birthdate}'
+        patient_info_layout.ids.header.text = f'Patient ID - {patient_id}'
+        patient_info_layout.ids.patient_name.text += patient_name
+        patient_info_layout.ids.patient_sex.text += patient_sex
+        patient_info_layout.ids.patient_age.text += f'{patient_age}'
+        patient_info_layout.ids.patient_birthdate.text += patient_birthdate
     
     def no_patient(self):
+        if self.save_record_btn.parent:
+            self.save_record_btn.parent.remove_widget(self.save_record_btn)
+
         if self.patient_info_layout:
             self.remove_widget(self.patient_info_layout)
-            self.remove_widget(self.save_record_btn)
+           
         elif self.no_patient_layout:
             self.remove_widget(self.no_patient_layout)
-            self.remove_widget(self.save_record_btn)
+         
 
         no_patient_layout = Builder.load_file('src/main_dashboard/no_patient.kv')
         self.add_widget(no_patient_layout)
