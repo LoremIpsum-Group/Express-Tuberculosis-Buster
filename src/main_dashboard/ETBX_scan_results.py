@@ -2,6 +2,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 from kivy.properties import NumericProperty
+from main_dashboard.ETBX_full_view import xray_full_app
 
 from components.core_functions import (
     load_model_efficientNet,
@@ -113,6 +114,8 @@ class ScanResult(Screen):
         global xray_orig, xray_orig_resized, superimposed_img, masked_image
         xray_orig = image_path
         self.ids.res_img.source = xray_orig
+        self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
+        self.ids.x_ray.text_color = (1, 1, 1, 1)
 
         # !CORE FUNCTIONALITIES - START
         # Get segmented/masked image
@@ -134,9 +137,9 @@ class ScanResult(Screen):
         # * Replace here the image you want to display, temporary ONLY!!!!!
         # Good results: normal 2551, tuberculosis 640
 
-        plt.imshow(superimposed_img)
-        plt.axis('off')  # Turn off axis
-        plt.show()
+        # plt.imshow(superimposed_img)
+        # plt.axis('off')  # Turn off axis
+        # plt.show()
 
         bar_color = None
         if (predicted_score <= 25):
@@ -197,19 +200,8 @@ class ScanResult(Screen):
 
 
     def full_view(self):
-        original_img = plt.imread(xray_orig)
-        # Create a new figure with 2 subplots
-        fig, axs = plt.subplots(1, 2)
+        xrayPath = xray_orig
+        supIM = superimposed_img
 
-        # Display the original image in the first subplot
-        axs[0].imshow(original_img, cmap="gray")
-        axs[0].set_title('Original Image')
-        axs[0].axis('off')  # Hide axes
-
-        # Display the superimposed image in the second subplot
-        axs[1].imshow(superimposed_img)
-        axs[1].set_title('Superimposed Image')
-        axs[1].axis('off')  # Hide axes
-
-        # Show the figure
-        plt.show()
+        xray_full_app(xrayPath, supIM)
+        pass
