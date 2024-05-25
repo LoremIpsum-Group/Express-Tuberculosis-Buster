@@ -2,6 +2,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 from kivy.properties import NumericProperty
+from main_dashboard.ETBX_full_view import xray_full_app
 
 from components.core_functions import (
     load_model_efficientNet,
@@ -85,6 +86,21 @@ class ScanResult(Screen):
         conn.commit()
         conn.close()
 
+    def img_string(self, image):
+        """
+        Changes the displayed image based on the selected instance. In-depth procedure:
+        1. Save PIL Image to BytesIO object. A BytesIO object is like a file object, but it resides in memory instead of being saved to disk.
+        2. Retrieve the contents of the BytesIO object as a bytes string using the `getvalue` method.
+        3. Encode the bytes string into base64 format. Base64 encoding is a way of converting binary data into text format, which is needed because `img.source` expects a string.
+        4. Convert the string into a data URL by adding the prefix 'data:image/png;base64,'. A data URL is a URI scheme that allows you to include data in-line in web pages as if they were external resources.
+        """
+        with io.BytesIO() as output:
+            image.save(output, format="PNG")
+            contents = output.getvalue()
+
+        img_data = base64.b64encode(contents).decode('ascii')
+        return 'data:image/png;base64,' + img_data 
+    
     def update_result(self, image_path):
         """
         Updates the scan result with the provided image path.
@@ -98,6 +114,8 @@ class ScanResult(Screen):
         global xray_orig, xray_orig_resized, superimposed_img, masked_image
         xray_orig = image_path
         self.ids.res_img.source = xray_orig
+        self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
+        self.ids.x_ray.text_color = (1, 1, 1, 1)
 
         # !CORE FUNCTIONALITIES - START
         # Get segmented/masked image
@@ -119,9 +137,9 @@ class ScanResult(Screen):
         # * Replace here the image you want to display, temporary ONLY!!!!!
         # Good results: normal 2551, tuberculosis 640
 
-        plt.imshow(superimposed_img)
-        plt.axis('off')  # Turn off axis
-        plt.show()
+        # plt.imshow(superimposed_img)
+        # plt.axis('off')  # Turn off axis
+        # plt.show()
 
         bar_color = None
         if (predicted_score <= 25):
@@ -145,57 +163,45 @@ class ScanResult(Screen):
         scan_result.notes = self.ids.notes.text
 
     def change_img(self, instance):
-        """
-        Changes the displayed image based on the selected instance. In-depth procedure:
-        1. Convert numpy array to PIL Image.
-        2. Reorder color channels.
-        3. Save PIL Image to BytesIO object. A BytesIO object is like a file object, but it resides in memory instead of being saved to disk.
-        4. Retrieve the contents of the BytesIO object as a bytes string using the `getvalue` method.
-        5. Encode the bytes string into base64 format. Base64 encoding is a way of converting binary data into text format, which is needed because `img.source` expects a string.
-        6. Convert the string into a data URL by adding the prefix 'data:image/png;base64,'. A data URL is a URI scheme that allows you to include data in-line in web pages as if they were external resources.
-        """
+        white = (1, 1, 1, 1)  # Default color
+        blue = (0.1, 0.5, .9, 1)  # Pressed color
+
+        # Reset all buttons to default color
+        self.ids.x_ray.md_bg_color = white
+        self.ids.x_ray.text_color = blue
+        self.ids.pre_proc.md_bg_color = white
+        self.ids.pre_proc.text_color = blue
+        self.ids.grad_cam.md_bg_color = white
+        self.ids.grad_cam.text_color = blue
+
+        # Change the pressed button's color
+        instance.md_bg_color = blue
+        instance.text_color = white
+
         if instance == self.ids.x_ray:
             self.ids.res_img.source = xray_orig
 
         elif instance == self.ids.grad_cam:
             img = Image.fromarray((superimposed_img) .astype(np.uint8))
             #img = img.convert("RGB")            
-
-            with io.BytesIO() as output:
-                img.save(output, format="PNG")
-                contents = output.getvalue()
-
-            img_data = base64.b64encode(contents).decode('ascii')          
-            self.ids.res_img.source = 'data:image/png;base64,' + img_data
+                     
+            self.ids.res_img.source = self.img_string(img)   
 
         elif instance == self.ids.pre_proc: 
             img = Image.fromarray(((1.0 - masked_image) * 255).astype(np.uint8))
             img = img.convert('L')
 
-            with io.BytesIO() as output:
-                img.save(output, format="PNG")
-                contents = output.getvalue()
-
-            img_data = base64.b64encode(contents).decode('ascii')
-            self.ids.res_img.source = 'data:image/png;base64,' + img_data     
+            self.ids.res_img.source = self.img_string(img) 
 
         else:
             pass
 
+
+
+
     def full_view(self):
-        original_img = plt.imread(xray_orig)
-        # Create a new figure with 2 subplots
-        fig, axs = plt.subplots(1, 2)
+        xrayPath = xray_orig
+        supIM = superimposed_img
 
-        # Display the original image in the first subplot
-        axs[0].imshow(original_img, cmap="gray")
-        axs[0].set_title('Original Image')
-        axs[0].axis('off')  # Hide axes
-
-        # Display the superimposed image in the second subplot
-        axs[1].imshow(superimposed_img)
-        axs[1].set_title('Superimposed Image')
-        axs[1].axis('off')  # Hide axes
-
-        # Show the figure
-        plt.show()
+        xray_full_app(xrayPath, supIM)
+        pass

@@ -1,0 +1,15 @@
+#:kivy 2.3.0
+BoxLayout:
+    orientation: 'vertical' 
+    size_hint: 0.4, 0.4 
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Label:
+        text: 'Patient not found!'
+        color: 1, 0, 0, 1
+        
