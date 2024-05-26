@@ -2,6 +2,11 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 from kivy.properties import NumericProperty
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
+from kivy.graphics import Color, Rectangle
 from main_dashboard.ETBX_full_view import xray_full_app
 
 from components.core_functions import (
@@ -18,6 +23,7 @@ from components.core_functions import (
     base64
 )
 
+import sqlite3
 class ScanResultData: 
     """
         A class that stores information about results of scanned X-ray 
@@ -40,7 +46,7 @@ model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
 
-# scan_results = ScanResultData()
+scan_results = ScanResultData()
 class ScanResult(Screen):
     """
     Represents a screen for displaying scan results.
@@ -74,15 +80,6 @@ class ScanResult(Screen):
         """
         )
         
-        # working table but keeps on adding
-        # c.execute("""CREATE TABLE IF NOT EXISTS main_table (  
-        #         result_ID INTEGER NOT NULL,
-        #         patient_ID INTEGER NOT NULL,
-        #         date_of_scan TEXT NOT NULL,
-        #         result TEXT NOT NULL, 
-        #         percentage TEXT NOT NULL)
-        #         """)
-     
         conn.commit()
         conn.close()
 
@@ -100,6 +97,7 @@ class ScanResult(Screen):
 
         img_data = base64.b64encode(contents).decode('ascii')
         return 'data:image/png;base64,' + img_data 
+        pass
     
     def update_result(self, image_path):
         """
@@ -137,9 +135,9 @@ class ScanResult(Screen):
         # * Replace here the image you want to display, temporary ONLY!!!!!
         # Good results: normal 2551, tuberculosis 640
 
-        # plt.imshow(superimposed_img)
-        # plt.axis('off')  # Turn off axis
-        # plt.show()
+        plt.imshow(superimposed_img)
+        plt.axis('off')  # Turn off axis
+        plt.show()
 
         bar_color = None
         if (predicted_score <= 25):
@@ -180,23 +178,39 @@ class ScanResult(Screen):
 
         if instance == self.ids.x_ray:
             self.ids.res_img.source = xray_orig
+            pass
 
         elif instance == self.ids.grad_cam:
             img = Image.fromarray((superimposed_img) .astype(np.uint8))
-            #img = img.convert("RGB")            
+            img = img.convert("RGB")            
                      
-            self.ids.res_img.source = self.img_string(img)   
+            self.ids.res_img.source = self.img_string(img)  
+            pass 
 
         elif instance == self.ids.pre_proc: 
             img = Image.fromarray(((1.0 - masked_image) * 255).astype(np.uint8))
             img = img.convert('L')
+            
 
             self.ids.res_img.source = self.img_string(img) 
 
         else:
             pass
 
+    def back_button(self):
+        white = (1, 1, 1, 1)  # Default color
+        blue = (0.1, 0.5, .9, 1)  # Pressed color
 
+        self.ids.x_ray.md_bg_color = white
+        self.ids.x_ray.text_color = blue
+        self.ids.pre_proc.md_bg_color = white
+        self.ids.pre_proc.text_color = blue
+        self.ids.grad_cam.md_bg_color = white
+        self.ids.grad_cam.text_color = blue
+
+        self.show_popup()
+        
+        pass
 
 
     def full_view(self):
@@ -205,3 +219,62 @@ class ScanResult(Screen):
 
         xray_full_app(xrayPath, supIM)
         pass
+
+    def show_popup(self):
+        content = BoxLayout(orientation='vertical')
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+        content.bind(size=self._update_rect, pos=self._update_rect)
+        content.add_widget(Label(
+            text="[b]Are you sure you want to go back?\nScan Results will be lost[/b]!", 
+            color=(0, 0, 1, 1), markup=True))
+        
+        inner_content = BoxLayout(orientation='horizontal',
+            spacing=10, padding=10, size_hint_y=0.3)
+
+        confirm_btn = Button(text='Confirm',
+            background_color=(0, 0, 1, 1), background_normal='',
+            on_press= self.confirm)
+        
+        cancel_btn = Button(text='Cancel',
+            background_color=(0, 0, 1, 1), background_normal='',
+            on_press= self.close_popup)
+        
+        inner_content.add_widget(confirm_btn)
+        inner_content.add_widget(cancel_btn)
+        content.add_widget(inner_content)
+
+        
+        #content.add_widget(Button(text="Close", on_press=self.close_popup))
+        
+        self.popup = Popup(title='Confirm Action', content=content, size_hint=(0.4, 0.4),
+            separator_color=(0,0,0,0), background_color=(0, 0, 1, 0.5),auto_dismiss=False)
+        self.popup.open()
+    
+    def confirm(self, instance):
+        save_new_screen = self.manager.get_screen('save_new')
+        save_existing_screen = self.manager.get_screen('save_existing')
+        save_new_screen.ids.patient_id.text = ''
+        save_new_screen.ids.first_name.text = ''
+        save_new_screen.ids.last_name.text = ''
+        save_new_screen.ids.age.text = ''
+        save_new_screen.ids.birthdate.text = ''
+        save_new_screen.ids.address.text = ''
+        save_new_screen.ids.male.active = False
+        save_new_screen.ids.female.active = False
+        self.manager.get_screen('scan_result').ids.notes.text = ''
+        self.manager.get_screen('save_existing').ids.patient_id.text = ''
+        self.manager.current = 'scan_img'
+     
+        save_existing_screen.clear_layout()
+
+        self.popup.dismiss()
+        
+    def close_popup(self, instance):
+        self.popup.dismiss()
+    
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
+   

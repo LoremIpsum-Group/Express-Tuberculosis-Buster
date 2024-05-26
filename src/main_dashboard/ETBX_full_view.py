@@ -2,7 +2,6 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
 
-
 class FullScreenApp:
     def __init__(self, root, image1_path, gradCamIm):
         self.root = root
@@ -11,7 +10,9 @@ class FullScreenApp:
         min_val = np.min(gradCamIm)
         max_val = np.max(gradCamIm)
         self.image2_data = ((gradCamIm - min_val) / (max_val - min_val) * 255).astype(np.uint8)
-        
+
+        self.root.configure(bg='black')
+
         self.root.attributes("-fullscreen", True)
         self.root.bind("<Escape>", self.exit_fullscreen)
         
@@ -24,8 +25,8 @@ class FullScreenApp:
         self.photo1 = self.resize_image(self.image1, self.screen_width // 2, self.screen_height)
         self.photo2 = self.resize_image(self.image2, self.screen_width // 2, self.screen_height)
         
-        self.canvas1 = tk.Canvas(self.root, width=self.screen_width // 2, height=self.screen_height, bg='black')
-        self.canvas2 = tk.Canvas(self.root, width=self.screen_width // 2, height=self.screen_height, bg='black')
+        self.canvas1 = tk.Canvas(self.root, width=self.screen_width // 2, height=self.screen_height, bg='black', highlightthickness=0, borderwidth=0)
+        self.canvas2 = tk.Canvas(self.root, width=self.screen_width // 2, height=self.screen_height, bg='black', highlightthickness=0, borderwidth=0)
         
         self.image_id1 = self.canvas1.create_image(0, 0, anchor="nw", image=self.photo1)
         self.image_id2 = self.canvas2.create_image(0, 0, anchor="nw", image=self.photo2)
@@ -60,102 +61,107 @@ class FullScreenApp:
     def on_button_press(self, event):
         self.start_x = event.x
         self.start_y = event.y
-        self.canvas = event.widget
 
     def on_drag(self, event):
         dx = event.x - self.start_x
         dy = event.y - self.start_y
 
-        if self.canvas == self.canvas1:
-            image_id = self.image_id1
-            current_image = self.current_image1
-        else:
-            image_id = self.image_id2
-            current_image = self.current_image2
+        bbox1 = self.canvas1.bbox(self.image_id1)
+        bbox2 = self.canvas2.bbox(self.image_id2)
 
-        x0, y0, x1, y1 = self.canvas.bbox(image_id)
+        new_x0_1 = bbox1[0] + dx
+        new_y0_1 = bbox1[1] + dy
+        new_x1_1 = bbox1[2] + dx
+        new_y1_1 = bbox1[3] + dy
 
-        new_x0 = x0 + dx
-        new_y0 = y0 + dy
-        new_x1 = x1 + dx
-        new_y1 = y1 + dy
+        new_x0_2 = bbox2[0] + dx
+        new_y0_2 = bbox2[1] + dy
+        new_x1_2 = bbox2[2] + dx
+        new_y1_2 = bbox2[3] + dy
 
-        if current_image.width > self.canvas.winfo_width():
-            if new_x0 > 0:
-                dx = -x0
-            if new_x1 < self.canvas.winfo_width():
-                dx = self.canvas.winfo_width() - x1
-        else:
-            dx = 0
+        if new_x0_1 > 0:
+            dx = -bbox1[0]
+        if new_y0_1 > 0:
+            dy = -bbox1[1]
+        if new_x1_1 < self.canvas1.winfo_width():
+            dx = self.canvas1.winfo_width() - bbox1[2]
+        if new_y1_1 < self.canvas1.winfo_height():
+            dy = self.canvas1.winfo_height() - bbox1[3]
 
-        if current_image.height > self.canvas.winfo_height():
-            if new_y0 > 0:
-                dy = -y0
-            if new_y1 < self.canvas.winfo_height():
-                dy = self.canvas.winfo_height() - y1
-        else:
-            dy = 0
+        if new_x0_2 > 0:
+            dx = -bbox2[0]
+        if new_y0_2 > 0:
+            dy = -bbox2[1]
+        if new_x1_2 < self.canvas2.winfo_width():
+            dx = self.canvas2.winfo_width() - bbox2[2]
+        if new_y1_2 < self.canvas2.winfo_height():
+            dy = self.canvas2.winfo_height() - bbox2[3]
 
-        self.canvas.move(image_id, dx, dy)
+        self.canvas1.move(self.image_id1, dx, dy)
+        self.canvas2.move(self.image_id2, dx, dy)
         
         self.start_x = event.x
         self.start_y = event.y
 
     def on_zoom(self, event):
         scale_factor = 1.1 if event.delta > 0 else 0.9
-        canvas = event.widget
 
-        mouse_x, mouse_y = event.x, event.y
+        self.scale_factor1 *= scale_factor
+        self.scale_factor2 *= scale_factor
 
-        if canvas == self.canvas1:
-            self.scale_factor1 *= scale_factor
-            self.current_image1 = self.image1.resize(
-                (int(self.image1.width * self.scale_factor1), int(self.image1.height * self.scale_factor1)),
-                Image.LANCZOS
-            )
-            self.photo1 = ImageTk.PhotoImage(self.current_image1)
-            image_id = self.image_id1
-        else:
-            self.scale_factor2 *= scale_factor
-            self.current_image2 = self.image2.resize(
-                (int(self.image2.width * self.scale_factor2), int(self.image2.height * self.scale_factor2)),
-                Image.LANCZOS
-            )
-            self.photo2 = ImageTk.PhotoImage(self.current_image2)
-            image_id = self.image_id2
+        new_image1 = self.image1.resize(
+            (int(self.image1.width * self.scale_factor1), int(self.image1.height * self.scale_factor1)),
+            Image.LANCZOS
+        )
+        self.photo1 = ImageTk.PhotoImage(new_image1)
+        self.canvas1.itemconfig(self.image_id1, image=self.photo1)
+        
+        new_image2 = self.image2.resize(
+            (int(self.image2.width * self.scale_factor2), int(self.image2.height * self.scale_factor2)),
+            Image.LANCZOS
+        )
+        self.photo2 = ImageTk.PhotoImage(new_image2)
+        self.canvas2.itemconfig(self.image_id2, image=self.photo2)
 
-        canvas.itemconfig(image_id, image=self.photo1 if canvas == self.canvas1 else self.photo2)
+        bbox1 = self.canvas1.bbox(self.image_id1)
+        bbox2 = self.canvas2.bbox(self.image_id2)
+        new_x1 = event.x - (event.x - bbox1[0]) * scale_factor
+        new_y1 = event.y - (event.y - bbox1[1]) * scale_factor
+        new_x2 = event.x - (event.x - bbox2[0]) * scale_factor
+        new_y2 = event.y - (event.y - bbox2[1]) * scale_factor
 
-        bbox = canvas.bbox(image_id)
-        canvas_width = canvas.winfo_width()
-        canvas_height = canvas.winfo_height()
-        new_x = mouse_x - (mouse_x - bbox[0]) * scale_factor
-        new_y = mouse_y - (mouse_y - bbox[1]) * scale_factor
+        self.canvas1.coords(self.image_id1, new_x1, new_y1)
+        self.canvas2.coords(self.image_id2, new_x2, new_y2)
 
-        canvas.coords(image_id, new_x, new_y)
-
-        x0, y0, x1, y1 = canvas.bbox(image_id)
+        x0, y0, x1, y1 = self.canvas1.bbox(self.image_id1)
         if x0 > 0:
-            canvas.move(image_id, -x0, 0)
+            self.canvas1.move(self.image_id1, -x0, 0)
         if y0 > 0:
-            canvas.move(image_id, 0, -y0)
-        if x1 < canvas_width:
-            canvas.move(image_id, canvas_width - x1, 0)
-        if y1 < canvas_height:
-            canvas.move(image_id, 0, canvas_height - y1)
+            self.canvas1.move(self.image_id1, 0, -y0)
+        if x1 < self.canvas1.winfo_width():
+            self.canvas1.move(self.image_id1, self.canvas1.winfo_width() - x1, 0)
+        if y1 < self.canvas1.winfo_height():
+            self.canvas1.move(self.image_id1, 0, self.canvas1.winfo_height() - y1)
 
-        canvas.config(scrollregion=canvas.bbox(tk.ALL))
+        x0, y0, x1, y1 = self.canvas2.bbox(self.image_id2)
+        if x0 > 0:
+            self.canvas2.move(self.image_id2, -x0, 0)
+        if y0 > 0:
+            self.canvas2.move(self.image_id2, 0, -y0)
+        if x1 < self.canvas2.winfo_width():
+            self.canvas2.move(self.image_id2, self.canvas2.winfo_width() - x1, 0)
+        if y1 < self.canvas2.winfo_height():
+            self.canvas2.move(self.image_id2, 0, self.canvas2.winfo_height() - y1)
 
-    
+        self.canvas1.config(scrollregion=self.canvas1.bbox(tk.ALL))
+        self.canvas2.config(scrollregion=self.canvas2.bbox(tk.ALL))
+
     def exit_fullscreen(self, event=None):
         self.root.destroy()
+        # self.root.attributes("-fullscreen", False)
+        # self.root.quit()
 
 def xray_full_app(imgPath1, gradCam):
-
     root = tk.Tk()
-    
-
     app = FullScreenApp(root, imgPath1, gradCam)
-    
-
     root.mainloop()
