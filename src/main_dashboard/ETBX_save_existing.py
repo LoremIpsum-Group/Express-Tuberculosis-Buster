@@ -6,6 +6,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button 
 from kivy.uix.popup import Popup
+from kivy.graphics import Color, Rectangle
 from main_dashboard.ETBX_scan_results import scan_result
 
 import sqlite3 
@@ -130,12 +131,20 @@ class SaveExisting(Screen):
 
         conn.commit()
         conn.close()
+        self.show_popup()
+        self.ids.patient_id.text = ''
 
     def show_popup(self):
         content = BoxLayout(orientation='vertical')
-    
-        content.add_widget(Label(text="Record saved successfully!", color=(0, 0, 1, 1)))
-        content.add_widget(Button(text="Close", on_press=self.close_popup))
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+         
+        content.bind(size=self._update_rect, pos=self._update_rect)
+        content.add_widget(Label(text="[b]Record saved successfully![/b]", color=(0, 0, 1, 1), markup=True))
+        content.add_widget(Button(text="Close", 
+            background_color=(0, 0, 1, 1), background_normal='',
+            on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
         self.popup.open()
     
@@ -143,5 +152,20 @@ class SaveExisting(Screen):
         self.popup.dismiss()
         self.manager.current = 'scan_img'
 
+    def clear_layout(self):
+        
+        if self.save_record_btn.parent:
+            self.save_record_btn.parent.remove_widget(self.save_record_btn)
 
-            
+        if self.patient_info_layout:
+            self.remove_widget(self.patient_info_layout)
+           
+        elif self.no_patient_layout:
+            self.remove_widget(self.no_patient_layout)
+        
+        self.patient_info_layout = None
+        self.no_patient_layout = None
+
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size

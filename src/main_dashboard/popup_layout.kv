@@ -1,0 +1,33 @@
+#:kivy 2.3.0 
+
+BoxLayout:
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Label:
+        text: '[b]Are you sure you want to go back?\nScan Results will be lost.[/b]'
+        color: 0, 0, 1, 1
+        markup: True
+
+    BoxLayout:
+        spacing: 10
+        padding: 20
+        orientation: 'horizontal'
+        
+        size_hint_y: 0.3
+
+        Button:
+            text: 'Confirm'
+            background_color: 0, 0, 1, 1
+            background_normal: ''
+            on_press:
+
+        Button:
+            text: 'Cancel'
+            background_color: 0, 0, 1, 1
+            background_normal: ''
+           

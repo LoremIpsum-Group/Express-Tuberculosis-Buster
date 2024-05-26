@@ -104,9 +104,7 @@ class SaveNew(Screen):
             conn.commit()
             conn.close()
             self.show_popup()
-
-   
-    
+ 
     def clear_fields(self):
         self.ids.patient_id.text = ''
         self.ids.first_name.text = ''
@@ -119,13 +117,23 @@ class SaveNew(Screen):
         
     def show_popup(self):
         content = BoxLayout(orientation='vertical')
-    
-        content.add_widget(Label(text="Record saved successfully!", color=(0, 0, 1, 1)))
-        content.add_widget(Button(text="Close", on_press=self.close_popup))
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+         
+        content.bind(size=self._update_rect, pos=self._update_rect)
+        content.add_widget(Label(text="[b]Record saved successfully![/b]", color=(0, 0, 1, 1), markup=True))
+        content.add_widget(Button(text="Close", 
+            background_color=(0, 0, 1, 1), background_normal='',
+            on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
         self.popup.open()
     
     def close_popup(self, instance):
         self.popup.dismiss()
         self.manager.current = 'scan_img'
+    
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
 
