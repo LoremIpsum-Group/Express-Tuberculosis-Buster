@@ -13,6 +13,13 @@ from main_dashboard.ETBX_scan_results import scan_result
 import sqlite3
 import datetime
 
+from components.core_functions import (
+    io,
+    np,
+    Image
+)
+
+
 Builder.load_file("main_dashboard/save_new.kv")
 class SaveNew(Screen): 
     def __init__(self, **kwargs):
@@ -78,6 +85,20 @@ class SaveNew(Screen):
         with open(scan_result.orig_img, 'rb') as file:
             xray_orig = file.read()
 
+        preproc_img = Image.fromarray(((1.0 - scan_result.preproc_img) * 255).astype(np.uint8))
+        preproc_img.convert('L')
+
+        preproc_img_io = io.BytesIO()
+        preproc_img.save(preproc_img_io, format='PNG')
+        preproc_img_bytes = preproc_img_io.getvalue()  
+
+        gradcam_img = Image.fromarray((scan_result.gradcam_img).astype(np.uint8))
+        gradcam_img.convert("RGB")
+
+        gradcam_img_io = io.BytesIO()
+        gradcam_img.save(gradcam_img_io, format='PNG')
+        gradcam_img_bytes = gradcam_img_io.getvalue()  
+
         conn = sqlite3.connect("src/components/view_record_main.db")
         cur = conn.cursor()
         
@@ -94,8 +115,7 @@ class SaveNew(Screen):
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (patient_id, scan_date, scan_result.results, scan_result.percentage, 
-             xray_orig, scan_result.preproc_img, scan_result.gradcam_img, 
-             scan_result.notes)
+             xray_orig, preproc_img_bytes, gradcam_img_bytes, scan_result.notes)
         )
         
         if cur.lastrowid is not None:
@@ -104,9 +124,7 @@ class SaveNew(Screen):
             conn.commit()
             conn.close()
             self.show_popup()
-
-   
-    
+ 
     def clear_fields(self):
         self.ids.patient_id.text = ''
         self.ids.first_name.text = ''
@@ -119,13 +137,23 @@ class SaveNew(Screen):
         
     def show_popup(self):
         content = BoxLayout(orientation='vertical')
-    
-        content.add_widget(Label(text="Record saved successfully!", color=(0, 0, 1, 1)))
-        content.add_widget(Button(text="Close", on_press=self.close_popup))
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+         
+        content.bind(size=self._update_rect, pos=self._update_rect)
+        content.add_widget(Label(text="[b]Record saved successfully![/b]", color=(0, 0, 1, 1), markup=True))
+        content.add_widget(Button(text="Close", 
+            background_color=(0, 0, 1, 1), background_normal='',
+            on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
         self.popup.open()
     
     def close_popup(self, instance):
         self.popup.dismiss()
         self.manager.current = 'scan_img'
+    
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
 
