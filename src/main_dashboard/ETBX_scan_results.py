@@ -196,7 +196,20 @@ class ScanResult(Screen):
         else:
             pass
 
+    def back_button(self):
+        white = (1, 1, 1, 1)  # Default color
+        blue = (0.1, 0.5, .9, 1)  # Pressed color
 
+        self.ids.x_ray.md_bg_color = white
+        self.ids.x_ray.text_color = blue
+        self.ids.pre_proc.md_bg_color = white
+        self.ids.pre_proc.text_color = blue
+        self.ids.grad_cam.md_bg_color = white
+        self.ids.grad_cam.text_color = blue
+
+        self.manager.current = 'scan_img'
+        
+        pass
 
 
     def full_view(self):
