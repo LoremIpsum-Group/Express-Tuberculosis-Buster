@@ -127,14 +127,14 @@ class SaveExisting(Screen):
 
         preproc_img_io = io.BytesIO()
         preproc_img.save(preproc_img_io, format='PNG')
-        preproc_img_bytes = preproc_img_io.getvalue()  # This is your image in PNG format, stored in memory
+        preproc_img_bytes = preproc_img_io.getvalue()  
 
         gradcam_img = Image.fromarray((scan_result.gradcam_img).astype(np.uint8))
         gradcam_img.convert("RGB")
 
         gradcam_img_io = io.BytesIO()
         gradcam_img.save(gradcam_img_io, format='PNG')
-        gradcam_img_bytes = gradcam_img_io.getvalue()  # This is your image in PNG format, stored in memory
+        gradcam_img_bytes = gradcam_img_io.getvalue()  
     
         conn = sqlite3.connect("src/components/view_record_main.db")
         cur = conn.cursor()
