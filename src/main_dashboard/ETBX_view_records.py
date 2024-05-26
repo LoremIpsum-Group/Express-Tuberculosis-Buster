@@ -84,18 +84,19 @@ class ViewRecords(Screen):
         
         conn.close()
                 
-    # def record_clicked(self, patient_id):
-    #     conn = sqlite3.connect('src/components/view_record_main.db')
-    #     c = conn.cursor()
-    #     c.execute("SELECT * FROM RESULTS WHERE patient_ID = ?", (patient_id,))
-    #     record = c.fetchone()
-    #     conn.close()
+    def record_clicked(self, patient_id): 
         
-    #     if record:
-    #         message = f"Result ID: {record[0]}\n  Patient ID: {record[1]}\n  Date of Scan: {record[2]}\n  Result: {record[3]}\n  Percentage: {record[4]} "
-    #         self.error_popup(message)
-    #     else:
-    #         self.error_popup("Record not found")
+        for record in self.data_items:
+            if record[1] == patient_id:
+                # Fetch entire record including image data (BLOB)
+                full_record = record
+                res_id = full_record[0]
+
+                # Pass the entire record to update_result
+                self.manager.get_screen('patient_result').update_result(res_id)
+                self.manager.current = 'patient_result'
+                break
+                    
     
     #popup for invalid inputs 
     def error_popup(self, message):
