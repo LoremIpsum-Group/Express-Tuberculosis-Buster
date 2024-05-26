@@ -13,6 +13,13 @@ from main_dashboard.ETBX_scan_results import scan_result
 import sqlite3
 import datetime
 
+from components.core_functions import (
+    io,
+    np,
+    Image
+)
+
+
 Builder.load_file("main_dashboard/save_new.kv")
 class SaveNew(Screen): 
     def __init__(self, **kwargs):
@@ -78,6 +85,20 @@ class SaveNew(Screen):
         with open(scan_result.orig_img, 'rb') as file:
             xray_orig = file.read()
 
+        preproc_img = Image.fromarray(((1.0 - scan_result.preproc_img) * 255).astype(np.uint8))
+        preproc_img.convert('L')
+
+        preproc_img_io = io.BytesIO()
+        preproc_img.save(preproc_img_io, format='PNG')
+        preproc_img_bytes = preproc_img_io.getvalue()  # This is your image in PNG format, stored in memory
+
+        gradcam_img = Image.fromarray((scan_result.gradcam_img).astype(np.uint8))
+        gradcam_img.convert("RGB")
+
+        gradcam_img_io = io.BytesIO()
+        gradcam_img.save(gradcam_img_io, format='PNG')
+        gradcam_img_bytes = gradcam_img_io.getvalue()  # This is your image in PNG format, stored in memory
+
         conn = sqlite3.connect("src/components/view_record_main.db")
         cur = conn.cursor()
         
@@ -94,8 +115,7 @@ class SaveNew(Screen):
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (patient_id, scan_date, scan_result.results, scan_result.percentage, 
-             xray_orig, scan_result.preproc_img, scan_result.gradcam_img, 
-             scan_result.notes)
+             xray_orig, preproc_img_bytes, gradcam_img_bytes, scan_result.notes)
         )
         
         if cur.lastrowid is not None:
