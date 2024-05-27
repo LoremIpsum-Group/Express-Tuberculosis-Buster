@@ -255,7 +255,6 @@ class ScanResult(Screen):
         save_new_screen.ids.patient_id.text = ''
         save_new_screen.ids.first_name.text = ''
         save_new_screen.ids.last_name.text = ''
-        save_new_screen.ids.age.text = ''
         save_new_screen.ids.birthdate.text = ''
         save_new_screen.ids.address.text = ''
         save_new_screen.ids.male.active = False

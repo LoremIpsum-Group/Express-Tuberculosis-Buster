@@ -72,10 +72,11 @@ class SaveNew(Screen):
         patient_id = self.ids.patient_id.text 
         first_name = self.ids.first_name.text
         last_name = self.ids.last_name.text
-        age = int(self.ids.age.text)
         birthdate = self.ids.birthdate.text
+        current_date = datetime.datetime.now()
+        age = (current_date - datetime.datetime.strptime(birthdate, "%Y-%m-%d")).days // 365
         address = self.ids.address.text
-        scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        scan_date = current_date.strftime("%Y-%m-%d")
 
         if (self.ids.male.active):
             sex = 'Male'
@@ -102,6 +103,13 @@ class SaveNew(Screen):
         conn = sqlite3.connect("src/components/view_record_main.db")
         cur = conn.cursor()
         
+        cur.execute("SELECT patient_id FROM PATIENT where patient_id = ?", (patient_id,))
+
+        if cur.fetchone():
+            self.ids.patient_id.text = "Patient ID already exists!"
+            self.ids.patient_id.error = True
+            return 
+
         cur.execute(
             f"""
             INSERT INTO PATIENT (patient_ID, first_name, last_name, sex, age, date_of_birth, address)
@@ -129,12 +137,13 @@ class SaveNew(Screen):
         self.ids.patient_id.text = ''
         self.ids.first_name.text = ''
         self.ids.last_name.text = ''
-        self.ids.age.text = ''
         self.ids.birthdate.text = ''
         self.ids.address.text = ''
+        self.ids.male.active = False
+        self.ids.female.active = False
         self.manager.get_screen('scan_result').ids.notes.text = ''
 
-        
+    # display a popup after successfully saving the record
     def show_popup(self):
         content = BoxLayout(orientation='vertical')
         with content.canvas.before:

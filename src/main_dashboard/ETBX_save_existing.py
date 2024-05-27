@@ -100,6 +100,7 @@ class SaveExisting(Screen):
         patient_info_layout.ids.patient_age.text += f'{patient_age}'
         patient_info_layout.ids.patient_birthdate.text += patient_birthdate
     
+    # display no patient layout when patient ID does not exist
     def no_patient(self):
         if self.save_record_btn.parent:
             self.save_record_btn.parent.remove_widget(self.save_record_btn)
@@ -119,6 +120,7 @@ class SaveExisting(Screen):
         patient_id = self.ids.patient_id.text
         scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
     
+        # convert images to BLOB for storage
         with open(scan_result.orig_img, 'rb') as file:
             xray_orig = file.read()
 

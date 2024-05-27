@@ -26,6 +26,7 @@
             size_hint: 0.2, 0.09
             pos_hint: {"center_x": 0.39, "center_y": 0.70}
             
+            
         MDTextField:
             id: first_name
             hint_text: "First Name"
@@ -39,29 +40,22 @@
             mode: "rectangle"
             size_hint: 0.2, 0.09
             pos_hint: {"center_x": 0.61, "center_y": 0.60}
-        
-        MDTextField:
-            id: age
-            hint_text: "Age" 
-            mode: "rectangle"
-            size_hint: 0.2, 0.09
-            pos_hint: {"center_x": 0.39, "center_y": 0.50}
 
+        
         MDTextField:
             id: birthdate
             hint_text: "Birthdate"
             icon_right: "calendar"
             mode: "rectangle"
             size_hint: 0.2, 0.09
-            pos_hint: {"center_x": 0.61, "center_y": 0.50}
+            pos_hint: {"center_x": 0.39, "center_y": 0.50}
             on_focus: root.show_date_picker(self.focus)
-
 
         BoxLayout: 
             spacing: 10
             orientation: "horizontal" 
             size_hint: 0.2, 0.2 
-            pos_hint: {"center_x": 0.395, "center_y": 0.40}
+            pos_hint: {"center_x": 0.615, "center_y": 0.50}
 
             Label:
                 text: "Sex: "
@@ -90,25 +84,18 @@
             hint_text: "Address"
             mode: "rectangle"
             size_hint: 0.42, 0.09
-            pos_hint: {"center_x": 0.501, "center_y": 0.30}
+            pos_hint: {"center_x": 0.501, "center_y": 0.40}
 
-        BoxLayout:
-            orientation: "horizontal"
-            size_hint: 0.4, 0.4
-            pos_hint: {"center_x": 0.5, "center_y": 0.25}
-            padding: 20
-            spacing: 20
+        Button:
+            text: "Save"
+            background_normal: ""
+            pos_hint: {"center_x": 0.5, "center_y": 0.30}
+            background_color: 0, 0, 1, 1
+            size_hint: 0.08, 0.08
+            on_press: root.save_record()
 
-            Button:
-                text: "Save"
-                background_normal: ""
-                background_color: 0, 0, 1, 1
-                size_hint: 0.2, 0.2
-                on_press: root.save_record()
-
-            Button:
-                text: "Back"
-                background_normal: ""
-                background_color: 0, 0, 1, 1
-                size_hint: 0.2, 0.2
-                on_press: root.manager.current = "scan_result"
+        MDRectangleFlatButton:
+            text: 'Back'
+            size_hint_x: 0.06
+            pos_hint: {'center_x':0.95,'center_y':0.95}
+            on_press: root.manager.current = "scan_result"
