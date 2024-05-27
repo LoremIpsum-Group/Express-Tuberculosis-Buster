@@ -7,11 +7,7 @@ from main_dashboard.ETBX_full_view import xray_full_app
 
 
 from components.core_functions import (
-    load_model_efficientNet,
-    load_model_unet,
-    segment_image,
-    predict,
-    get_gradCAM,
+
     sqlite3,
     io,
     plt,
@@ -37,8 +33,7 @@ class ScanResultData:
 scan_result = ScanResultData() 
 
 # Load the trained model
-model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
-model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
+
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_view_rcrds_patient.kv")
 
@@ -88,9 +83,7 @@ class PatientResult(Screen):
         conn.commit()
         conn.close()
 
-       
-
-    def img_string(self, image):
+    def img_string_bytes(self, image):
         """
         Changes the displayed image based on the selected instance. In-depth procedure:
         1. Save PIL Image to BytesIO object. A BytesIO object is like a file object, but it resides in memory instead of being saved to disk.
@@ -98,14 +91,20 @@ class PatientResult(Screen):
         3. Encode the bytes string into base64 format. Base64 encoding is a way of converting binary data into text format, which is needed because `img.source` expects a string.
         4. Convert the string into a data URL by adding the prefix 'data:image/png;base64,'. A data URL is a URI scheme that allows you to include data in-line in web pages as if they were external resources.
         """
+
+        image_stream = io.BytesIO(image)
+        png_image_object = Image.open(image_stream)
+
         with io.BytesIO() as output:
-            image.save(output, format="PNG")
+            png_image_object.save(output, format="PNG")
             contents = output.getvalue()
+
 
         img_data = base64.b64encode(contents).decode('ascii')
         return 'data:image/png;base64,' + img_data 
     
-    def update_result(self, image_blob):
+ 
+    def update_result(self, res_id):
         """
         Updates the scan result with the provided image path.
 
@@ -115,71 +114,76 @@ class PatientResult(Screen):
         Returns:
             None
         """
-        def save_image_from_bytes(image_bytes, file_path):
-            image = Image.open(io.BytesIO(image_bytes))
-            image.save(file_path)
+        conn = sqlite3.connect('src/components/view_record_main.db')
+        c = conn.cursor()
+        c.execute("SELECT orig_image, preproc_image, grad_cam_image, percentage, notes FROM RESULTS WHERE result_id = ?", (res_id,))
+        result = c.fetchone()
 
-        image_bytes = bytes(image_blob)
-
-        image = Image.open(io.BytesIO(image_bytes))
-
-        global xray_orig, xray_orig_resized, superimposed_img, masked_image
-        xray_orig = image
-
-        file_path = "assets/temp-img-location-per-view-records/view_record_temp.png"
-
-        #assets/temp-img-location-per-view-records
-        save_image_from_bytes(xray_orig, file_path)
+        global orig_img, preproc_img, gradcam_img, percent, note, orig_image_bytes, gradcam_image_bytes
 
 
-        self.ids.res_img.source = xray_orig
+        orig_image_bytes = result[0]
+        orig_img = self.img_string_bytes(orig_image_bytes)
+
+        preproc_image_bytes = result[1]
+        preproc_img = self.img_string_bytes(preproc_image_bytes)
+
+        gradcam_image_bytes = result[2]
+        gradcam_img = self.img_string_bytes(gradcam_image_bytes)
+        # orig_image_bytes = self.img_string(result[0])
+        # orig_image_stream = io.BytesIO(orig_image_bytes)
+        #orig_image = Image.open(orig_image_stream)
+        # orig_image.save('orig_image.jpg')            
+        # orig_img = 'orig_image.jpg'
+        #assets/temp-img-location-per-view-records/
+        
+        #print(type(orig_image))
+
+
+        #preproc_image_bytes = self.img_string(result[1])
+        # preproc_image_stream = io.BytesIO(preproc_image_bytes)
+        # preproc_image = Image.open(preproc_image_stream)
+        # preproc_image.save('preproc_image.jpg')
+        # preproc_img = 'preproc_image.jpg'
+
+        #gradcam_image_bytes = self.img_string(result[2])
+        # gradcam_image_stream = io.BytesIO(gradcam_image_bytes)
+        # gradcam_image = Image.open(gradcam_image_stream)
+        # gradcam_image.save('gradcam_image.jpg')
+        # gradcam_img = 'gradcam_image.jpg'
+
+        percent = result[3]
+
+        note = result[4]
+
+        #print(type(gradcam_image_bytes))
+        #print(type(preproc_image_bytes))
+
+
+        #self.ids.res_img.source = xray_orig
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
 
-        # !CORE FUNCTIONALITIES - START
-        # Get segmented/masked image
-        xray_orig_resized, masked_image, mask_result = segment_image(
-             model_segmentation, xray_orig
-        )
-
-        # Get Score from segmented image
-        predicted_class, predicted_score = predict(model_classifier, masked_image)
-
-        # Superimpose heatmap of segmented image onto original image
-        superimposed_img = get_gradCAM(model_classifier, xray_orig_resized, masked_image)
-
-        # !CORE FUNCTIONALITIES - end
-        # *DEBUGGING PURPOSES, removable any time
-        # preprocessed_img = get_img_array_OLD(masked_image)
-        # predicted_class, predicted_score = predict(model_classifier, preprocessed_img)
-        # superimposed_img = get_gradCAM_NONSEGMENTED(model_classifier, original_image)
-        # * Replace here the image you want to display, temporary ONLY!!!!!
-        # Good results: normal 2551, tuberculosis 640
-
-        # plt.imshow(superimposed_img)
-        # plt.axis('off')  # Turn off axis
-        # plt.show()
 
         bar_color = None
-        if (predicted_score <= 25):
+        if (percent <= 25):
             bar_color = (0, 1, 0, 1)
-        elif (predicted_score <= 49):
+        elif (percent <= 49):
             bar_color = (1, 1, 0, 1)
-        elif (predicted_score <= 74):
+        elif (percent <= 74):
             bar_color = (1, 0.5, 0, 1)
         else:
             bar_color = (1, 0, 0, 1)
 
-        self.percentage = int(predicted_score)
+        self.percentage = int(percent)
         self.percentage_color = bar_color
-        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) + " %\n segmented datatype: " + str(masked_image.dtype)
+        self.ids.result_classnPerc.text =  str(percent)
 
-        scan_result.results = predicted_class
-        scan_result.percentage = predicted_score
-        scan_result.orig_img = xray_orig
-        scan_result.preproc_img = masked_image 
-        scan_result.gradcam_img = superimposed_img
-        scan_result.notes = self.ids.notes.text
+        # scan_result.percentage = percent
+        # scan_result.orig_img = xray_orig
+        # scan_result.preproc_img = masked_image 
+        # scan_result.gradcam_img = superimposed_img
+        # scan_result.notes = self.ids.note.text
 
     def change_img(self, instance):
         white = (1, 1, 1, 1)  # Default color
@@ -198,27 +202,27 @@ class PatientResult(Screen):
         instance.text_color = white
 
         if instance == self.ids.x_ray:
-            self.ids.res_img.source = xray_orig
-
-        elif instance == self.ids.grad_cam:
-            img = Image.fromarray((superimposed_img) .astype(np.uint8))
-            #img = img.convert("RGB")            
-                     
-            self.ids.res_img.source = self.img_string(img)   
-
+            self.ids.res_img.source = orig_img
+            print(type(orig_img))
+        elif instance == self.ids.grad_cam:            
+            self.ids.res_img.source = gradcam_img 
+            print(type(gradcam_img))
         elif instance == self.ids.pre_proc: 
-            img = Image.fromarray(((1.0 - masked_image) * 255).astype(np.uint8))
-            img = img.convert('L')
-
-            self.ids.res_img.source = self.img_string(img) 
-
+            self.ids.res_img.source = preproc_img
+            print(type(preproc_img))
         else:
             pass
 
 
     def full_view(self):
-        xrayPath = xray_orig
-        supIM = superimposed_img
+        #base64_decoded = base64.b64decode(orig_img)
+        image = Image.open(io.BytesIO(orig_image_bytes))
+        image_np_orig = np.array(image)
 
-        xray_full_app(xrayPath, supIM)
+        #base64_decoded1 = base64.b64decode(gradcam_img)
+        image1 = Image.open(io.BytesIO(gradcam_image_bytes))
+        image_np_grad = np.array(image1)
+
+      
+        xray_full_app(image_np_orig, image_np_grad)
         pass
