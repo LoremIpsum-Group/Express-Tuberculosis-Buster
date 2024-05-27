@@ -33,7 +33,7 @@
 
         Button:
             markup: True
-            text: '[b]View Records[/b]'
+            text: '[b]View Record[/b]'
              
             pos_hint: {'x':0.5, 'y':0.6}
             color: [1,1,1,1]
@@ -45,20 +45,7 @@
             on_press:
                 root.manager.current = 'view_rec'
 
-        #! For testing
-        Button:
-            markup: True
-            text: '[b]Scan Result[/b]'
-             
-            pos_hint: {'x':0.5, 'y':0.6}
-            color: [1,1,1,1]
-            background_normal: ''
-            background_down: ''
-            background_color: 0, 0, 1, 1
-            size_hint_x: 0.5
-            size_hint_y: None           
-            on_press:
-                root.manager.current = 'scan_result'
+       
     BoxLayout:
         id: main_area
         orientation: 'vertical'

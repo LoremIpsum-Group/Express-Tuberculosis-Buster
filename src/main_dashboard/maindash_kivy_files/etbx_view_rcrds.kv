@@ -40,7 +40,7 @@
        
         Button:
             markup: True
-            text: '[b]View Patient[/b]'
+            text: '[b]View Record[/b]'
             pos_hint: {'x':0.50, 'y':0.6}
             color: [0, 0, 1, 1]
             size_hint_x: 0.5
@@ -49,18 +49,7 @@
             background_down: ''
             on_press:
                 root.manager.current = 'view_rec'    
-                        
-        # For testing
-        # HoverLabel:
-        #     markup: True
-        #     text: '[b]Scan Result[/b]'
-        #     font_size: 27   
-        #     pos_hint: {'x':0.5, 'y':0.7}
-        #     color: [1,1,1,1]
-        #     size_hint: None, None
-        #     on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_result'
-                          
-
+                    
     BoxLayout:
         id: main_area
         orientation: 'horizontal'
