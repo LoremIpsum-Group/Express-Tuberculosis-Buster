@@ -14,7 +14,7 @@ from main_dashboard.ETBX_save_existing import SaveExisting
 from kivymd.app import MDApp
 
 class MainApp(MDApp):
-    
+
     def build(self):
         Window.maximize()
         self.screen_manager = ScreenManager(transition=NoTransition())
@@ -32,5 +32,3 @@ class MainApp(MDApp):
 if __name__ == '__main__':
     MainApp().run()
 
-
-# helloo

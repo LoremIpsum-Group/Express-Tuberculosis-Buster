@@ -135,9 +135,6 @@ class ScanResult(Screen):
         # * Replace here the image you want to display, temporary ONLY!!!!!
         # Good results: normal 2551, tuberculosis 640
 
-        plt.imshow(superimposed_img)
-        plt.axis('off')  # Turn off axis
-        plt.show()
 
         bar_color = None
         if (predicted_score <= 25):
@@ -214,7 +211,7 @@ class ScanResult(Screen):
 
 
     def full_view(self):
-        xrayPath = xray_orig
+        xrayPath = xray_orig_resized
         supIM = superimposed_img
 
         xray_full_app(xrayPath, supIM)
