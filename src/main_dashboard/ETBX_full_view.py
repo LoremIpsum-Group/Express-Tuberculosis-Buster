@@ -7,9 +7,15 @@ class FullScreenApp:
         self.root = root
         self.root.title("X-Ray Inspector")
 
+        min_val1 = np.min(image1_path)
+        max_val1 = np.max(image1_path)
+        self.image1_data = ((image1_path - min_val1) / (max_val1 - min_val1) * 255).astype(np.uint8)
+
         min_val = np.min(gradCamIm)
         max_val = np.max(gradCamIm)
         self.image2_data = ((gradCamIm - min_val) / (max_val - min_val) * 255).astype(np.uint8)
+
+
 
         self.root.configure(bg='black')
 
@@ -19,7 +25,7 @@ class FullScreenApp:
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
         
-        self.image1 = Image.open(image1_path)
+        self.image1 = Image.fromarray(self.image1_data)
         self.image2 = Image.fromarray(self.image2_data)
         
         self.photo1 = self.resize_image(self.image1, self.screen_width // 2, self.screen_height)
