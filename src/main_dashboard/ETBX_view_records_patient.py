@@ -48,8 +48,12 @@ class PatientResult(Screen):
     Methods:
         update_result(image_path): Updates the scan result with the provided image path.
         change_img(instance): Changes the displayed image based on the selected instance.
+        img_string_bytes(image): Converts the image to a base64-encoded data URL.
+        full_view(): Displays the full view of the scan result images.
     """
-
+    def on_enter(self, *args):
+        self.change_img(self.ids.x_ray)
+        
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         conn = sqlite3.connect('src/components/view_record_main.db')
@@ -116,11 +120,14 @@ class PatientResult(Screen):
         """
         conn = sqlite3.connect('src/components/view_record_main.db')
         c = conn.cursor()
-        c.execute("SELECT orig_image, preproc_image, grad_cam_image, percentage, notes FROM RESULTS WHERE result_id = ?", (res_id,))
+        
+
+        c.execute("SELECT orig_image, preproc_image, grad_cam_image, percentage, notes, result, patient_ID FROM RESULTS WHERE result_id = ?", (res_id,))
         result = c.fetchone()
 
         global orig_img, preproc_img, gradcam_img, percent, note, orig_image_bytes, gradcam_image_bytes
 
+        
 
         orig_image_bytes = result[0]
         orig_img = self.img_string_bytes(orig_image_bytes)
@@ -156,6 +163,9 @@ class PatientResult(Screen):
 
         note = result[4]
 
+        classification = result[5]
+
+        patient_id = result[6]
         #print(type(gradcam_image_bytes))
         #print(type(preproc_image_bytes))
 
@@ -177,7 +187,9 @@ class PatientResult(Screen):
 
         self.percentage = int(percent)
         self.percentage_color = bar_color
-        self.ids.result_classnPerc.text =  str(percent)
+        self.ids.result_classnPerc.text =  classification + ": " + str(percent)
+        self.ids.patient_id_text.text = 'Scan Results for Patient: ' + str(patient_id)
+        self.ids.notes.text = note
 
         # scan_result.percentage = percent
         # scan_result.orig_img = xray_orig
@@ -188,6 +200,8 @@ class PatientResult(Screen):
     def change_img(self, instance):
         white = (1, 1, 1, 1)  # Default color
         blue = (0.1, 0.5, .9, 1)  # Pressed color
+
+        self.ids.res_img.source = orig_img #open agad 
 
         # Reset all buttons to default color
         self.ids.x_ray.md_bg_color = white
@@ -201,6 +215,7 @@ class PatientResult(Screen):
         instance.md_bg_color = blue
         instance.text_color = white
 
+        
         if instance == self.ids.x_ray:
             self.ids.res_img.source = orig_img
             print(type(orig_img))
@@ -212,7 +227,8 @@ class PatientResult(Screen):
             print(type(preproc_img))
         else:
             pass
-
+    
+    
 
     def full_view(self):
         #base64_decoded = base64.b64decode(orig_img)

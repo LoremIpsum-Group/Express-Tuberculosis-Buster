@@ -31,7 +31,8 @@
 
    
         Label:
-            text: 'Scan Results for Patient: '
+            #text: 'Scan Results for Patient: '
+            id: patient_id_text
             font_size: 24
             color: [0, 0, 1, 1]
             pos_hint: {'center_x': 0.15, 'center_y': 0.9}
@@ -105,19 +106,19 @@
             text: 'Back'
             size_hint_x: 0.06
             pos_hint: {'center_x':0.95,'center_y':0.95}
-            on_press: root.manager.current = 'scan_img'
+            on_press: root.manager.current = 'view_rec'
         
 
         BoxLayout:
             spacing: 20
             orientation: 'horizontal'
             size_hint: 0.2 , 0.2 
-            pos_hint: {'center_x': 0.7, 'center_y': 0.29} 
+            pos_hint: {'center_x': 0.75, 'center_y': 0.29} 
 
 
 
             MDRectangleFlatButton:
-                text: 'Full View'
+                text: 'Full View Image'
                 size_hint_x: 0.06    
                 on_press: root.full_view()
         
