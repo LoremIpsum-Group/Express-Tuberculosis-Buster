@@ -6,8 +6,7 @@ from main_dashboard.ETBx_scan_image import ScanImage
 from main_dashboard.ETBX_view_records import ViewRecords  
 from main_dashboard.ETBX_manage_account import ManageAccount
 from main_dashboard.ETBX_scan_results import ScanResult   
-from main_dashboard.ETBX_view_records_patient import PatientResult  # Import DisplayResult screen
-
+from main_dashboard.ETBX_view_records_patient import PatientResult  
 
 from main_dashboard.ETBX_save_new import SaveNew
 from main_dashboard.ETBX_save_existing import SaveExisting
@@ -25,7 +24,7 @@ class MainApp(MDApp):
         self.screen_manager.add_widget(ScanResult(name='scan_result'))
         self.screen_manager.add_widget(SaveNew(name='save_new'))
         self.screen_manager.add_widget(SaveExisting(name='save_existing'))
-        self.screen_manager.add_widget(PatientResult(name='patient_result'))  # Add DisplayResult screen
+        self.screen_manager.add_widget(PatientResult(name='patient_result')) 
 
         return self.screen_manager
 
