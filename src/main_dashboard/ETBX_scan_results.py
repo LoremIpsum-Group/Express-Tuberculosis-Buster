@@ -264,10 +264,13 @@ class ScanResult(Screen):
         self.manager.get_screen('scan_result').ids.notes.text = ''
         self.ids.misclassified.active = False
         self.manager.get_screen('save_existing').ids.patient_id.text = ''
+        self.manager.get_screen('save_existing').ids.patient_search_result.clear_widgets()
+        self.manager.get_screen('save_existing').ids.patient_search_result.add_widget(
+                Label(text="[b]Search Patient ID to save[/b]", 
+                      pos_hint={'center_x': 0.5, 'center_y': 0.5},
+                      color=(0, 0, 0, 1), markup=True)
+        )
         self.manager.current = 'scan_img'
-     
-        save_existing_screen.clear_layout()
-
         self.popup.dismiss()
         
     def close_popup(self, instance):

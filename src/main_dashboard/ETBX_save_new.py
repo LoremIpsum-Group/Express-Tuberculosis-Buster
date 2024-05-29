@@ -110,7 +110,12 @@ class SaveNew(Screen):
         
         if cur.lastrowid is not None:
             self.clear_fields() 
-
+            self.manager.get_screen('save_existing').ids.patient_search_result.clear_widgets()
+            self.manager.get_screen('save_existing').ids.patient_search_result.add_widget(
+                Label(text="[b]Search Patient ID to save[/b]", 
+                      pos_hint={'center_x': 0.5, 'center_y': 0.5},
+                      color=(0, 0, 0, 1), markup=True)
+            )
             conn.commit()
             conn.close()
             self.show_popup()

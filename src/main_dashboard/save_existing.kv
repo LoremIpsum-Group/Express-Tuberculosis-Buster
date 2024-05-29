@@ -26,6 +26,53 @@
             size_hint: 0.20, 0.07
             on_text_validate: root.search_record()
         
+
+        Label:
+            id: header
+            text: 'Patient Information'
+            color: (0, 0, 1, 1)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.70}
+        BoxLayout:
+            size_hint_x: 0.4
+            size_hint_y: None
+            height: 1
+            pos_hint: {'center_x': 0.5, 'center_y': 0.67}
+            canvas:
+                Color:
+                    rgba: 0, 0, 1, 1  
+                Line:
+                    points: [self.x, self.y, self.right, self.y]
+        
+        BoxLayout:
+            id: patient_search_result
+            orientation: 'vertical'
+            size_hint: 0.4, 0.4 
+            pos_hint: {'center_x': 0.50, 'center_y': 0.45}
+            canvas.before:
+                Color:
+                    rgba: (250/255, 250/255, 254/255, 1)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [20, ]
+            Label:
+                text: "[b]Search Patient ID to save[/b]"
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                color: (0, 0, 1, 1)
+                markup: True
+
+        Button:
+            id: save_button
+            text: "Save Record"
+            background_normal: ''
+            background_color: (0, 0, 1, 1)
+            size_hint_x: 0.06
+            size_hint_y: 0.06
+            pos_hint: {'center_x': 0.5, 'center_y': 0.15}
+            disabled: True
+            on_press: root.save_record()
+            
+        
         MDRectangleFlatButton:
             text: "Back"
             size_hint_x: 0.06
@@ -33,6 +80,7 @@
             background_normal: ''
             background_color: 0, 0, 1, 1
             on_press: root.manager.current = 'scan_result'
+        
         
         # GridLayout:
         #     cols: 2
@@ -106,4 +154,4 @@
         #         size_hint: 0.2, 0.2
         #         background_normal: ''
         #         background_color: 0, 0, 1, 1
-        #         on_press: root.manager.current = 'scan_result'
+        #         on_press: root.manager.current = 'scan_resul

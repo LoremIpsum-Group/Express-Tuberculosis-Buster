@@ -24,15 +24,7 @@ class SaveExisting(Screen):
         super().__init__(**kwargs)
         self.patient_info_layout = None
         self.no_patient_layout = None
-        self.save_record_btn = Button(
-            text="Save Record", 
-            background_normal='',
-            background_color=(0, 0, 1, 1),
-            on_press=self.save_record,
-            size_hint_x=0.06,
-            size_hint_y=0.06,
-            pos_hint={'center_x': 0.5, 'center_y': 0.25}
-        )
+    
         conn = sqlite3.connect('src/components/view_record_main.db')
         cur = conn.cursor()
 
@@ -54,6 +46,7 @@ class SaveExisting(Screen):
 
         conn.commit()
         conn.close()
+        
     
     def search_record(self):
         patient_id = self.ids.patient_id.text.strip()
@@ -75,48 +68,42 @@ class SaveExisting(Screen):
                 self.no_patient()
     
     def display_patient(self, patient):
-        if self.patient_info_layout:
-            self.remove_widget(self.patient_info_layout)
-            self.remove_widget(self.save_record_btn)
-        elif self.no_patient_layout:
-            self.remove_widget(self.no_patient_layout)
-            self.remove_widget(self.save_record_btn)
-
+        self.ids.patient_search_result.clear_widgets()
+        self.ids.save_button.disabled = False
         patient_id = patient[0]
         patient_name = patient[1] + " " + patient[2]
         patient_sex = patient[3]
         patient_age = patient[4]
         patient_birthdate = patient[5]
-        patient_info_layout = Builder.load_file('src/main_dashboard/patient_info_layout.kv')
-        self.add_widget(patient_info_layout)
 
-        if self.save_record_btn.parent:
-            self.save_record_btn.parent.remove_widget(self.save_record_btn)
+        patient_info_content1 = BoxLayout(orientation='horizontal')
+        name_label = Label(text=f'Name:\n{patient_name}', color=(0,0,0,1))
+        age_label = Label(text=f'Age:\n{patient_age}', color=(0,0,0,1))
+        patient_info_content1.add_widget(name_label)
+        patient_info_content1.add_widget(age_label)
 
-        self.add_widget(self.save_record_btn)
-        patient_info_layout.ids.header.text = f'Patient ID - {patient_id}'
-        patient_info_layout.ids.patient_name.text += patient_name
-        patient_info_layout.ids.patient_sex.text += patient_sex
-        patient_info_layout.ids.patient_age.text += f'{patient_age}'
-        patient_info_layout.ids.patient_birthdate.text += patient_birthdate
+        patient_info_content2 = BoxLayout(orientation='horizontal')
+        sex_label = Label(text=f'Sex:\n{patient_sex}', color=(0,0,0,1))
+        birthdate_label = Label(text=f'Birthdate:\n{patient_birthdate}', color=(0,0,0,1))
+        patient_info_content2.add_widget(sex_label)
+        patient_info_content2.add_widget(birthdate_label)
+
+        self.ids.patient_search_result.add_widget(patient_info_content1)
+        self.ids.patient_search_result.add_widget(patient_info_content2)
+  
+
     
     # display no patient layout when patient ID does not exist
     def no_patient(self):
-        if self.save_record_btn.parent:
-            self.save_record_btn.parent.remove_widget(self.save_record_btn)
-
-        if self.patient_info_layout:
-            self.remove_widget(self.patient_info_layout)
-           
-        elif self.no_patient_layout:
-            self.remove_widget(self.no_patient_layout)
-         
-
-        no_patient_layout = Builder.load_file('src/main_dashboard/no_patient.kv')
-        self.add_widget(no_patient_layout)
+        self.ids.save_button.disabled = True
+        self.ids.patient_search_result.clear_widgets()
+        self.ids.patient_search_result.add_widget(Label(
+            text=f"No Patient ID - {self.ids.patient_id.text.strip()} Found! Please check the Patient ID and try again.",
+            color=(1,0,0,1)
+        ))
 
     
-    def save_record(self, instance):
+    def save_record(self):
         patient_id = self.ids.patient_id.text
         scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
         is_misclassified = self.manager.get_screen('scan_result').ids.misclassified
@@ -162,7 +149,7 @@ class SaveExisting(Screen):
         self.manager.get_screen('scan_result').ids.misclassified.active = False
 
     def show_popup(self):
-        content = BoxLayout(orientation='vertical')
+        content = BoxLayout(orientation='vertical', padding=10)
         with content.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(size=content.size, pos=content.pos)
@@ -177,21 +164,15 @@ class SaveExisting(Screen):
     
     def close_popup(self, instance):
         self.popup.dismiss()
+        self.ids.patient_search_result.clear_widgets()
+        self.ids.save_button.disabled = True
+        self.ids.patient_search_result.add_widget(
+            Label(text="[b]Search Patient ID to save[/b]", 
+                  pos_hint={'center_x': 0.5, 'center_y': 0.5},
+                  color=(0, 0, 0, 1), markup=True)
+        )
         self.manager.current = 'scan_img'
 
-    def clear_layout(self):
-        
-        if self.save_record_btn.parent:
-            self.save_record_btn.parent.remove_widget(self.save_record_btn)
-
-        if self.patient_info_layout:
-            self.remove_widget(self.patient_info_layout)
-           
-        elif self.no_patient_layout:
-            self.remove_widget(self.no_patient_layout)
-        
-        self.patient_info_layout = None
-        self.no_patient_layout = None
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
