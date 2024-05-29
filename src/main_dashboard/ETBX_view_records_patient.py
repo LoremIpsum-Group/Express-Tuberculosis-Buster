@@ -123,7 +123,7 @@ class PatientResult(Screen):
         c = conn.cursor()
         
 
-        c.execute("SELECT orig_image, preproc_image, grad_cam_image, percentage, notes, result, patient_ID FROM RESULTS WHERE result_id = ?", (res_id,))
+        c.execute("SELECT orig_image, preproc_image, grad_cam_image, percentage, notes, result, patient_ID, misclassified FROM RESULTS WHERE result_id = ?", (res_id,))
         result = c.fetchone()
 
         global orig_img, preproc_img, gradcam_img, percent, note, orig_image_bytes, gradcam_image_bytes
@@ -170,7 +170,7 @@ class PatientResult(Screen):
         #print(type(gradcam_image_bytes))
         #print(type(preproc_image_bytes))
 
-
+        misclassifier = result[7]
         #self.ids.res_img.source = xray_orig
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
@@ -191,6 +191,7 @@ class PatientResult(Screen):
         self.ids.result_classnPerc.text =  classification + ": " + str(percent)
         self.ids.patient_id_text.text = 'Scan Results for Patient: ' + str(patient_id)
         self.ids.notes.text = note
+        self.ids.misclassified.active = misclassifier
 
         # scan_result.percentage = percent
         # scan_result.orig_img = xray_orig

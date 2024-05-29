@@ -105,6 +105,8 @@ class ViewRecords(Screen):
             self.ids.search_result.text = f"Records of Patient ID: {search_input}"
             c.execute("SELECT * FROM RESULTS WHERE patient_ID = ?", (search_input,))
             results = c.fetchall()
+            self.ids.result_label.text = "Result"
+            self.ids.date_label.text = "Date of Scan"
             if results:
                 for result in results:
                     self.data_items.append(result)
@@ -113,6 +115,8 @@ class ViewRecords(Screen):
                 self.ids.search_result_layout.clear_widgets()
                 self.error_popup("No ID found")
                 self.ids.search_result.text = ""
+                self.ids.result_label.text = ""
+                self.ids.date_label.text = ""
 
         conn.close()
                 
@@ -173,7 +177,7 @@ class ViewRecords(Screen):
         close_button.bind(on_press=lambda instance: self.close_popup(instance))
         button_grid = GridLayout(cols=2, size_hint=(1, 0.2), pos_hint={'x': 0, 'y': 0})
 
-        button1 = Button(text='Export Images')
+        button1 = Button(text='Export Result')
         button1.bind(on_release=lambda instance: self.export_result(search_input))
         button1.bind(on_release=lambda instance: self.export_success())
         button1.bind(on_release=lambda instance: self.close_popup(instance))
@@ -188,6 +192,9 @@ class ViewRecords(Screen):
         content.add_widget(close_button)
         content.add_widget(button_grid)
         self.popup.open()
+
+   
+
 
     def export_success(self):
         """
@@ -230,7 +237,7 @@ class ViewRecords(Screen):
         c.execute(
             """
             SELECT PATIENT.patient_ID, PATIENT.first_name, PATIENT.last_name, PATIENT.sex, PATIENT.age, PATIENT.address, 
-            RESULTS.date_of_scan, RESULTS.result, RESULTS.percentage, RESULTS.notes, RESULTS.orig_image, RESULTS.preproc_image, RESULTS.grad_cam_image
+            RESULTS.date_of_scan, RESULTS.result, RESULTS.percentage, RESULTS.notes, RESULTS.orig_image, RESULTS.preproc_image, RESULTS.grad_cam_image, RESULTS.misclassified
             FROM PATIENT
             JOIN RESULTS ON PATIENT.patient_ID = RESULTS.patient_id
             WHERE PATIENT.patient_ID = ?
@@ -251,34 +258,74 @@ class ViewRecords(Screen):
                 result = record[7]
                 percentage = record[8]
                 notes = record[9]
-            
-        pdf.cell(200, 10, f'Patient ID: {patient_ID}', ln=True)
-        pdf.cell(200, 10, f'First Name: {first_name}', ln=True)
-        pdf.cell(200, 10, f'Last Name: {last_name}', ln=True)
-        pdf.cell(200, 10, f'Sex: {sex}', ln=True)
-        pdf.cell(200, 10, f'Age: {age}', ln=True)
-        pdf.cell(200, 10, f'Address: {address}', ln=True)
-        pdf.cell(200, 10, f'Date of Scan: {date_of_scan}', ln=True)   
-        pdf.cell(200, 10, f'Result: {result}', ln=True)
-        pdf.cell(200, 10, f'Percentage: {percentage}', ln=True)
-        pdf.cell(200, 10, f'Notes: {notes}', ln=True)
-
-        pdf.output('assets/temp-img-location-per-view-records/patient_results.pdf')
-        
+                misclassified = record [13]
+        if misclassified == True: 
+            misclassified = "True"
+        else:
+            misclassified = "False"    
+        #C:\Users\paopa\OneDrive\Desktop\git repo (realgit)\Express-Tuberculosis-Buster
+        #dependencies.txt
         orig_image_bytes  = record[10]
         orig_image_stream = io.BytesIO(orig_image_bytes)
         orig_image = Image.open(orig_image_stream)
-        orig_image.save('assets/temp-img-location-per-view-records/orig_image.jpg')
-        
+        #orig_image.save('assets/temp-img-location-per-view-records/orig_image.jpg')
+        orig_image.save('Exported-Results/orig_image.jpg')
+
         preproc_image_bytes = record[11]
         preproc_image_stream = io.BytesIO(preproc_image_bytes)
         preproc_image = Image.open(preproc_image_stream)
-        preproc_image.save('assets/temp-img-location-per-view-records/preproc_image.jpg')
+        #preproc_image.save('assets/temp-img-location-per-view-records/preproc_image.jpg')
+        preproc_image.save('Exported-Results/preproc_image.jpg')
 
         gradcam_image_bytes = record[12]
         gradcam_image_stream = io.BytesIO(gradcam_image_bytes)
         gradcam_image = Image.open(gradcam_image_stream)
-        gradcam_image.save('assets/temp-img-location-per-view-records/gradcam_image.jpg')
+        #gradcam_image.save('assets/temp-img-location-per-view-records/gradcam_image.jpg')
+        gradcam_image.save('Exported-Results/gradcam_image.jpg')
+        #Exported-Results
+        pdf.set_font('times', 'B', 20)
+        pdf.cell(0, 10, '[Hospital Name]', ln=True, align='C')
+        pdf.cell(0, 10, 'Report of Tuberculosis Screening', ln=True, align='C')
+        pdf.ln(20)  
+
+        pdf.set_font('times', '', 16)
+        pdf.cell(95, 10, f'Patient ID: {patient_ID}')
+        pdf.cell(95, 10, f'Date of Scan: {date_of_scan}', ln=True)
+        pdf.cell(95, 10, f'First Name: {first_name}')
+        pdf.cell(95, 10, f'Last Name: {last_name}', ln=True)
+        pdf.cell(95, 10, f'Sex: {sex}')
+        pdf.cell(95, 10, f'Age: {age}', ln=True)
+        pdf.cell(0, 10, f'Address: {address}', ln=True)
+        pdf.ln(5)  
+
+        pdf.cell(95, 10, f'Result: {result}')
+        pdf.cell(95, 10, f'Model Prediction %: {percentage}', ln=True)
+        pdf.cell(0, 10, f'Misclassification: {misclassified}', ln=True)
+        pdf.ln(5)  
+
+        pdf.cell(0, 10, 'Notes:', ln=True)
+        pdf.multi_cell(0, 10, notes)
+
+        pdf.ln(80)
+        pdf.set_font('times', '', 16)
+        pdf.cell(0, 10, 'Attending Physician:', ln=True)
+        pdf.cell(0, 10, 'Name: _________________________', ln=True)
+        pdf.cell(0, 10, 'Signature: _____________________', ln=True)
+
+        pdf.add_page()
+        pdf.set_font('times', 'B', 20)
+        pdf.cell(0, 20, 'Original Image', 0, 1, 'C')
+        #pdf.image('assets/temp-img-location-per-view-records/orig_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image('Exported-Results/orig_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+
+        pdf.add_page()
+        pdf.set_font('times', 'B', 20)
+        pdf.cell(0, 20, 'Grad-CAM Image', 0, 1, 'C')
+        #pdf.image('assets/temp-img-location-per-view-records/gradcam_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image('Exported-Results/gradcam_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+
+        #pdf.output('assets/temp-img-location-per-view-records/patient_results.pdf')
+        pdf.output('Exported-Results/patient_results.pdf')
 
 
     def close_popup(self, instance):
