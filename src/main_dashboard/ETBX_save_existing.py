@@ -98,7 +98,7 @@ class SaveExisting(Screen):
         self.ids.save_button.disabled = True
         self.ids.patient_search_result.clear_widgets()
         self.ids.patient_search_result.add_widget(Label(
-            text="No Patient Found! Please check the Patient ID and try again.",
+            text=f"No Patient ID - {self.ids.patient_id.text.strip()} Found! Please check the Patient ID and try again.",
             color=(1,0,0,1)
         ))
 
