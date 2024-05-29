@@ -37,6 +37,7 @@ class ScanResultData:
         self.preproc_img = None
         self.gradcam_img = None 
         self.notes = None 
+        self.is_misclassified = None
 
 scan_result = ScanResultData() 
 
@@ -75,6 +76,7 @@ class ScanResult(Screen):
                 preproc_image BLOB NOT NULL, 
                 grad_cam_image BLOB NOT NULL, 
                 notes TEXT, 
+                misclassified BOOLEAN, 
                 FOREIGN KEY(patient_id) REFERENCES PATIENT(patient_id)
             )
         """
@@ -260,6 +262,7 @@ class ScanResult(Screen):
         save_new_screen.ids.male.active = False
         save_new_screen.ids.female.active = False
         self.manager.get_screen('scan_result').ids.notes.text = ''
+        self.ids.misclassified.active = False
         self.manager.get_screen('save_existing').ids.patient_id.text = ''
         self.manager.current = 'scan_img'
      

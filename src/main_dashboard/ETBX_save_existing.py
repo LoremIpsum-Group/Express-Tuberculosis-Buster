@@ -119,7 +119,8 @@ class SaveExisting(Screen):
     def save_record(self, instance):
         patient_id = self.ids.patient_id.text
         scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    
+        is_misclassified = self.manager.get_screen('scan_result').ids.misclassified
+
         # convert images to BLOB for storage
         with open(scan_result.orig_img, 'rb') as file:
             xray_orig = file.read()
@@ -143,17 +144,22 @@ class SaveExisting(Screen):
 
         cur.execute(
             """
-            INSERT INTO RESULTS (patient_ID, date_of_scan, result, percentage, orig_image, preproc_image, grad_cam_image, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO RESULTS (patient_ID, date_of_scan, result, percentage, 
+                orig_image, preproc_image, grad_cam_image, notes, misclassified)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (patient_id, scan_date, scan_result.results, scan_result.percentage, 
-             xray_orig, preproc_img_bytes, gradcam_img_bytes, scan_result.notes)
+             xray_orig, preproc_img_bytes, gradcam_img_bytes, 
+             self.manager.get_screen('scan_result').ids.notes.text,
+             self.manager.get_screen('scan_result').ids.misclassified.active)
         )
 
         conn.commit()
         conn.close()
         self.show_popup()
         self.ids.patient_id.text = ''
+        self.manager.get_screen('scan_result').ids.notes.text = ''
+        self.manager.get_screen('scan_result').ids.misclassified.active = False
 
     def show_popup(self):
         content = BoxLayout(orientation='vertical')
@@ -165,7 +171,7 @@ class SaveExisting(Screen):
         content.add_widget(Label(text="[b]Record saved successfully![/b]", color=(0, 0, 1, 1), markup=True))
         content.add_widget(Button(text="Close", 
             background_color=(0, 0, 1, 1), background_normal='',
-            on_press=self.close_popup))
+            size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
         self.popup.open()
     

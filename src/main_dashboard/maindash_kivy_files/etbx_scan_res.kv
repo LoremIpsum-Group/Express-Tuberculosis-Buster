@@ -70,6 +70,18 @@
             font_size: 26
             pos_hint: {"center_x": 0.63, "center_y": 0.70}  
 
+        BoxLayout: 
+            orientation: 'horizontal'
+            size_hint: 0.10, 0.10
+            pos_hint: {'center_x': 0.80, 'center_y': 0.70}
+            
+            Label:
+                text: 'Misclassified'
+                color: 0, 0, 1, 1
+            CheckBox:
+                id: misclassified
+                color: 0, 0, 0, 1
+
         TextInput:
             id: notes
             multiline: True

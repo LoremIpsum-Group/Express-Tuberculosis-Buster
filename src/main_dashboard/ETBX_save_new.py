@@ -46,35 +46,14 @@ class SaveNew(Screen):
 
         conn.commit()
         conn.close()
-    
-
-    def show_date_picker(self, focus):
-        if not focus:
-            return
-        
-        date_dialog = MDDatePicker()
-        date_dialog.bind(on_save=self.on_date_picker_save, on_cancel=self.on_date_picker_cancel)
-        date_dialog.pos = [
-            self.ids.birthdate.center_x - date_dialog.width / 2,
-            self.ids.birthdate.center_y - (date_dialog.height + dp(32))
-        ]
-        
-        date_dialog.open()
-       
-    
-    def on_date_picker_save(self, instance, value, date_range):
-        self.ids.birthdate.text = value.strftime("%Y-%m-%d")
-    
-    def on_date_picker_cancel(self, instance, value):
-        self.ids.field.focus = False
-
+           
     def save_record(self):
         patient_id = self.ids.patient_id.text 
         first_name = self.ids.first_name.text
         last_name = self.ids.last_name.text
         birthdate = self.ids.birthdate.text
         current_date = datetime.datetime.now()
-        age = (current_date - datetime.datetime.strptime(birthdate, "%Y-%m-%d")).days // 365
+        age = (current_date - datetime.datetime.strptime(birthdate, "%Y/%m/%d")).days // 365
         address = self.ids.address.text
         scan_date = current_date.strftime("%Y-%m-%d")
 
@@ -119,11 +98,14 @@ class SaveNew(Screen):
 
         cur.execute(
             """
-            INSERT INTO RESULTS (patient_ID, date_of_scan, result, percentage, orig_image, preproc_image, grad_cam_image, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO RESULTS (patient_ID, date_of_scan, result, 
+                percentage, orig_image, preproc_image, grad_cam_image, notes, misclassified)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (patient_id, scan_date, scan_result.results, scan_result.percentage, 
-             xray_orig, preproc_img_bytes, gradcam_img_bytes, scan_result.notes)
+             xray_orig, preproc_img_bytes, gradcam_img_bytes, 
+             self.manager.get_screen('scan_result').ids.notes.text,
+             self.manager.get_screen('scan_result').ids.misclassified.active)
         )
         
         if cur.lastrowid is not None:
@@ -142,10 +124,11 @@ class SaveNew(Screen):
         self.ids.male.active = False
         self.ids.female.active = False
         self.manager.get_screen('scan_result').ids.notes.text = ''
+        self.manager.get_screen('scan_result').ids.misclassified.active = False
 
     # display a popup after successfully saving the record
     def show_popup(self):
-        content = BoxLayout(orientation='vertical')
+        content = BoxLayout(orientation='vertical', padding=10)
         with content.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(size=content.size, pos=content.pos)
@@ -153,8 +136,8 @@ class SaveNew(Screen):
         content.bind(size=self._update_rect, pos=self._update_rect)
         content.add_widget(Label(text="[b]Record saved successfully![/b]", color=(0, 0, 1, 1), markup=True))
         content.add_widget(Button(text="Close", 
-            background_color=(0, 0, 1, 1), background_normal='',
-            on_press=self.close_popup))
+            background_color=(0, 0, 1, 1), background_normal='', 
+            size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
         self.popup.open()
     
@@ -165,4 +148,9 @@ class SaveNew(Screen):
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
-
+    
+    def on_focus_notes(self,instance, value):
+        if value:
+            pass
+        else:
+            instance.text = instance.text 

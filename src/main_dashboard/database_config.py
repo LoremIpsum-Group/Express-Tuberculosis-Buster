@@ -36,8 +36,9 @@ cur.execute(
     #     )
     # """
 
+    # FOR DELETING TABLES
     # """
-    #     DROP TABLE RESULTS;
+    #     DROP TABLE PATIENT;
     # """
 
     #! FOR TESTING PURPOSES

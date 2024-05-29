@@ -70,6 +70,7 @@ class PatientResult(Screen):
                 preproc_image BLOB NOT NULL, 
                 grad_cam_image BLOB NOT NULL, 
                 notes TEXT, 
+                misclassified BOOLEAN,
                 FOREIGN KEY(patient_id) REFERENCES PATIENT(patient_id)
             )
         """

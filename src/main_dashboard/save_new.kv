@@ -44,12 +44,13 @@
         
         MDTextField:
             id: birthdate
-            hint_text: "Birthdate"
+            validator: "date"
+            date_format: "yyyy/mm/dd"
+            hint_text: "Birthdate: yyyy/mm/dd"
             icon_right: "calendar"
             mode: "rectangle"
             size_hint: 0.2, 0.09
             pos_hint: {"center_x": 0.39, "center_y": 0.50}
-            on_focus: root.show_date_picker(self.focus)
 
         BoxLayout: 
             spacing: 10
