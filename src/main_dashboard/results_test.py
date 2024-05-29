@@ -1,5 +1,8 @@
 from kivy.app import App 
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
 from kivy.lang import Builder
 
 import sqlite3 
@@ -9,7 +12,35 @@ from PIL import Image
 Builder.load_file('src/main_dashboard/resultstest.kv')
 class ResultsTest(Screen):
     def __init__(self, **kwargs):
+        self.exists_layout = False
+        self.not_exists_layout = False
         super().__init__(**kwargs)
+
+    def exists(self):
+        self.ids.patient_search_result.clear_widgets()
+        patient_info_content1 = BoxLayout(orientation='horizontal')
+        name_label = Label(text='Name: ', color=(0,0,0,1))
+        age_label = Label(text='Age: ', color=(0,0,0,1))
+        patient_info_content1.add_widget(name_label)
+        patient_info_content1.add_widget(age_label)
+
+        patient_info_content2 = BoxLayout(orientation='horizontal')
+        sex_label = Label(text='Sex:\nMale ', color=(0,0,0,1))
+        birthdate_label = Label(text='Birthdate: ', color=(0,0,0,1))
+        patient_info_content2.add_widget(sex_label)
+        patient_info_content2.add_widget(birthdate_label)
+
+        self.ids.patient_search_result.add_widget(patient_info_content1)
+        self.ids.patient_search_result.add_widget(patient_info_content2)
+    
+    def not_exists(self):
+        self.ids.patient_search_result.clear_widgets()
+        self.ids.patient_search_result.add_widget(Label(
+            text="No Patient Found! Please check the Patient ID and try again.",
+            color=(1,0,0,1)
+        ))
+
+
 
     def search_result(self):
         result_id = self.ids.result_id.text

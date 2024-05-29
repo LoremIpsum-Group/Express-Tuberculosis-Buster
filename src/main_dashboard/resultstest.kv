@@ -11,65 +11,54 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
+      
+        Label:
+            id: header
+            text: 'Patient Information'
+            color: (0, 0, 1, 1)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.80}
+        BoxLayout:
+            size_hint_x: 0.4
+            size_hint_y: None
+            height: 1
+            pos_hint: {'center_x': 0.5, 'center_y': 0.75}
+            canvas:
+                Color:
+                    rgba: 0, 0, 1, 1  
+                Line:
+                    points: [self.x, self.y, self.right, self.y]
 
         BoxLayout:
-            orientation: 'horizontal'
+            id: patient_search_result
+            orientation: 'vertical'
+            size_hint: 0.4, 0.4 
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-            Image:
-                id: orig_image
-                source: '' 
-                size_hint: 0.4, 0.4
-            
-            
-            Image:
-                id: preproc_image
-                source: '' 
-                size_hint: 0.4, 0.4
-            
-            Image:
-                id: gradcam_image
-                source: '' 
-                size_hint: 0.4, 0.4
+            canvas.before:
+                Color:
+                    rgba: (250/255, 250/255, 254/255, 1)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [20, ]
 
+           
+            
         BoxLayout:
-            orientation: 'horizontal'
-            
-            TextInput:
-                id: result_id
-                hint_text: 'Search Result ID'
-                size_hint_y: 0.1
-            
-                multiline: False
-        
+            orientation: "horizontal" 
+            size_hint: 0.2, 0.1 
+
             Button:
-                size_hint_y: 0.1
-                text: "Search"
-                on_press: root.search_result()
+                text: "Exists"
+                on_press: root.exists() 
             
-            BoxLayout:
-                orientation: 'horizontal'
-                size_hint: 0.5, 0.1
-                pos_hint: {'center_x': 0.8, 'center_y': 0.8}
-                TextInput:
-                    id: test_text 
-                    multiline: True
-
-                
-                Button:
-                    text: 'Display'
-                    on_press: print(root.ids.error_flag.active)
+            Button
+                text: "Does not Exist"
+                on_press: root.not_exists()
             
-            BoxLayout: 
-                orientation: 'horizontal'
-                size_hint: 0.4, 0.1
-                post_hint: {'center_x': 0.5, 'center_y': 0.5}
-                spacing: 10
-                Label:
-                    text: 'Misclassified'
-                    color: 0, 0, 1, 1
-                CheckBox:
-                    id: error_flag
-                    color: 0, 0, 0, 1
+            Button
+                text: "Clear Widget"
+                on_press: root.ids.patient_search_result.clear_widgets()
+            
         
 
-       
+    
