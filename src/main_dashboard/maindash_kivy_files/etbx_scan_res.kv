@@ -9,8 +9,13 @@
     Image:
         id: res_img
         size_hint: .45, .65
-        pos_hint: {'center_x': 0.30,'center_y': 0.47}  
-        
+        pos_hint: {'center_x': 0.30,'center_y': 0.47}
+
+    Image:
+        source:  'assets/gradientImage.png'
+        size_hint: .40, .1 
+        pos_hint: {'center_x': .75, 'center_y': 0.1}
+
     FloatLayout:
 
         canvas.before:
@@ -68,12 +73,12 @@
             bold: True
             color: [0, 0, 0, 1]
             font_size: 26
-            pos_hint: {"center_x": 0.63, "center_y": 0.70}  
+            pos_hint: {"center_x": 0.67, "center_y": 0.70}  
 
         BoxLayout: 
             orientation: 'horizontal'
             size_hint: 0.10, 0.10
-            pos_hint: {'center_x': 0.80, 'center_y': 0.70}
+            pos_hint: {'center_x': 0.83, 'center_y': 0.70}
             
             Label:
                 text: 'Misclassified'
