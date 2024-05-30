@@ -8,6 +8,8 @@ from kivy.uix.popup import Popup
 
 from kivymd.uix.button import MDRectangleFlatButton
 
+from kivy.graphics import Color, Rectangle
+
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
 
@@ -171,18 +173,23 @@ class ViewRecords(Screen):
             None
         """
         content = FloatLayout()
-        label = Label(text="Please choose: ", size_hint=(1, 0.8), pos_hint={'x': 0, 'y': 0.2})
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+        content.bind(size=self._update_rect, pos=self._update_rect)
+        label = Label(text="Please choose: ", color=(0,0,1,1), size_hint=(1, 0.8), pos_hint={'x': 0, 'y': 0.2})
         self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
-        close_button = Button(text='X', size_hint=(0.1, 0.1), pos_hint={'right': 1, 'top': 1})
+        close_button = Button(text='X', size_hint=(0.1, 0.1),
+             background_color=(1, 0, 0, 1), background_normal='', pos_hint={'right': 1, 'top': 1})
         close_button.bind(on_press=lambda instance: self.close_popup(instance))
-        button_grid = GridLayout(cols=2, size_hint=(1, 0.2), pos_hint={'x': 0, 'y': 0})
+        button_grid = GridLayout(cols=2, size_hint=(1, 0.2), pos_hint={'x': 0, 'y': 0}, padding=10, spacing=10)
 
-        button1 = Button(text='Export Result')
+        button1 = Button(text='Export Result', background_color=(0, 0, 1, 1), background_normal='')
         button1.bind(on_release=lambda instance: self.export_result(search_input))
         button1.bind(on_release=lambda instance: self.export_success())
         button1.bind(on_release=lambda instance: self.close_popup(instance))
 
-        button2 = Button(text='View Result')
+        button2 = Button(text='View Result', background_color=(0, 0, 1, 1), background_normal='')
         button2.bind(on_release=lambda instance: self.record_clicked(search_input))
         button2.bind(on_release=lambda instance: self.close_popup(instance))
 
@@ -210,10 +217,15 @@ class ViewRecords(Screen):
         Returns:
         - None
         """
-        content = BoxLayout(orientation='vertical')
-        label = Label(text="Exported Successfully!")
+        content = BoxLayout(orientation='vertical', padding=10)
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+        content.bind(size=self._update_rect, pos=self._update_rect)
+        label = Label(text="Exported Successfully!", color=(0,0,1,1))
         self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
-        close_button = Button(text='Close', on_press=lambda instance: self.close_popup(instance))
+        close_button = Button(text='Close', background_color=(1, 0, 0, 1), background_normal='',
+            size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=lambda instance: self.close_popup(instance))
         content.add_widget(label)
         content.add_widget(close_button)
         self.popup.open()
@@ -339,5 +351,9 @@ class ViewRecords(Screen):
             None
         """
         self.popup.dismiss()
+    
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
     
   

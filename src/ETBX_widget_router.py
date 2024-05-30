@@ -1,5 +1,6 @@
 from kivy.uix.screenmanager import ScreenManager, NoTransition, FadeTransition
 from kivy.core.window import Window
+from kivy.config import Config
 
 from main_dashboard.ETBX_main_dashboard import MainDashboard
 from main_dashboard.ETBx_scan_image import ScanImage
@@ -13,7 +14,7 @@ from main_dashboard.ETBX_save_existing import SaveExisting
 from kivymd.app import MDApp
 
 class MainApp(MDApp):
-
+    Config.set('kivy', 'exit_on_escape', '0')
     def build(self):
         Window.maximize()
         self.screen_manager = ScreenManager(transition=NoTransition())
