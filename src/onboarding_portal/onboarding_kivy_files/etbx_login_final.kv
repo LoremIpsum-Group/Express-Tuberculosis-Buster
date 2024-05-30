@@ -1,0 +1,68 @@
+#:kivy 1.2.0
+
+<LoginTextInput@MDTextField>:
+    multiline: False
+    size_hint_x: .3
+    pos_hint: {'center_x' : 0.5, 'center_y' : 0.5}
+    background_color: 1, 1, 1, 1
+    padding: 10, 10
+    mode: "rectangle"
+
+<LoginTextButton@MDTextButton+HoverBehavior>:
+    color: (0,0,0,1)
+    on_enter: self.color = 0, 0, 1, 1
+    on_leave: self.color = 0, 0, 0, 1
+
+<LoginScreen>:
+    FloatLayout:
+        background_color: [1, 1, 1, 1]
+
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: '[b][i]ETBx[/i][/b]'
+            font_size: 60
+            color: [0, 0, 1, 1]
+            markup: True
+            pos_hint: {"y": 0.30}
+
+        LoginTextInput:
+            id: username_input
+            hint_text: "Email"
+            icon_left: "email"
+            pos_hint: {"x": 0.35, "y": 0.60}
+        
+        LoginTextInput:
+            id: password_input
+            hint_text: "Password"
+            password: True 
+            icon_left: "lock"
+            pos_hint: {"x": 0.35, "y": 0.49}
+
+        MDIconButton:
+            icon: "eye-off"
+            pos_hint: {"center_x": 0.62, "center_y": 0.53}
+            theme_text_color: "Hint"
+            on_release:
+                self.icon = "eye" if self.icon == "eye-off" else "eye-off"
+                password_input.password = False if password_input.password is True else True 
+
+        LoginTextButton:
+            text: 'Forgot Password?'
+            id: forgot_password_button
+            pos_hint: {"center_x": 0.57, "center_y": 0.45}
+            on_press: root.forgot_password()
+        
+        Button:
+            text: 'Login'
+            background_color: 0, 0, 1, 1
+            pos_hint: {"center_x": 0.5, "center_y" : 0.25}
+            size_hint: 0.2, 0.1
+            border: (20, 20, 20, 20)
+            on_press: root.login_button()
+        

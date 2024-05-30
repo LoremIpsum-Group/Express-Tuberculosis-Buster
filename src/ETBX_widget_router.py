@@ -9,6 +9,8 @@ from main_dashboard.ETBX_manage_account import ManageAccount
 from main_dashboard.ETBX_scan_results import ScanResult   
 from main_dashboard.ETBX_view_records_patient import PatientResult  
 
+from onboarding_portal.ETBX_login_final import LoginScreen
+
 from main_dashboard.ETBX_save_new import SaveNew
 from main_dashboard.ETBX_save_existing import SaveExisting
 from kivymd.app import MDApp
@@ -18,6 +20,7 @@ class MainApp(MDApp):
     def build(self):
         Window.maximize()
         self.screen_manager = ScreenManager(transition=NoTransition())
+        self.screen_manager.add_widget(LoginScreen(name='login'))   
         self.screen_manager.add_widget(MainDashboard(name='main_menu'))
         self.screen_manager.add_widget(ScanImage(name='scan_img'))
         self.screen_manager.add_widget(ViewRecords(name='view_rec'))
