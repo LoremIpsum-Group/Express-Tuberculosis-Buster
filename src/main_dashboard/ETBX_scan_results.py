@@ -43,7 +43,7 @@ scan_result = ScanResultData()
 
 # Load the trained model
 model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
-model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_3.h5')
+model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_7.h5')
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
 
@@ -150,7 +150,7 @@ class ScanResult(Screen):
 
         self.percentage = int(predicted_score)
         self.percentage_color = bar_color
-        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) + " %\n segmented datatype: " + str(masked_image.dtype)
+        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) # + " %\n segmented datatype: " + str(masked_image.dtype)
 
         scan_result.results = predicted_class
         scan_result.percentage = predicted_score
@@ -197,15 +197,6 @@ class ScanResult(Screen):
             pass
 
     def back_button(self):
-        white = (1, 1, 1, 1)  # Default color
-        blue = (0.1, 0.5, .9, 1)  # Pressed color
-
-        self.ids.x_ray.md_bg_color = white
-        self.ids.x_ray.text_color = blue
-        self.ids.pre_proc.md_bg_color = white
-        self.ids.pre_proc.text_color = blue
-        self.ids.grad_cam.md_bg_color = white
-        self.ids.grad_cam.text_color = blue
 
         self.show_popup()
         
@@ -270,6 +261,16 @@ class ScanResult(Screen):
                       pos_hint={'center_x': 0.5, 'center_y': 0.5},
                       color=(0, 0, 0, 1), markup=True)
         )
+        white = (1, 1, 1, 1)  # Default color
+        blue = (0.1, 0.5, .9, 1)  # Pressed color
+
+        self.ids.x_ray.md_bg_color = white
+        self.ids.x_ray.text_color = blue
+        self.ids.pre_proc.md_bg_color = white
+        self.ids.pre_proc.text_color = blue
+        self.ids.grad_cam.md_bg_color = white
+        self.ids.grad_cam.text_color = blue
+        
         self.manager.current = 'scan_img'
         self.popup.dismiss()
         

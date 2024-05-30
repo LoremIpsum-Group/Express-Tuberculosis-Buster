@@ -11,10 +11,10 @@
         size_hint: .45, .65
         pos_hint: {'center_x': 0.30,'center_y': 0.47}
 
-    Image:
-        source:  'assets/gradientImage.png'
-        size_hint: .40, .1 
-        pos_hint: {'center_x': .75, 'center_y': 0.1}
+    # Image:
+    #     source:  'assets/gradientImage.png'
+    #     size_hint: .40, .1 
+    #     pos_hint: {'center_x': .75, 'center_y': 0.1}
 
     FloatLayout:
 
@@ -36,7 +36,7 @@
 
    
         Label:
-            text: 'Scan Results for Patient: '
+            text: 'Scan Results for Patient '
             font_size: 24
             color: [0, 0, 1, 1]
             pos_hint: {'center_x': 0.15, 'center_y': 0.9}
@@ -108,13 +108,13 @@
             
             MDRectangleFlatButton:
                 id: pre_proc
-                text: 'Pre-Proc'
+                text: 'Isolated Lung'
                 size_hint_x: 0.6
                 on_press: root.change_img(self)
             
             MDRectangleFlatButton:
                 id: grad_cam
-                text: 'Grad-Cam'
+                text: 'Heatmap'
                 size_hint_x: 0.6
                 on_press: root.change_img(self)
         
