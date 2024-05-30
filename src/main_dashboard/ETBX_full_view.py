@@ -18,7 +18,7 @@ class FullScreenApp:
         self.root.configure(bg='black')
 
         self.root.attributes("-fullscreen", True)
-        self.root.bind("<Escape>", self.exit_fullscreen)
+        self.root.bind_all("<Escape>", lambda event: self.exit_fullscreen(event))
         
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
