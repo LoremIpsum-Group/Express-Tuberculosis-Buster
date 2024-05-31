@@ -22,14 +22,9 @@ class LoginScreen(Screen):
                 self.manager.current = 'main_menu'
                 print("Login Successful")
             
-            elif username_input != "doctor":
-                self.show_popup('Invalid Username')
-            
-            elif password_input != "apple":
-                self.show_popup('Invalid Password')
 
-            elif username_input != "doctor" and password_input != "apple":
-                self.show_popup('Invalid Username and Password')
+            elif username_input != "doctor" or password_input != "apple":
+                self.show_popup('Invalid Username or Password')
 
         else:
             self.show_popup('Please enter all the fields')

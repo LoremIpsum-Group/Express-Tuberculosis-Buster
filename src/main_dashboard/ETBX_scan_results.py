@@ -138,6 +138,7 @@ class ScanResult(Screen):
         # Good results: normal 2551, tuberculosis 640
 
 
+        # visual representation of the percentage score
         bar_color = None
         if (predicted_score <= 25):
             bar_color = (0, 1, 0, 1)

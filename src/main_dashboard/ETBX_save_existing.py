@@ -103,7 +103,8 @@ class SaveExisting(Screen):
         ))
 
     
-    def save_record(self):
+    def save_record(self, instance):
+        self.close(instance)
         patient_id = self.ids.patient_id.text
         scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
         is_misclassified = self.manager.get_screen('scan_result').ids.misclassified
@@ -162,6 +163,44 @@ class SaveExisting(Screen):
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
         self.popup.open()
     
+
+    def confirm_save_popup(self):
+
+        content = BoxLayout(orientation='vertical')
+        with content.canvas.before:
+            Color(1, 1, 1, 1)
+            self.rect = Rectangle(size=content.size, pos=content.pos)
+        content.bind(size=self._update_rect, pos=self._update_rect)
+        content.add_widget(Label(
+            text="[b]Saving scan result to patient record\nDo you want to proceed?[/b]", 
+            color=(0, 0, 1, 1), markup=True))
+        
+        inner_content = BoxLayout(orientation='horizontal',
+            spacing=10, padding=10, size_hint_y=0.3)
+
+        confirm_btn = Button(text='Confirm',
+            background_color=(0, 0, 1, 1), background_normal='',
+            on_press=self.save_record)
+        
+        cancel_btn = Button(text='Cancel',
+            background_color=(0, 0, 1, 1), background_normal='',
+            on_press= self.close)
+        
+        inner_content.add_widget(confirm_btn)
+        inner_content.add_widget(cancel_btn)
+        content.add_widget(inner_content)
+
+        
+        #content.add_widget(Button(text="Close", on_press=self.close_popup))
+        
+        self.popup = Popup(title='Confirm Action', content=content, size_hint=(0.4, 0.4),
+            separator_color=(0,0,0,0), background_color=(0, 0, 1, 0.5),auto_dismiss=False)
+        self.popup.open()
+
+
+    def close(self, instance):
+        self.popup.dismiss()
+
     def close_popup(self, instance):
         self.popup.dismiss()
         self.ids.patient_search_result.clear_widgets()
