@@ -3,7 +3,20 @@ from PIL import Image, ImageTk
 import numpy as np
 
 class FullScreenApp:
-    def __init__(self, root, image1_path, gradCamIm):
+    def __init__(self, root, image1_path, gradCamIm): 
+        """
+        Initializes the X-Ray Inspector class and defines the widgets present in the tkinter application.
+
+        Parameters:
+        - root: The root Tkinter window.
+        - image1_path: a float32 x-ray image which will then be converted to uint8 to be displayed using the
+        fromarray() function of the PIL library.
+        - gradCamIm: a float32 gradcam layered image which will then be converted to uint8 to be displayed using the
+        fromarray() function of the PIL library.
+
+        Returns:
+        None
+        """
         self.root = root
         self.root.title("X-Ray Inspector")
 
@@ -73,21 +86,51 @@ class FullScreenApp:
         self.scale_factor2 = 1.0
 
     def resize_image(self, image, target_width, max_height):
+        """
+        Resize the given image while maintaining the aspect ratio.
+
+        Args:
+            image (PIL.Image.Image): The image to be resized.
+            target_width (int): The desired width of the resized image.
+            max_height (int): The maximum height of the resized image.
+
+        Returns:
+            PIL.ImageTk.PhotoImage: The resized image as a PhotoImage object.
+        """
         width_percent = target_width / float(image.size[0])
         new_height = int((float(image.size[1]) * float(width_percent)))
-        
+
         if new_height > max_height:
             height_percent = max_height / float(image.size[1])
             new_width = int((float(image.size[0]) * float(height_percent)))
             return ImageTk.PhotoImage(image.resize((new_width, max_height), Image.LANCZOS))
-        
+
         return ImageTk.PhotoImage(image.resize((target_width, new_height), Image.LANCZOS))
 
     def on_button_press(self, event):
+        """
+        Callback function for button press event.
+
+        Parameters:
+            event (Event): The event object containing information about the button press.
+
+        Returns:
+            None
+        """
         self.start_x = event.x
         self.start_y = event.y
 
     def on_drag(self, event):
+        """
+        Handles the dragging of images on the canvas. This function also creates a shape around the image
+        which will help in containing it inside of the defined canvas. 
+
+        Args:
+            event (Event): The event object containing information about the drag event.
+
+        Returns:
+            None
+        """
         dx = event.x - self.start_x
         dy = event.y - self.start_y
 
@@ -118,6 +161,16 @@ class FullScreenApp:
             self.canvas2.move(self.image_id2, 0, self.canvas2.winfo_height() - y1)
 
     def on_zoom(self, event):
+        """
+        Handles the zoom functionality when the user scrolls the mouse wheel.
+
+        Args:
+            event (tk.Event): The event object containing information about the event.
+
+        Returns:
+            None
+        """
+
         scale_factor = 1.1 if event.delta > 0 else 0.9
 
         self.scale_factor1 *= scale_factor

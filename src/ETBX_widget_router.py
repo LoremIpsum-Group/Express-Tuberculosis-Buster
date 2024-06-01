@@ -23,25 +23,41 @@ class MainApp(MDApp):
     Config.set('kivy', 'exit_on_escape', '0')
 
     def build(self):
-        Window.maximize()
-        self.screen_manager = ScreenManager(transition=NoTransition())
+            """
+            Builds the user interface by creating and configuring the screen manager.
+            
+            Returns:
+                ScreenManager: The configured screen manager object.
+            """
+            
+            Window.maximize()
+            self.screen_manager = ScreenManager(transition=NoTransition())
 
-        self.screen_manager.add_widget(LoadingScreen(name='loading'))
+            self.screen_manager.add_widget(LoadingScreen(name='loading'))
 
-        self.screen_manager.add_widget(LoginScreen(name='login'))
-        self.screen_manager.add_widget(MainDashboard(name='main_menu'))
-        self.screen_manager.add_widget(ScanImage(name='scan_img'))
-        self.screen_manager.add_widget(ViewRecords(name='view_rec'))
-        self.screen_manager.add_widget(ScanResult(name='scan_result'))
-        self.screen_manager.add_widget(SaveNew(name='save_new'))
-        self.screen_manager.add_widget(SaveExisting(name='save_existing'))
-        self.screen_manager.add_widget(PatientResult(name='patient_result')) 
+            self.screen_manager.add_widget(LoginScreen(name='login'))
+            self.screen_manager.add_widget(MainDashboard(name='main_menu'))
+            self.screen_manager.add_widget(ScanImage(name='scan_img'))
+            self.screen_manager.add_widget(ViewRecords(name='view_rec'))
+            self.screen_manager.add_widget(ScanResult(name='scan_result'))
+            self.screen_manager.add_widget(SaveNew(name='save_new'))
+            self.screen_manager.add_widget(SaveExisting(name='save_existing'))
+            self.screen_manager.add_widget(PatientResult(name='patient_result')) 
 
-        Clock.schedule_once(self.load_models, 7)
+            Clock.schedule_once(self.load_models, 7) #lmaoooo
 
-        return self.screen_manager
+            return self.screen_manager
 
     def load_models(self, dt):
+        """
+        Loads the machine learning models for classification and segmentation.
+
+        Args:
+            dt: The datetime object representing the current date and time.
+
+        Returns:
+            None
+        """
 
         from components.core_functions import load_model_efficientNet, load_model_unet
 
@@ -52,7 +68,7 @@ class MainApp(MDApp):
         scan_result_screen.model_classifier = self.model_classifier
         scan_result_screen.model_segmentation = self.model_segmentation
 
-        self.screen_manager.current = 'login'  
+        self.screen_manager.current = 'login'
 
 if __name__ == '__main__':
     MainApp().run()
