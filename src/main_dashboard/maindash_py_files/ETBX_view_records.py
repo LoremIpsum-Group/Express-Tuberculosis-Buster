@@ -33,18 +33,7 @@ class ViewRecords(Screen):
 
     
     def __init__(self, **kwargs):
-        """
-        Initializes an instance of the ETBX_view_records class.
-
-        Parameters:
-        - kwargs: Additional keyword arguments that can be passed to the parent class.
-
-        Attributes:
-        - conn: SQLite connection object used to connect to the database.
-        - c: SQLite cursor object used to execute SQL statements.
-        """
         super().__init__(**kwargs)
-        
         conn = sqlite3.connect('src/components/view_record_main.db')
         c = conn.cursor()
         c.execute(
@@ -201,8 +190,6 @@ class ViewRecords(Screen):
         self.popup.open()
 
    
-
-
     def export_success(self):
         """
         Displays a popup message indicating successful export.
@@ -275,26 +262,28 @@ class ViewRecords(Screen):
             misclassified = "True"
         else:
             misclassified = "False"    
-        #C:\Users\paopa\OneDrive\Desktop\git repo (realgit)\Express-Tuberculosis-Buster
-        #dependencies.txt
+        
         orig_image_bytes  = record[10]
         orig_image_stream = io.BytesIO(orig_image_bytes)
         orig_image = Image.open(orig_image_stream)
-        #orig_image.save('assets/temp-img-location-per-view-records/orig_image.jpg')
-        orig_image.save('Exported-Results/orig_image.jpg')
+        orig_image.save(f'Exported-Results/orig_image_{patient_ID}.jpg')
 
         preproc_image_bytes = record[11]
         preproc_image_stream = io.BytesIO(preproc_image_bytes)
         preproc_image = Image.open(preproc_image_stream)
-        #preproc_image.save('assets/temp-img-location-per-view-records/preproc_image.jpg')
-        preproc_image.save('Exported-Results/preproc_image.jpg')
+        preproc_image.save(f'Exported-Results/preproc_image_{patient_ID}.jpg')
 
         gradcam_image_bytes = record[12]
         gradcam_image_stream = io.BytesIO(gradcam_image_bytes)
         gradcam_image = Image.open(gradcam_image_stream)
-        #gradcam_image.save('assets/temp-img-location-per-view-records/gradcam_image.jpg')
-        gradcam_image.save('Exported-Results/gradcam_image.jpg')
-        #Exported-Results
+        gradcam_image.save(f'Exported-Results/gradcam_image_{patient_ID}.jpg')
+
+
+        '''
+        This part generates a PDF report for a patient's record, including information such as patient ID, name, sex, age, address,
+        date of scan, result, percentage, notes, and misclassification. It also saves the original image and Grad-CAM image associated
+        with the record.
+        '''
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 10, '[Hospital Name]', ln=True, align='C')
         pdf.cell(0, 10, 'Report of Tuberculosis Screening', ln=True, align='C')
@@ -327,18 +316,14 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Original Image', 0, 1, 'C')
-        #pdf.image('assets/temp-img-location-per-view-records/orig_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
-        pdf.image('Exported-Results/orig_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(f'Exported-Results/orig_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
 
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Grad-CAM Image', 0, 1, 'C')
-        #pdf.image('assets/temp-img-location-per-view-records/gradcam_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
-        pdf.image('Exported-Results/gradcam_image.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(f'Exported-Results/gradcam_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
 
-        #pdf.output('assets/temp-img-location-per-view-records/patient_results.pdf')
-        pdf.output('Exported-Results/patient_results.pdf')
-
+        pdf.output(f'Exported-Results/patient_results_{patient_ID}.pdf')
 
     def close_popup(self, instance):
         """

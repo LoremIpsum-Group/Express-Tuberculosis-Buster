@@ -32,12 +32,8 @@ class ScanResultData:
 
 scan_result = ScanResultData() 
 
-# Load the trained model
-
-
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_view_rcrds_patient.kv")
 
-# scan_results = ScanResultData()
 class PatientResult(Screen):
     """
     Represents a screen for displaying scan results.
@@ -128,7 +124,6 @@ class PatientResult(Screen):
 
         global orig_img, preproc_img, gradcam_img, percent, note, orig_image_bytes, gradcam_image_bytes
 
-        
 
         orig_image_bytes = result[0]
         orig_img = self.img_string_bytes(orig_image_bytes)
@@ -161,15 +156,11 @@ class PatientResult(Screen):
         # gradcam_img = 'gradcam_image.jpg'
 
         percent = result[3]
-
         note = result[4]
-
         classification = result[5]
-
         patient_id = result[6]
         #print(type(gradcam_image_bytes))
         #print(type(preproc_image_bytes))
-
         misclassifier = result[7]
         #self.ids.res_img.source = xray_orig
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
@@ -200,6 +191,16 @@ class PatientResult(Screen):
         # scan_result.notes = self.ids.note.text
 
     def change_img(self, instance):
+        """
+        Change the displayed image based on the button pressed.
+
+        Parameters:
+        - instance: The button instance that was pressed.
+
+        Returns:
+        - None
+        """
+
         white = (1, 1, 1, 1)  # Default color
         blue = (0.1, 0.5, .9, 1)  # Pressed color
 
@@ -217,7 +218,6 @@ class PatientResult(Screen):
         instance.md_bg_color = blue
         instance.text_color = white
 
-        
         if instance == self.ids.x_ray:
             self.ids.res_img.source = orig_img
             print(type(orig_img))
@@ -233,14 +233,26 @@ class PatientResult(Screen):
     
 
     def full_view(self):
-        #base64_decoded = base64.b64decode(orig_img)
+        """
+        This function displays the full view of the patient's records.
+
+        It decodes the original and gradcam images using base64 decoding,
+        opens them as PIL images, and converts them to numpy arrays.
+        Then, it calls the `xray_full_app` function to display the full view.
+
+        Parameters:
+        - self: The instance of the class.
+
+        Returns:
+        - None
+        """
+        # base64_decoded = base64.b64decode(orig_img)
         image = Image.open(io.BytesIO(orig_image_bytes))
         image_np_orig = np.array(image)
 
-        #base64_decoded1 = base64.b64decode(gradcam_img)
+        # base64_decoded1 = base64.b64decode(gradcam_img)
         image1 = Image.open(io.BytesIO(gradcam_image_bytes))
         image_np_grad = np.array(image1)
 
-      
         xray_full_app(image_np_orig, image_np_grad)
         pass
