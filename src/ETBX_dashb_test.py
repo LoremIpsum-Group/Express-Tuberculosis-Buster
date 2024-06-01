@@ -3,10 +3,10 @@
 from kivy.uix.screenmanager import ScreenManager, NoTransition
 from kivy.core.window import Window
 
-from main_dashboard.ETBX_main_dashboard import MainDashboard
-from main_dashboard.ETBx_scan_image import ScanImage
-from main_dashboard.ETBX_view_records import ViewRecords
-from main_dashboard.ETBX_scan_results import ScanResult
+from main_dashboard.maindash_py_files.ETBX_main_dashboard import MainDashboard
+from main_dashboard.maindash_py_files.ETBx_scan_image import ScanImage
+from main_dashboard.maindash_py_files.ETBX_view_records import ViewRecords
+from main_dashboard.maindash_py_files.ETBX_scan_results import ScanResult
 
 
 from kivymd.app import MDApp

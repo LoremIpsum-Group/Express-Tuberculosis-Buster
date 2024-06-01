@@ -2,7 +2,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 from kivy.properties import NumericProperty
-from main_dashboard.ETBX_full_view import xray_full_app
+from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
 
 
 

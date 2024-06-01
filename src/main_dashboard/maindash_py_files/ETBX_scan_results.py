@@ -7,7 +7,7 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Color, Rectangle
-from main_dashboard.ETBX_full_view import xray_full_app
+from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
 
 from components.core_functions import (
     load_model_efficientNet,

@@ -1,6 +1,6 @@
 import datetime
 
-from scan_result_data import ScanResultData as SRD
+from main_dashboard.maindash_py_files.scan_result_data import ScanResultData as SRD
 
 srd = SRD()
 srd.results = 'Non-TB'

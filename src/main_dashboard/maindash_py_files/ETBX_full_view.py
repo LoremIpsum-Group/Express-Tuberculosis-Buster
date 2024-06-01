@@ -46,7 +46,7 @@ class FullScreenApp:
         self.bottom_frame.grid(row=1, column=0, columnspan = 2, sticky="s")
 
         # Load an image
-        self.image = Image.open("assets/gradientImage1.png")
+        self.image = Image.open("assets/gradientImage2.png")
         self.photo = ImageTk.PhotoImage(self.image)
 
         # Add image to a label
