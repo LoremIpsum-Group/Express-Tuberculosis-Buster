@@ -1,6 +1,6 @@
-from kivy.uix.screenmanager import Screen   
+from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
-from kivymd.uix.button import MDRaisedButton   
+from kivymd.uix.button import MDRaisedButton
 from kivy.properties import NumericProperty
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -10,8 +10,6 @@ from kivy.graphics import Color, Rectangle
 from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
 
 from components.core_functions import (
-    load_model_efficientNet,
-    load_model_unet,
     segment_image,
     predict,
     get_gradCAM,
@@ -24,44 +22,27 @@ from components.core_functions import (
 )
 
 import sqlite3
-class ScanResultData: 
-    """
-        A class that stores information about results of scanned X-ray 
-        for database storage 
-    """
 
+class ScanResultData:
     def __init__(self):
-        self.results = None 
-        self.percentage = None 
-        self.orig_img = None 
+        self.results = None
+        self.percentage = None
+        self.orig_img = None
         self.preproc_img = None
-        self.gradcam_img = None 
-        self.notes = None 
+        self.gradcam_img = None
+        self.notes = None
         self.is_misclassified = None
 
-scan_result = ScanResultData() 
-
-# Load the trained model
-model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_6_1.h5')
-model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_7.h5')
+scan_result = ScanResultData()
 
 Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
 
-scan_results = ScanResultData()
 class ScanResult(Screen):
-    """
-    Represents a screen for displaying scan results.
-
-    Attributes:
-        None
-
-    Methods:
-        update_result(image_path): Updates the scan result with the provided image path.
-        change_img(instance): Changes the displayed image based on the selected instance.
-    """
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.model_classifier = None
+        self.model_segmentation = None
+
         conn = sqlite3.connect('src/components/view_record_main.db')
         c = conn.cursor()
         c.execute(
@@ -81,7 +62,6 @@ class ScanResult(Screen):
             )
         """
         )
-        
         conn.commit()
         conn.close()
 
@@ -98,8 +78,7 @@ class ScanResult(Screen):
             contents = output.getvalue()
 
         img_data = base64.b64encode(contents).decode('ascii')
-        return 'data:image/png;base64,' + img_data 
-        pass
+        return 'data:image/png;base64,' + img_data
     
     def update_result(self, image_path):
         """
@@ -109,7 +88,7 @@ class ScanResult(Screen):
             image_path (str): The path to the image file.
 
         Returns:
-            None
+            None 
         """
         global xray_orig, xray_orig_resized, superimposed_img, masked_image
         xray_orig = image_path
@@ -117,28 +96,14 @@ class ScanResult(Screen):
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
 
-        # !CORE FUNCTIONALITIES - START
-        # Get segmented/masked image
+        # Core functionalities
         xray_orig_resized, masked_image, mask_result = segment_image(
-             model_segmentation, image_path
+             self.model_segmentation, image_path
         )
 
-        # Get Score from segmented image
-        predicted_class, predicted_score = predict(model_classifier, masked_image)
+        predicted_class, predicted_score = predict(self.model_classifier, masked_image)
+        superimposed_img = get_gradCAM(self.model_classifier, xray_orig_resized, masked_image)
 
-        # Superimpose heatmap of segmented image onto original image
-        superimposed_img = get_gradCAM(model_classifier, xray_orig_resized, masked_image)
-
-        # !CORE FUNCTIONALITIES - end
-        # *DEBUGGING PURPOSES, removable any time
-        # preprocessed_img = get_img_array_OLD(masked_image)
-        # predicted_class, predicted_score = predict(model_classifier, preprocessed_img)
-        # superimposed_img = get_gradCAM_NONSEGMENTED(model_classifier, original_image)
-        # * Replace here the image you want to display, temporary ONLY!!!!!
-        # Good results: normal 2551, tuberculosis 640
-
-
-        # visual representation of the percentage score
         bar_color = None
         if (predicted_score <= 25):
             bar_color = (0, 1, 0, 1)
@@ -151,20 +116,29 @@ class ScanResult(Screen):
 
         self.percentage = int(predicted_score)
         self.percentage_color = bar_color
-        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) # + " %\n segmented datatype: " + str(masked_image.dtype)
+        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score)
 
         scan_result.results = predicted_class
         scan_result.percentage = predicted_score
         scan_result.orig_img = xray_orig
-        scan_result.preproc_img = masked_image 
+        scan_result.preproc_img = masked_image
         scan_result.gradcam_img = superimposed_img
         scan_result.notes = self.ids.notes.text
 
     def change_img(self, instance):
-        white = (1, 1, 1, 1)  # Default color
-        blue = (0.1, 0.5, .9, 1)  # Pressed color
+        """
+        Change the displayed image based on the selected instance.
 
-        # Reset all buttons to default color
+        Parameters:
+            instance (kivy.uix.button.Button): The button instance that triggered the image change.
+
+        Returns:
+            None
+        """
+
+        white = (1, 1, 1, 1)
+        blue = (0.1, 0.5, .9, 1)
+
         self.ids.x_ray.md_bg_color = white
         self.ids.x_ray.text_color = blue
         self.ids.pre_proc.md_bg_color = white
@@ -172,78 +146,64 @@ class ScanResult(Screen):
         self.ids.grad_cam.md_bg_color = white
         self.ids.grad_cam.text_color = blue
 
-        # Change the pressed button's color
         instance.md_bg_color = blue
         instance.text_color = white
 
         if instance == self.ids.x_ray:
             self.ids.res_img.source = xray_orig
-            pass
-
         elif instance == self.ids.grad_cam:
-            img = Image.fromarray((superimposed_img) .astype(np.uint8))
-            img = img.convert("RGB")            
-                     
-            self.ids.res_img.source = self.img_string(img)  
-            pass 
-
-        elif instance == self.ids.pre_proc: 
+            img = Image.fromarray((superimposed_img).astype(np.uint8))
+            img = img.convert("RGB")
+            self.ids.res_img.source = self.img_string(img)
+        elif instance == self.ids.pre_proc:
             img = Image.fromarray(((1.0 - masked_image) * 255).astype(np.uint8))
             img = img.convert('L')
-            
-
-            self.ids.res_img.source = self.img_string(img) 
-
-        else:
-            pass
-
-    def back_button(self):
-
-        self.show_popup()
-        
-        pass
-
+            self.ids.res_img.source = self.img_string(img)
 
     def full_view(self):
+        """
+        Sends float32 images to a separate python file which displays them side by side
+        so that the images can be inspected and reviewed.
+        """
         xrayPath = xray_orig_resized
         supIM = superimposed_img
-
         xray_full_app(xrayPath, supIM)
-        pass
 
-    def show_popup(self):
+    def back_button(self):
+        """
+        Displays a popup window when pressing the back button
+        with a confirmation message and buttons for confirming or canceling an action.
+        """
         content = BoxLayout(orientation='vertical')
         with content.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(size=content.size, pos=content.pos)
         content.bind(size=self._update_rect, pos=self._update_rect)
         content.add_widget(Label(
-            text="[b]Are you sure you want to go back?\nScan Results will be lost[/b]!", 
+            text="[b]Are you sure you want to go back?\nScan Results will be lost[/b]!",
             color=(0, 0, 1, 1), markup=True))
         
-        inner_content = BoxLayout(orientation='horizontal',
-            spacing=10, padding=10, size_hint_y=0.3)
-
-        confirm_btn = Button(text='Confirm',
-            background_color=(0, 0, 1, 1), background_normal='',
-            on_press= self.confirm)
-        
-        cancel_btn = Button(text='Cancel',
-            background_color=(0, 0, 1, 1), background_normal='',
-            on_press= self.close_popup)
-        
+        inner_content = BoxLayout(orientation='horizontal', spacing=10, padding=10, size_hint_y=0.3)
+        confirm_btn = Button(text='Confirm', background_color=(0, 0, 1, 1), background_normal='', on_press=self.confirm)
+        cancel_btn = Button(text='Cancel', background_color=(0, 0, 1, 1), background_normal='', on_press=self.close_popup)
         inner_content.add_widget(confirm_btn)
         inner_content.add_widget(cancel_btn)
         content.add_widget(inner_content)
 
-        
-        #content.add_widget(Button(text="Close", on_press=self.close_popup))
-        
         self.popup = Popup(title='Confirm Action', content=content, size_hint=(0.4, 0.4),
-            separator_color=(0,0,0,0), background_color=(0, 0, 1, 0.5),auto_dismiss=False)
+            separator_color=(0,0,0,0), background_color=(0, 0, 1, 0.5), auto_dismiss=False)
         self.popup.open()
     
     def confirm(self, instance):
+        """
+        Resets the screen and navigates to the 'scan_img' screen after confirming an action from the popup.
+
+        Args:
+            instance: The instance of the button that triggered the confirmation.
+
+        Returns:
+            None
+        """
         save_new_screen = self.manager.get_screen('save_new')
         save_existing_screen = self.manager.get_screen('save_existing')
         save_new_screen.ids.patient_id.text = ''
@@ -258,12 +218,12 @@ class ScanResult(Screen):
         self.manager.get_screen('save_existing').ids.patient_id.text = ''
         self.manager.get_screen('save_existing').ids.patient_search_result.clear_widgets()
         self.manager.get_screen('save_existing').ids.patient_search_result.add_widget(
-                Label(text="[b]Search Patient ID to save[/b]", 
+                Label(text="[b]Search Patient ID to save[/b]",
                       pos_hint={'center_x': 0.5, 'center_y': 0.5},
                       color=(0, 0, 0, 1), markup=True)
         )
-        white = (1, 1, 1, 1)  # Default color
-        blue = (0.1, 0.5, .9, 1)  # Pressed color
+        white = (1, 1, 1, 1)
+        blue = (0.1, 0.5, .9, 1)
 
         self.ids.x_ray.md_bg_color = white
         self.ids.x_ray.text_color = blue
@@ -271,14 +231,32 @@ class ScanResult(Screen):
         self.ids.pre_proc.text_color = blue
         self.ids.grad_cam.md_bg_color = white
         self.ids.grad_cam.text_color = blue
-        
+
         self.manager.current = 'scan_img'
         self.popup.dismiss()
         
     def close_popup(self, instance):
+        """
+        Closes the popup window.
+
+        Parameters:
+        - instance: The instance of the button that triggered the event.
+
+        Returns:
+        None
+        """
         self.popup.dismiss()
     
     def _update_rect(self, instance, value):
+        """
+        Update the position and size of the rectangle based on the given instance.
+
+        Parameters:
+        - instance: The instance whose position and size will be used to update the rectangle.
+        - value: The new value for the instance.
+
+        Returns:
+        None
+        """
         self.rect.pos = instance.pos
         self.rect.size = instance.size
-   
