@@ -24,7 +24,7 @@ Builder.load_file("main_dashboard/maindash_kivy_files/save_new.kv")
 class SaveNew(Screen): 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
+
         conn = sqlite3.connect('src/components/view_record_main.db')
         cur = conn.cursor()
 
@@ -46,12 +46,12 @@ class SaveNew(Screen):
 
         conn.commit()
         conn.close()
-           
+
     def save_record(self, instance):
         self.close(instance)
         if not self.entries_valid():
             return 
-        
+
         patient_id = self.ids.patient_id.text 
         first_name = self.ids.first_name.text
         last_name = self.ids.last_name.text
@@ -65,7 +65,7 @@ class SaveNew(Screen):
             sex = 'Male'
         elif (self.ids.female.active):
             sex = 'Female'
-        
+
         with open(scan_result.orig_img, 'rb') as file:
             xray_orig = file.read()
 
@@ -76,7 +76,8 @@ class SaveNew(Screen):
         preproc_img.save(preproc_img_io, format='PNG')
         preproc_img_bytes = preproc_img_io.getvalue()  
 
-        gradcam_img = Image.fromarray((scan_result.gradcam_img).astype(np.uint8))
+        # gradcam_img = Image.fromarray((scan_result.gradcam_img).astype(np.uint8))
+        gradcam_img =  scan_result.gradcam_img
         gradcam_img.convert("RGB")
 
         gradcam_img_io = io.BytesIO()
@@ -85,7 +86,7 @@ class SaveNew(Screen):
 
         conn = sqlite3.connect("src/components/view_record_main.db")
         cur = conn.cursor()
-        
+
         cur.execute("SELECT patient_id FROM PATIENT where patient_id = ?", (patient_id,))
 
         if cur.fetchone():
@@ -111,7 +112,7 @@ class SaveNew(Screen):
              self.manager.get_screen('scan_result').ids.notes.text,
              self.manager.get_screen('scan_result').ids.misclassified.active)
         )
-        
+
         if cur.lastrowid is not None:
             self.clear_fields() 
             self.manager.get_screen('save_existing').ids.patient_search_result.clear_widgets()
@@ -123,7 +124,7 @@ class SaveNew(Screen):
             conn.commit()
             conn.close()
             self.show_popup()
- 
+
     def clear_fields(self):
         self.ids.patient_id.text = ''
         self.ids.first_name.text = ''
@@ -141,7 +142,7 @@ class SaveNew(Screen):
         with content.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(size=content.size, pos=content.pos)
-         
+
         content.bind(size=self._update_rect, pos=self._update_rect)
         content.add_widget(Label(text="[b]Record saved successfully![/b]", color=(0, 0, 1, 1), markup=True))
         content.add_widget(Button(text="Close", 
@@ -149,11 +150,11 @@ class SaveNew(Screen):
             size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
         self.popup.open()
-    
+
     def close_popup(self, instance):
         self.popup.dismiss()
         self.manager.current = 'scan_img'
-    
+
     def close(self, instance):
         self.popup.dismiss()
 
@@ -169,29 +170,28 @@ class SaveNew(Screen):
         content.add_widget(Label(
             text="[b]Saving scan result to patient\nDo you want to proceed?[/b]", 
             color=(0, 0, 1, 1), markup=True))
-        
+
         inner_content = BoxLayout(orientation='horizontal',
             spacing=10, padding=10, size_hint_y=0.3)
 
         confirm_btn = Button(text='Confirm',
             background_color=(0, 0, 1, 1), background_normal='',
             on_press=self.save_record)
-        
+
         cancel_btn = Button(text='Cancel',
             background_color=(0, 0, 1, 1), background_normal='',
             on_press= self.close)
-        
+
         inner_content.add_widget(confirm_btn)
         inner_content.add_widget(cancel_btn)
         content.add_widget(inner_content)
 
-        
-        #content.add_widget(Button(text="Close", on_press=self.close_popup))
-        
+        # content.add_widget(Button(text="Close", on_press=self.close_popup))
+
         self.popup = Popup(title='Confirm Action', content=content, size_hint=(0.4, 0.4),
             separator_color=(0,0,0,0), background_color=(0, 0, 1, 0.5),auto_dismiss=False)
         self.popup.open()
-    
+
     def entries_valid(self):
         valid = True 
         try:
@@ -205,27 +205,26 @@ class SaveNew(Screen):
             if not self.ids.first_name.text:
                 self.ids.first_name.error = True
                 valid = False
-            
+
             if not self.ids.last_name.text:
                 self.ids.last_name.error = True
                 valid = False
-            
+
             # checks if sex is not selected
             if not any([self.ids.male.active, self.ids.female.active]):
                 valid = False 
-            
+
             return valid
-    
+
         except ValueError:
             self.ids.birthdate.text = "Invalid date format"
             self.ids.birthdate.error = True
             return False
-        
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
-    
+
     def on_focus_notes(self,instance, value):
         if value:
             pass

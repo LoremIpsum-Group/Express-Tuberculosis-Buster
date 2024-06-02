@@ -15,10 +15,10 @@ from tensorflow.keras.preprocessing import image
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 # valid options: top_conv, block3a_project_conv, block6f_expand_conv, block7a_expand_conv, block6a_project_conv
-last_conv_layer_name = "block6a_project_conv"
+last_conv_layer_name = "top_conv"
 
-IMAGE_HEIGHT = 300
-IMAGE_WIDTH = 300
+IMAGE_HEIGHT = 512
+IMAGE_WIDTH = 512
 
 # for temporarily storing output images into memory
 import io

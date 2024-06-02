@@ -18,9 +18,19 @@ from .dependencies_loading import (
     IMAGE_WIDTH,
     last_conv_layer_name,
 )
-
-from .load_models import load_model_efficientNet, load_model_unet
+"""
 from .preprocessing_only import get_img_array_OLD, get_img_array_original, get_img_array
 from .segmentation_only import segment_image
 from .classifier_only import load_model_from_file, predict
 from .grad_CAM_new import make_gradcam_heatmap, superimpose_heatmap, get_gradCAM
+"""
+from .load_models import load_model_efficientNet, load_model_unet
+from .ALL_FOR_ONE import (
+    check_image,
+    crop_resize_image,
+    segment_imageV2,
+    check_segmented_img,
+    classify_image,
+    make_gradcam_heatmap,
+    superimpose_heatmap,
+)

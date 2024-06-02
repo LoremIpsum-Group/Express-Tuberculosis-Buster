@@ -120,8 +120,9 @@ class SaveExisting(Screen):
         preproc_img.save(preproc_img_io, format='PNG')
         preproc_img_bytes = preproc_img_io.getvalue()  
 
-        gradcam_img = Image.fromarray((scan_result.gradcam_img).astype(np.uint8))
-        gradcam_img.convert("RGB")
+        # gradcam_img = Image.fromarray((scan_result.gradcam_img).astype(np.uint8))
+        # gradcam_img.convert("RGB")
+        gradcam_img = scan_result.gradcam_img
 
         gradcam_img_io = io.BytesIO()
         gradcam_img.save(gradcam_img_io, format='PNG')

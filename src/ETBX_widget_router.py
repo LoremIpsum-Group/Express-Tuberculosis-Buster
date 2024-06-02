@@ -61,8 +61,8 @@ class MainApp(MDApp):
 
         from components.core_functions import load_model_efficientNet, load_model_unet
 
-        self.model_classifier = load_model_efficientNet('assets/ml-model/efficientnetB3_V0_7_11.h5')
-        self.model_segmentation = load_model_unet('assets/ml-model/unet_V0_1_7.h5')
+        self.model_classifier = load_model_efficientNet(r'assets\ml-model\efficientnetB3_V0_7_11.h5')
+        self.model_segmentation = load_model_unet(r'assets\ml-model\unet_V0_1_7.h5')
 
         scan_result_screen = self.screen_manager.get_screen('scan_result')
         scan_result_screen.model_classifier = self.model_classifier

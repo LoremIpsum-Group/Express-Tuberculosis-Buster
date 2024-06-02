@@ -9,16 +9,23 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Color, Rectangle
 from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
 
+
 from components.core_functions import (
-    segment_image,
-    predict,
-    get_gradCAM,
+    check_image,
+    crop_resize_image,
+    segment_imageV2,
+    check_segmented_img,
+    classify_image,
+    make_gradcam_heatmap,
+    superimpose_heatmap,
+
+    last_conv_layer_name,
     sqlite3,
     io,
     plt,
     np,
     Image,
-    base64
+    base64,
 )
 
 import sqlite3
@@ -79,7 +86,7 @@ class ScanResult(Screen):
 
         img_data = base64.b64encode(contents).decode('ascii')
         return 'data:image/png;base64,' + img_data
-    
+
     def update_result(self, image_path):
         """
         Updates the scan result with the provided image path.
@@ -96,13 +103,41 @@ class ScanResult(Screen):
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
 
-        # Core functionalities
-        xray_orig_resized, masked_image, mask_result = segment_image(
-             self.model_segmentation, image_path
-        )
+        #! START Core functionalities
+        faulty_img = check_image(image_path)
+        if not faulty_img[0]:
+            # * Cropping and resizing image
+            cropped_img = crop_resize_image(image_path)
+            # * Segmentation part
+            xray_orig_resized, masked_image, mask_result = segment_imageV2(
+                self.model_segmentation,
+                cropped_img,
+                img_shape=(512, 512),
+                threshold=120,
+            )
+            # * Check if segmentation is successful
+            segment_bad = check_segmented_img(masked_image, mask_result)
 
-        predicted_class, predicted_score = predict(self.model_classifier, masked_image)
-        superimposed_img = get_gradCAM(self.model_classifier, xray_orig_resized, masked_image)
+            # WEAKLY APPLIED CHECKING. FOR FUTURE, TRY TO INCORPORATE POPUP
+            if not segment_bad[0]:
+                self.show_warning_popup(segment_bad[1])  # Displays all good so far
+
+            else:                
+                self.show_warning_popup(segment_bad[1]) # Displays waht check_segmented_img returns in the components folder
+
+            # * Classification part
+            predicted_class, predicted_score, raw = classify_image(self.model_classifier, masked_image)
+
+            # * GradCAM part, do not include Cl;assification ==Non tuberculosis if want to mimic actual flow of program
+            if predicted_class == "Tuberculosis" or predicted_class == "Non-Tuberculosis":
+                # ? genearte gradcam of segmented image, but superimpose it onto original img (not yet cropped)
+                heatmap = make_gradcam_heatmap(
+                    masked_image, self.model_classifier, last_conv_layer_name
+                )
+                print(f"heatmap shape and datatype: {heatmap.shape} | {heatmap.dtype}")
+                superimposed_img = superimpose_heatmap(masked_image, heatmap)
+
+        #! END Core Functionalities
 
         bar_color = None
         if (predicted_score <= 25):
@@ -152,8 +187,9 @@ class ScanResult(Screen):
         if instance == self.ids.x_ray:
             self.ids.res_img.source = xray_orig
         elif instance == self.ids.grad_cam:
-            img = Image.fromarray((superimposed_img).astype(np.uint8))
-            img = img.convert("RGB")
+            # img = Image.fromarray((superimposed_img).astype(np.uint8))
+            img = superimposed_img
+            # img = img.convert("RGB")
             self.ids.res_img.source = self.img_string(img)
         elif instance == self.ids.pre_proc:
             img = Image.fromarray(((1.0 - masked_image) * 255).astype(np.uint8))
@@ -182,7 +218,7 @@ class ScanResult(Screen):
         content.add_widget(Label(
             text="[b]Are you sure you want to go back?\nScan Results will be lost[/b]!",
             color=(0, 0, 1, 1), markup=True))
-        
+
         inner_content = BoxLayout(orientation='horizontal', spacing=10, padding=10, size_hint_y=0.3)
         confirm_btn = Button(text='Confirm', background_color=(0, 0, 1, 1), background_normal='', on_press=self.confirm)
         cancel_btn = Button(text='Cancel', background_color=(0, 0, 1, 1), background_normal='', on_press=self.close_popup)
@@ -193,7 +229,7 @@ class ScanResult(Screen):
         self.popup = Popup(title='Confirm Action', content=content, size_hint=(0.4, 0.4),
             separator_color=(0,0,0,0), background_color=(0, 0, 1, 0.5), auto_dismiss=False)
         self.popup.open()
-    
+
     def confirm(self, instance):
         """
         Resets the screen and navigates to the 'scan_img' screen after confirming an action from the popup.
@@ -234,7 +270,7 @@ class ScanResult(Screen):
 
         self.manager.current = 'scan_img'
         self.popup.dismiss()
-        
+
     def close_popup(self, instance):
         """
         Closes the popup window.
@@ -246,7 +282,7 @@ class ScanResult(Screen):
         None
         """
         self.popup.dismiss()
-    
+
     def _update_rect(self, instance, value):
         """
         Update the position and size of the rectangle based on the given instance.
@@ -260,3 +296,24 @@ class ScanResult(Screen):
         """
         self.rect.pos = instance.pos
         self.rect.size = instance.size
+
+    def show_warning_popup(self, message):
+        """
+        Displays a popup with the given message.
+
+        Parameters:
+        - message (str): The message to be displayed in the popup.
+
+        Returns:
+        None
+        """
+        content = BoxLayout(orientation="vertical")
+        label = Label(text=message)
+        close_button = Button(text="Close", on_press=self.close_popup)
+        content.add_widget(label)
+        content.add_widget(close_button)
+        self.popup = Popup(
+            title="", content=content, auto_dismiss=False, size_hint=(0.4, 0.4)
+        )
+        self.popup.open()
+

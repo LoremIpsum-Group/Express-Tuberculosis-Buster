@@ -14,7 +14,7 @@ from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
 
-#from core_functions import load_model_efficientNet, load_model_unet
+# from core_functions import load_model_efficientNet, load_model_unet
 
 
 IMAGE_HEIGHT, IMAGE_WIDTH = 512, 512
@@ -71,6 +71,7 @@ def check_image(image_path):
 
     """
     FAULTY_IMG = False
+    message= "The input looking good so far."
     # Load the image
     image = cv2.imread(image_path)
 
@@ -87,19 +88,22 @@ def check_image(image_path):
 
     if mean_pixel_value < threshold_black:
         print("Image is likely black.")
+        message = "Image is likely black."
         FAULTY_IMG = True
     elif mean_pixel_value > threshold_white:
         print("Image is likely white.")
+        message = "Image is likely white."
         FAULTY_IMG = True
     elif not np.isclose(mean_normalized_value, 0.17, atol=0.40):
         print(
             "Image migth be darker or brighter than expected. Segmentation might be affected."
         )
+        message = "Image migth be darker or brighter than expected.\nSegmentation might be affected."
     else:
         print("Image color is not plain black or white.")
 
     print("\n\n---End of Checking input image---\n")
-    return FAULTY_IMG
+    return FAULTY_IMG, message
 
 
 # Special preprocessing function for cropping image
@@ -163,32 +167,18 @@ def crop_resize_image(path):
 def check_segmented_img(segmented_img, mask_created):
 
     print("\n\n---Start of simple checking of the segmented image---\n")
+    message = "Segmented image not containing many artifacts"
     """
-    Function dedicated for checking the image after being segmented. 
+    Function dedicated for checking the image after being segmented. MUST BE COMPREHENSIVE AND SO MUST BE REVISED
 
     Returns:
     Faulty (bool): True if the image has been compromised during segmentation, False otherwise.
     """
 
-    """
-    #* More advanced way of validating image, if image (most likely unrelated) is segmented into multiple parts
-    #* because it is unreleated to the model or if the image quality is too bad, it will mot probably look like pebbles
-    #* basta mukang spider web. If that happens, this will count the number of components in the image and if it is too high
-    #* flag or warning can be done
-
-    from skimage.measure import label
-
-    # Label the connected components in the segmented image
-    labels = label(masked_image)
-
-    # Count the number of unique labels (excluding the background label 0)
-    num_components = len(np.unique(labels)) - 1
-
-    # If the number of components is very high, raise a warning
-    if num_components > 4:
-        print("Warning: The segmented image might have 'pebble-like' artifacts, image most likely faulty 0w0")
-    """
-
+    # * More advanced way of validating image, if image (most likely unrelated) is segmented into multiple parts
+    # * because it is unreleated to the model or if the image quality is too bad, it will mot probably look like pebbles
+    # * basta mukang spider web. If that happens, this will count the number of components in the image and if it is too high
+    # * flag or warning can be done
     # Label the connected components in the segmented image
     num_components, labels = cv2.connectedComponents(segmented_img)
 
@@ -199,7 +189,8 @@ def check_segmented_img(segmented_img, mask_created):
 
     if num_components > 4:
         print("Warning: The segmented image might have 'pebble-like' artifacts, image most likely faulty 0w0")
-        
+        message = "Warning: The segmented image might \nhave 'pebble-like' artifacts,image \nmost likely faulty 0w0"
+        return True, message
 
     #! Code below checks if produced masked image is blank, indicates issue with applying mask itself. Can be used as error catching
     #! Technically repetetive, if mask is blank, then masked image is blank duh
@@ -212,10 +203,11 @@ def check_segmented_img(segmented_img, mask_created):
 
     if np.allclose(mask_created, 0) or np.allclose(segmented_img, 0):
         print("Mask is blank. Image is faulty!.")
-        return True
+        message = "Mask is blank. Image is faulty!."
+        return True, message
 
     print("\n\n---End of simple checking of the segmented image---\n")
-    return False
+    return False, message
 
 
 # ---- END OF PREPROCESSING STUFF----#
@@ -391,7 +383,6 @@ def make_gradcam_heatmap(image, model, last_conv_layer_name = last_conv_layer_na
 
     # * This segment contains the simple preprocessing of the image for creating the gradCAM heatmap
     image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-    # image = keras.applications.resnet.preprocess_input(image)
     image = np.expand_dims(image, axis=0)
 
     # First, we create a model that maps the input image to the activations
@@ -471,117 +462,210 @@ def superimpose_heatmap(original_img, heatmap, alpha=0.4):
     print("\n\n---End of superimposing image---\n")
     return superimposed_img
 
+#! Experimental, this process attempts to overlay heatmap in the shape of the segmented image,
+#! onto original image
+def superimpose_heatmap_V3(original_img, segmented_img, heatmap, alpha=0.3):
+    """
+    Superimposes the heatmap onto the original image, restricted to the regions defined by the segmented image.
+
+    Args:
+        original_img (numpy.ndarray): The original image.
+        segmented_img (numpy.ndarray): The segmented image defining the regions of interest.
+        heatmap (numpy.ndarray): The heatmap to be superimposed.
+        alpha (float, optional): The blending factor for the heatmap. Defaults to 0.4.
+
+    Returns:
+        "Image" object: The superimposed image.
+    """
+    # original_img = cv2.cvtColor(original_img, cv2.COLOR_GRAY2RGB)
+
+    # Assuming heatmap is your original array
+    heatmap[np.isnan(heatmap)] = (
+        0  # Replace NaN values with 0, ensures na fluid flow ng program even if pixel errors
+    )
+
+    # Rescale heatmap to a range 0-255
+    heatmap = np.uint8(255 * heatmap)
+
+    # Use jet colormap to colorize heatmap
+    jet = mpl.colormaps["jet"]
+
+    # Use RGB values of the colormap
+    jet_colors = jet(np.arange(256))[:, :3]
+    jet_heatmap = jet_colors[heatmap]
+
+    # Create an image with RGB colorized heatmap
+    jet_heatmap = keras.utils.array_to_img(jet_heatmap)
+    jet_heatmap = jet_heatmap.resize((original_img.shape[1], original_img.shape[0]))
+    jet_heatmap = keras.utils.img_to_array(jet_heatmap)
+
+    # Convert segmented image to binary mask
+    binary_mask = (segmented_img > 0).astype(np.uint8)
+
+    # Expand dimensions of binary mask to match the number of channels in the heatmap
+    # binary_mask_expanded = np.expand_dims(binary_mask, axis=-1)
+
+    # Superimpose the heatmap onto the original image
+    # superimposed_img = jet_heatmap * binary_mask_expanded + original_img * (1 - binary_mask_expanded)
+    # superimposed_img = jet_heatmap * binary_mask + original_img * (1 - binary_mask)
+    superimposed_img = jet_heatmap * binary_mask 
+
+    # Convert the superimposed image back to uint8
+    superimposed_img = superimposed_img.astype(np.uint8)
+
+    return superimposed_img
+
+#! Experimental, All in one generate heatmap, then overlay heatmap onto original image
+def get_gradCAM(model_classifier, original_image, masked_image):
+    # Remove last layer's activatio
+    model_classifier.layers[-1].activation = None
+
+    # preprocessed_img = get_img_array(masked_image)
+
+    # Generate Grad-CAM heatmap (replace arguments with actual values)
+    heatmap = make_gradcam_heatmap(
+        masked_image, model_classifier, last_conv_layer_name
+    )
+
+    orig_temp = cv2.cvtColor(original_image, cv2.COLOR_GRAY2RGB)
+    masked_temp = cv2.cvtColor(masked_image, cv2.COLOR_GRAY2RGB)
+
+    superimposed_segmented_onto_whole_img = superimpose_heatmap_V3(
+        orig_temp, masked_temp, heatmap
+    )
+    # activating again the classifier
+    model_classifier.layers[-1].activation = tf.keras.activations.sigmoid
+
+    # superimposed_img = cv2.resize(superimposed_img, (512, 512))
+
+    return superimposed_segmented_onto_whole_img
+
 
 # ----END OF GRADCAM SECTION----#
 
+# ----- SAMPLE SECTION TO RUN BASIC FLOW OF APP
+# ? CHECKING IF EVERYTHING WORKS/ PLEASE UNCOMMENT OR COMMENT ACCORDINGLY
 
-# CHECKING IF EVERYTHING WORKS/ PLEASE UNCOMMENT OR COMMENT ACCORDINGLY
-model_unet = load_model_unet(r"assets\ml-model\unet_V0_1_7.h5")
-model_efficientnet = load_model_efficientNet(
-    r"assets\ml-model\efficientnetB3_V0_7_11.h5"
-)
 
-MAIN_IMG_PATH = r"assets\sample-images\Normal-3499.png"
+# def run_sample (MAIN_IMG_PATH, model_unet, model_efficientnet):# * Checking image
+#     faulty_img = check_image(MAIN_IMG_PATH)
 
-# * Checking image
-faulty_img = check_image(MAIN_IMG_PATH)
+#     if not faulty_img:
+#         # * Cropping and resizing image
+#         cropped_img = crop_resize_image(MAIN_IMG_PATH)
 
-if not faulty_img:
-    # * Cropping and resizing image
-    cropped_img = crop_resize_image(MAIN_IMG_PATH)
+#         # * Segmentation part
+#         original_image, masked_image, mask_result = segment_imageV2(
+#             model_unet,
+#             cropped_img,
+#             img_shape=(512, 512),
+#             threshold=120,
+#         )
 
-    # * Segmentation part
-    original_image, masked_image, mask_result = segment_imageV2(
-        model_unet,
-        cropped_img,
-        img_shape=(512, 512),
-        threshold=120,
-    )
+#         # * Check if segmentation is successful
+#         segment_bad = check_segmented_img(masked_image, mask_result)
 
-    # * Check if segmentation is successful
-    segment_bad = check_segmented_img(masked_image, mask_result)
+#         if not segment_bad:
+#             # * Classification part
+#             classification, score, raw = classify_image(model_efficientnet, masked_image)
 
-    if not segment_bad:
-        # * Classification part
-        classification, score, raw = classify_image(model_efficientnet, masked_image)
+#             # * GradCAM part, do not include Cl;assification ==Non tuberculosis if want to mimic actual flow of program
+#             if classification == "Tuberculosis" or classification == "Non-Tuberculosis":
+#                 # ? genearte gradcam of segmented image, but superimpose it onto original img (not yet cropped)
+#                 heatmap = make_gradcam_heatmap(
+#                     masked_image, model_efficientnet, last_conv_layer_name
+#                 )
+#                 print(f"heatmap shape and datatype: {heatmap.shape} | {heatmap.dtype}")
+#                 superimposed_img = superimpose_heatmap(original_image, heatmap)
 
-        # * GradCAM part, do not include Cl;assification ==Non tuberculosis if want to mimic actual flow of program
-        if classification == "Tuberculosis" or classification == "Non-Tuberculosis":
-            # ? genearte gradcam of segmented image, but superimpose it onto original img (not yet cropped)
-            heatmap = make_gradcam_heatmap(
-                masked_image, model_efficientnet, last_conv_layer_name
-            )
-            superimposed_img = superimpose_heatmap(original_image, heatmap)
+#                 # ? to test if model, trained on segmented images, what it sees if whole image is processed
+#                 heatmap_wholeimg = make_gradcam_heatmap(
+#                     original_image, model_efficientnet, last_conv_layer_name
+#                 )
+#                 superimposed_img_wholeimg = superimpose_heatmap(
+#                     original_image, heatmap_wholeimg
+#                 )
 
-            # ? to test if model, trained on segmented images, what it sees if whole image is processed
-            heatmap_wholeimg = make_gradcam_heatmap(
-                original_image, model_efficientnet, last_conv_layer_name
-            )
-            superimposed_img_wholeimg = superimpose_heatmap(
-                original_image, heatmap_wholeimg
-            )
+#                 # ? generate gradcam on segmented image
+#                 superimposed_img_onsegmented = superimpose_heatmap(masked_image, heatmap)
 
-            # ? generate gradcam on segmented image
-            superimposed_img_onsegmented = superimpose_heatmap(masked_image, heatmap)
+#                 # ? Final wanted output, overlay only the shape of the segmented image, onto original image, then heatmap
+#                 super_superimposed_img = get_gradCAM (model_efficientnet, original_image, masked_image)
 
-        else:
-            # If want to mimic actual process or flow of program, uncomment next line
-            #superimposed_img , superimposed_img_wholeimg, superimposed_img_onsegmented = mask_result, mask_result, mask_result  # produced mask image, no idea how to implement pa i2
-            pass
+#             else:
+#                 # If want to mimic actual process or flow of program, uncomment next line
+#                 # superimposed_img , superimposed_img_wholeimg, superimposed_img_onsegmented = mask_result, mask_result, mask_result  # produced mask image, no idea how to implement pa i2
+#                 pass
 
-        # Following code are not necessary, just for checking purposes
-        print(f"Classification: {classification} | Score: {score} | Raw: {raw}")
+#             # Following code are not necessary, just for checking purposes
+#             print(f"Classification: {classification} | Score: {score} | Raw: {raw}")
 
-        fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2, 3, figsize=(20, 10))
+#             fig, ((ax1, ax2, ax3, ax4), (ax5, ax6, ax7, ax8)) = plt.subplots(
+#                 2, 4, figsize=(20, 10)
+#             )
 
-        im = cv2.imread(MAIN_IMG_PATH)
-        print(
-            "\nOriginal, unprocessed image shape: ",
-            im.shape,
-            im.dtype,
-            im.min(),
-            im.max(),
-            im.mean(),
-        )
+#             im = cv2.imread(MAIN_IMG_PATH)
+#             print(
+#                 "\nOriginal, unprocessed image shape: ",
+#                 im.shape,
+#                 im.dtype,
+#                 im.min(),
+#                 im.max(),
+#                 im.mean(),
+#             )
 
-        # Display the original image, that was preprocessed by system and not "the original image"
-        ax1.imshow(original_image, cmap="gray")
-        ax1.set_title("CUSTOM IMAGE FILE")
-        ax1.axis("off")
+#             # Display the original image, that was preprocessed by system and not "the original image"
+#             ax1.imshow(original_image, cmap="gray")
+#             ax1.set_title("CUSTOM IMAGE FILE")
+#             ax1.axis("off")
 
-        # Display the masked imh
-        ax2.imshow(masked_image, cmap="gray")
-        ax2.set_title("Masked image")
-        ax2.axis("off")
+#             # Display the masked imh
+#             ax2.imshow(masked_image, cmap="gray")
+#             ax2.set_title("Masked image")
+#             ax2.axis("off")
 
-        # Display the masked image
-        ax3.imshow(mask_result, cmap="gray")
-        ax3.set_title("Mask result")
-        ax3.axis("off")
+#             # Display the masked image
+#             ax3.imshow(mask_result, cmap="gray")
+#             ax3.set_title("Mask result")
+#             ax3.axis("off")
 
-        # genearte heatmap of segmented image, but superimpose it onto original img (not yet cropped)
-        ax4.imshow(superimposed_img)
-        ax4.set_title(f"GradCAM of segmented onto whole, rawscore: {raw:.1f}")
-        ax4.axis("off")
+#             # genearte heatmap of segmented image, but superimpose it onto original img (not yet cropped)
+#             ax4.imshow(superimposed_img)
+#             ax4.set_title(f"GradCAM of segmented onto whole,\n rawscore: {raw:.1f}")
+#             ax4.axis("off")
 
-        # generate gradcam on segmented image, then apply onto segmented imaage itself
-        ax5.imshow(superimposed_img_onsegmented)
-        ax5.set_title("GradCAM segmented img only")
-        ax5.axis("off")
+#             # generate gradcam on segmented image, then apply onto segmented imaage itself
+#             ax5.imshow(superimposed_img_onsegmented)
+#             ax5.set_title("GradCAM segmented img only")
+#             ax5.axis("off")
 
-        # generate heatmap by scanning the whole image and then producing heatmap on it
-        ax6.imshow(superimposed_img_wholeimg)
-        ax6.set_title("GradCAM on whole image")
-        ax6.axis("off")
+#             # generate heatmap by scanning the whole image and then producing heatmap on it
+#             ax6.imshow(superimposed_img_wholeimg)
+#             ax6.set_title("GradCAM on whole image")
+#             ax6.axis("off")
 
-        # Adjust the spacing between subplots
-        plt.subplots_adjust(wspace=0.1)
+#             # TESTING FOR NOW
+#             ax7.imshow(super_superimposed_img)
+#             ax7.set_title("Final wanted output\nEXPERIMENTAL")
+#             ax7.axis("off")
 
-        # Show the plot
-        plt.show()
+#             # You can use ax8 for another plot or just hide it if not needed
+#             ax8.axis("off")
 
-    else:
-        print("Segmentation failed. Please check the image.")
+#             # Adjust the spacing between subplots
+#             plt.subplots_adjust(wspace=0.1)
 
-else:
-    print("Image is faulty at input. Please check the image.")
+#             # Show the plot
+#             plt.show()
+
+#         else:
+#             print("Segmentation failed. Please check the image.")
+
+#     else:
+#         print("Image is faulty at input. Please check the image.")
+
+
+# model_unet = load_model_unet(r"assets\ml-model\unet_V0_1_7.h5")
+# model_efficientnet = load_model_efficientNet(r"assets\ml-model\efficientnetB3_V0_7_11.h5")
+# SAMPLE_IMG_TEST = r"assets\sample-images\Normal-3499.png"
+# run_sample(SAMPLE_IMG_TEST, model_unet, model_efficientnet)
