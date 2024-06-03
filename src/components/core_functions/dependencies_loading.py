@@ -14,6 +14,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing import image
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import pydicom
 # valid options: top_conv, block3a_project_conv, block6f_expand_conv, block7a_expand_conv, block6a_project_conv
 last_conv_layer_name = "top_conv"
 

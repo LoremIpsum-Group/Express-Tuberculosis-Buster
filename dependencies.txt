@@ -7,3 +7,4 @@ kivymd==1.2.0
 matplotlib==3.8.4
 opencv-python==4.9.0.80
 fpdf2==2.7.9
+pydicom==2.4.4

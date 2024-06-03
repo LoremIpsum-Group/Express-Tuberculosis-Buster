@@ -8,6 +8,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Color, Rectangle
 from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
+from main_dashboard.maindash_py_files.ETBx_scan_image import is_dicom, dicom_file
 
 
 from components.core_functions import (
@@ -26,7 +27,11 @@ from components.core_functions import (
     np,
     Image,
     base64,
+    os,
+    cv2,
+    dicom_processor as dcmp
 )
+
 
 import sqlite3
 
@@ -86,56 +91,67 @@ class ScanResult(Screen):
 
         img_data = base64.b64encode(contents).decode('ascii')
         return 'data:image/png;base64,' + img_data
-
-    def update_result(self, image_path):
+    
+    def update_result(self, image_path, is_dicom):
         """
         Updates the scan result with the provided image path.
 
         Args:
             image_path (str): The path to the image file.
-
+        
         Returns:
             None 
         """
+        
+    
         global xray_orig, xray_orig_resized, superimposed_img, masked_image
-        xray_orig = image_path
+        
+        if is_dicom:
+            image = dcmp.extract_image(dicom_file.file_path) # np.ndarray
+            image = cv2.resize(image, (512, 512))
+            image = Image.fromarray((image). astype(np.uint8))
+            image.save("dicom_image.png")
+            xray_orig = "dicom_image.png"
+        else:
+            xray_orig = image_path
+            
         self.ids.res_img.source = xray_orig
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
 
         #! START Core functionalities
-        faulty_img = check_image(image_path)
-        if not faulty_img[0]:
-            # * Cropping and resizing image
-            cropped_img = crop_resize_image(image_path)
-            # * Segmentation part
-            xray_orig_resized, masked_image, mask_result = segment_imageV2(
-                self.model_segmentation,
-                cropped_img,
-                img_shape=(512, 512),
-                threshold=120,
+        # * Cropping and resizing image
+     
+     
+        cropped_img = crop_resize_image(xray_orig)
+        # * Segmentation part
+        xray_orig_resized, masked_image, mask_result = segment_imageV2(
+            self.model_segmentation,
+            cropped_img,
+            img_shape=(512, 512),
+            threshold=120,
+        )
+        # * Check if segmentation is successful
+        segment_bad = check_segmented_img(masked_image, mask_result)
+
+        # WEAKLY APPLIED CHECKING. FOR FUTURE, TRY TO INCORPORATE POPUP
+        if not segment_bad[0]:
+            self.show_warning_popup(segment_bad[1])  # Displays all good so far
+
+        else:                
+            self.show_warning_popup(segment_bad[1]) # Displays waht check_segmented_img returns in the components folder
+
+        # * Classification part
+        predicted_class, predicted_score, raw = classify_image(self.model_classifier, masked_image)
+
+        # * GradCAM part, do not include Cl;assification ==Non tuberculosis if want to mimic actual flow of program
+        if predicted_class == "Tuberculosis" or predicted_class == "Non-Tuberculosis":
+            # ? genearte gradcam of segmented image, but superimpose it onto original img (not yet cropped)
+            heatmap = make_gradcam_heatmap(
+                masked_image, self.model_classifier, last_conv_layer_name
             )
-            # * Check if segmentation is successful
-            segment_bad = check_segmented_img(masked_image, mask_result)
-
-            # WEAKLY APPLIED CHECKING. FOR FUTURE, TRY TO INCORPORATE POPUP
-            if not segment_bad[0]:
-                self.show_warning_popup(segment_bad[1])  # Displays all good so far
-
-            else:                
-                self.show_warning_popup(segment_bad[1]) # Displays waht check_segmented_img returns in the components folder
-
-            # * Classification part
-            predicted_class, predicted_score, raw = classify_image(self.model_classifier, masked_image)
-
-            # * GradCAM part, do not include Cl;assification ==Non tuberculosis if want to mimic actual flow of program
-            if predicted_class == "Tuberculosis" or predicted_class == "Non-Tuberculosis":
-                # ? genearte gradcam of segmented image, but superimpose it onto original img (not yet cropped)
-                heatmap = make_gradcam_heatmap(
-                    masked_image, self.model_classifier, last_conv_layer_name
-                )
-                print(f"heatmap shape and datatype: {heatmap.shape} | {heatmap.dtype}")
-                superimposed_img = superimpose_heatmap(masked_image, heatmap)
+            print(f"heatmap shape and datatype: {heatmap.shape} | {heatmap.dtype}")
+            superimposed_img = superimpose_heatmap(masked_image, heatmap)
 
         #! END Core Functionalities
 
