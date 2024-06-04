@@ -1,0 +1,138 @@
+#:kivy 2.3.0
+#:kivy 2.3.0
+<PatientResult>:
+    percentage: 0 
+    percentage_color: (0, 0, 0, 0)
+    name: 'patient_result'
+    padding: 10
+    spacing : 10
+    Image:
+        id: res_img
+        size_hint: .45, .65
+        pos_hint: {'center_x': 0.30,'center_y': 0.47}  
+        
+    FloatLayout:
+
+        canvas.before:
+            # Total Percentage
+            Color:
+                rgba: 0.8, 0.8, 0.8, 1  # Gray color for total length
+            RoundedRectangle:
+                pos: self.x + self.width * 0.58, self.y + self.height * 0.63
+                size: self.parent.width * 0.35, self.parent.height * 0.03
+            
+            # Actual Percentage
+            Color:
+                rgba: root.percentage_color 
+            
+            RoundedRectangle:
+                pos: self.x + self.width * 0.58, self.y + self.height * 0.63
+                size: self.parent.width * 0.35 * (root.percentage / 100), self.parent.height * 0.03 # 75% filled
+
+   
+        Label:
+            #text: 'Scan Results for Patient: '
+            id: patient_id_text
+            font_size: 24
+            color: [0, 0, 1, 1]
+            pos_hint: {'center_x': 0.15, 'center_y': 0.9}
+
+        Label:
+            text: 'Original X-Ray, & Grad-Cam Results'
+            font_size: 22
+            color: [0, 0, 0, 1] 
+            pos_hint: {'center_x': 0.166, 'center_y': 0.85}
+    
+        # # Test
+        # Image:
+        #     id: res_img
+        #     size_hint: .50, .80
+        #     pos_hint: {'center_x': 0.2,'center_y':0.60}  
+
+
+        # Label: 
+        #     id: result_class
+        #     text: 'Lorem'
+        #     color: [0,0,0,1]
+        #     font_size: self.width* .020
+        #     pos_hint: {'center_x':0.8,'center_y':0.6}
+        # Label: 
+        #     id: result_perc
+        #     text: 'Ipsum'
+        #     color: [0,0,0,1]
+        #     font_size: self.width* .020
+        #     pos_hint: {'center_x':0.8,'center_y':0.55}   
+
+        Label:
+            id: result_classnPerc
+            text: "TB Positive: 89%"
+            bold: True
+            color: [0, 0, 0, 1]
+            font_size: 26
+            pos_hint: {"center_x": 0.63, "center_y": 0.70} 
+            
+        BoxLayout: 
+            orientation: 'horizontal'
+            size_hint: 0.10, 0.10
+            pos_hint: {'center_x': 0.80, 'center_y': 0.70}
+            
+            Label:
+                text: 'Misclassified'
+                color: 0, 0, 1, 1
+            CheckBox:
+                id: misclassified
+                color: 0, 0, 0, 1 
+                disabled: True
+
+        TextInput:
+            id: notes
+            multiline: True
+            size_hint: .35, .35
+            pos_hint: {'center_x': 0.755, 'center_y': 0.43}
+            disabled: True  
+
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 20
+            size_hint: 0.20, 0.20
+            pos_hint: {'center_x': 0.28, 'center_y': 0.15}
+
+            MDRectangleFlatButton:
+                id: x_ray
+                text: 'X-ray'
+                size_hint_x: 0.6
+                on_press: root.change_img(self)
+            
+            MDRectangleFlatButton:
+                id: pre_proc
+                text: 'Pre-Proc'
+                size_hint_x: 0.6
+                on_press: root.change_img(self)
+            
+            MDRectangleFlatButton:
+                id: grad_cam
+                text: 'Grad-Cam'
+                size_hint_x: 0.6
+                on_press: root.change_img(self)
+        
+        MDRectangleFlatButton:
+            text: 'Back'
+            size_hint_x: 0.06
+            pos_hint: {'center_x':0.95,'center_y':0.95}
+            on_press: root.manager.current = 'view_rec'
+        
+
+        BoxLayout:
+            spacing: 20
+            orientation: 'horizontal'
+            size_hint: 0.2 , 0.2 
+            pos_hint: {'center_x': 0.75, 'center_y': 0.29} 
+
+
+
+            MDRectangleFlatButton:
+                text: 'Full View Image'
+                size_hint_x: 0.06    
+                on_press: root.full_view()
+        

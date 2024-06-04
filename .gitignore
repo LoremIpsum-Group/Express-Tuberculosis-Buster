@@ -1,2 +1,8 @@
 *.h5
 __pycache__/
+.SANDBOX_FOLDER
+.venv
+first_db.db
+assets/sample-images/MCUCXR*
+Exported-Results/
+*view_record_main.db

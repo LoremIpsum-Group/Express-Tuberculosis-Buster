@@ -1,0 +1,53 @@
+#:kivy 2.3.0
+
+<TxtLabel@Label>:
+    color: (0, 0, 1, 1)
+    markup: True
+
+BoxLayout:
+    orientation: 'vertical'
+    size_hint: 0.4, 0.4 
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    canvas.before:
+        Color:
+            rgba: (250/255, 250/255, 254/255, 1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [20, ]
+
+    TxtLabel:
+        id: header
+        text: ''
+    BoxLayout:
+        size_hint_y: None
+        height: 1
+        canvas:
+            Color:
+                rgba: 0, 0, 1, 1  
+            Line:
+                points: [self.x, self.y, self.right, self.y]
+    BoxLayout:
+        orientation: 'horizontal'
+
+        TxtLabel:
+            id: patient_name
+            text: '[color=#00e]Name:[/color]\n'
+            color: (0, 0, 0, 1)
+         
+        TxtLabel:
+            id: patient_age
+            text: '[color=#00e]Age:[/color]\n'
+            color: (0, 0, 0, 1)
+
+    BoxLayout:
+        orientation: 'horizontal'
+
+        TxtLabel:
+            id: patient_sex
+            text: '[color=#00e]Sex:[/color]\n'
+            color: (0, 0, 0, 1)
+        TxtLabel:
+            id: patient_birthdate
+            text: '[color=#00e]Birthdate:[/color]\n'
+            color: (0, 0, 0, 1)
