@@ -1,4 +1,4 @@
-from components.core_functions.dependencies_loading import (
+from src.components.core_functions.dependencies_loading import (
     Image, 
     cv2,
     pydicom,

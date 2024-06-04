@@ -7,12 +7,11 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Color, Rectangle
-from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
-from main_dashboard.maindash_py_files.ETBx_scan_image import is_dicom, dicom_file
+from src.main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
+from src.main_dashboard.maindash_py_files.ETBx_scan_image import is_dicom, dicom_file
 
-
-from components.core_functions import (
-    check_image,
+from src.components.core_functions import (
+    resource_path,
     crop_resize_image,
     segment_imageV2,
     check_segmented_img,
@@ -32,9 +31,6 @@ from components.core_functions import (
     dicom_processor as dcmp
 )
 
-
-import sqlite3
-
 class ScanResultData:
     def __init__(self):
         self.results = None
@@ -47,7 +43,7 @@ class ScanResultData:
 
 scan_result = ScanResultData()
 
-Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_scan_res.kv"))
 
 class ScanResult(Screen):
     def __init__(self, **kwargs):
@@ -55,7 +51,7 @@ class ScanResult(Screen):
         self.model_classifier = None
         self.model_segmentation = None
 
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """ 
@@ -110,8 +106,8 @@ class ScanResult(Screen):
             image = dcmp.extract_image(dicom_file.file_path) # np.ndarray
             image = cv2.resize(image, (512, 512))
             image = Image.fromarray((image). astype(np.uint8))
-            image.save("dicom_image.png")
-            xray_orig = "dicom_image.png"
+            image.save(resource_path("dicom_image.png"))
+            xray_orig = resource_path("dicom_image.png")
         else:
             xray_orig = image_path
             

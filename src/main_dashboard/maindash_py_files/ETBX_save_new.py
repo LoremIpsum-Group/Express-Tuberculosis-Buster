@@ -1,31 +1,28 @@
 from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
-from kivy.app import App
-from kivy.metrics import dp 
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label 
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
-from kivymd.uix.pickers import MDDatePicker
 from kivy.graphics import Color, Rectangle
-from main_dashboard.maindash_py_files.ETBX_scan_results import scan_result
+from src.main_dashboard.maindash_py_files.ETBX_scan_results import scan_result
 
-import sqlite3
-import datetime
-
-from components.core_functions import (
+from src.components.core_functions import (
+    resource_path,
     io,
     np,
-    Image
+    Image,
+    sqlite3,
+    datetime
 )
 
 
-Builder.load_file("main_dashboard/maindash_kivy_files/save_new.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\save_new.kv"))
 class SaveNew(Screen): 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         cur = conn.cursor()
 
         cur.execute(
@@ -84,7 +81,7 @@ class SaveNew(Screen):
         gradcam_img.save(gradcam_img_io, format='PNG')
         gradcam_img_bytes = gradcam_img_io.getvalue()  
 
-        conn = sqlite3.connect("src/components/view_record_main.db")
+        conn = sqlite3.connect(resource_path("src\\components\\view_record_main.db"))
         cur = conn.cursor()
 
         cur.execute("SELECT patient_id FROM PATIENT where patient_id = ?", (patient_id,))

@@ -2,12 +2,10 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 from kivy.properties import NumericProperty
-from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
+from src.main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
 
-
-
-from components.core_functions import (
-
+from src.components.core_functions import (
+    resource_path,
     sqlite3,
     io,
     plt,
@@ -32,7 +30,7 @@ class ScanResultData:
 
 scan_result = ScanResultData() 
 
-Builder.load_file("main_dashboard/maindash_kivy_files/etbx_view_rcrds_patient.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_view_rcrds_patient.kv"))
 
 class PatientResult(Screen):
     """
@@ -52,7 +50,7 @@ class PatientResult(Screen):
         
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """ 
@@ -115,7 +113,7 @@ class PatientResult(Screen):
         Returns:
             None
         """
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         
 

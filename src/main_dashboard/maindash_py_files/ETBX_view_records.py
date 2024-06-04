@@ -18,14 +18,15 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.properties import ListProperty, StringProperty
 from kivy.uix.recyclegridlayout import RecycleGridLayout
 
-from fpdf import FPDF 
+from src.components.core_functions import (
+    resource_path,
+    FPDF,
+    io,
+    Image,
+    sqlite3
+)
 
-import io
-from PIL import Image
-
-import sqlite3
-
-Builder.load_file("main_dashboard/maindash_kivy_files/etbx_view_rcrds.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_view_rcrds.kv"))
 class ViewRecords(Screen):
 
     data_items = ListProperty([]) 
@@ -34,7 +35,7 @@ class ViewRecords(Screen):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """ 
@@ -80,7 +81,7 @@ class ViewRecords(Screen):
         - None
         """
         self.data_items.clear()
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\\components\\view_record_main.db'))
         c = conn.cursor()
         search_input = self.ids.search_input.text
 
@@ -231,7 +232,7 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 16)
 
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """
@@ -266,17 +267,17 @@ class ViewRecords(Screen):
         orig_image_bytes  = record[10]
         orig_image_stream = io.BytesIO(orig_image_bytes)
         orig_image = Image.open(orig_image_stream)
-        orig_image.save(f'Exported-Results/orig_image_{patient_ID}.jpg')
+        orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
 
         preproc_image_bytes = record[11]
         preproc_image_stream = io.BytesIO(preproc_image_bytes)
         preproc_image = Image.open(preproc_image_stream)
-        preproc_image.save(f'Exported-Results/preproc_image_{patient_ID}.jpg')
+        preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
 
         gradcam_image_bytes = record[12]
         gradcam_image_stream = io.BytesIO(gradcam_image_bytes)
         gradcam_image = Image.open(gradcam_image_stream)
-        gradcam_image.save(f'Exported-Results/gradcam_image_{patient_ID}.jpg')
+        gradcam_image.save(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
 
 
         '''
@@ -301,7 +302,7 @@ class ViewRecords(Screen):
 
         pdf.cell(95, 10, f'Result: {result}')
         pdf.cell(95, 10, f'Model Prediction %: {percentage}', ln=True)
-        pdf.cell(0, 10, f'Misclassification: {misclassified}', ln=True)
+        pdf.cell(0, 10, f'Did system Misclassify: {misclassified}', ln=True)
         pdf.ln(5)  
 
         pdf.cell(0, 10, 'Notes:', ln=True)
@@ -316,14 +317,14 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Original Image', 0, 1, 'C')
-        pdf.image(f'Exported-Results/orig_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30))
 
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
-        pdf.cell(0, 20, 'Grad-CAM Image', 0, 1, 'C')
-        pdf.image(f'Exported-Results/gradcam_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.cell(0, 20, 'Heatmap image', 0, 1, 'C')
+        pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30))
 
-        pdf.output(f'Exported-Results/patient_results_{patient_ID}.pdf')
+        pdf.output(resource_path(f'Exported-Result\\patient_results_{patient_ID}.pdf'))
 
     def close_popup(self, instance):
         """

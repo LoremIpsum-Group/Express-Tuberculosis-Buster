@@ -188,8 +188,8 @@ def check_segmented_img(segmented_img, mask_created):
     num_components = len(np.unique(labels)) - 1
 
     if num_components > 4:
-        print("Warning: The segmented image might have 'pebble-like' artifacts, image most likely faulty 0w0")
-        message = "Warning: The segmented image might \nhave 'pebble-like' artifacts,image \nmost likely faulty 0w0"
+        print("Warning: The segmented image might have 'pebble-like' artifacts, image most likely faulty")
+        message = "Warning: The segmented image might \nhave 'pebble-like' artifacts,image \nmost likely faulty"
         return True, message
 
     #! Code below checks if produced masked image is blank, indicates issue with applying mask itself. Can be used as error catching

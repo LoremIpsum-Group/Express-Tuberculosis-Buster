@@ -6,7 +6,9 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 
-Builder.load_file('src/onboarding_portal/onboarding_kivy_files/etbx_login_final.kv')
+from src.components.core_functions.resource_path import resource_path
+
+Builder.load_file(resource_path('src\\onboarding_portal\\onboarding_kivy_files\\etbx_login_final.kv'))
 
 class LoginScreen(Screen):
     def __init__(self, **kwargs):
@@ -44,7 +46,7 @@ class LoginScreen(Screen):
         """
         self.ids.username_input.clear_widgets()
         self.ids.password_input.clear_widgets()
-        self.forgot_password_popup('Please contact: Venz Salvatierra \nContact Number: 09123456789 \nEmail: venz@gmail.com')
+        self.forgot_password_popup('Please contact: Venz Salvatierra (ETBX-Developer)\nContact Number: 09773503492 \nEmail:202110530@fit.edu.ph')
 
     
     def forgot_password_popup(self, message):

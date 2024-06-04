@@ -7,25 +7,25 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button 
 from kivy.uix.popup import Popup
 from kivy.graphics import Color, Rectangle
-from main_dashboard.maindash_py_files.ETBX_scan_results import scan_result
+from src.main_dashboard.maindash_py_files.ETBX_scan_results import scan_result
 
-import sqlite3 
-import datetime 
-
-from components.core_functions import (
+from src.components.core_functions import (
+    resource_path,
     io,
     np,
-    Image
+    Image,
+    sqlite3,
+    datetime
 )
 
-Builder.load_file("main_dashboard/maindash_kivy_files/save_existing.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\save_existing.kv"))
 class SaveExisting(Screen): 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.patient_info_layout = None
         self.no_patient_layout = None
     
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         cur = conn.cursor()
 
         cur.execute(
@@ -56,7 +56,7 @@ class SaveExisting(Screen):
         else:
             self.ids.patient_id.error = False
 
-            conn = sqlite3.connect('src/components/view_record_main.db')
+            conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
             cur = conn.cursor()
             cur.execute("SELECT * FROM PATIENT WHERE patient_ID = ?", (int(patient_id),))
             result = cur.fetchone()
@@ -128,7 +128,7 @@ class SaveExisting(Screen):
         gradcam_img.save(gradcam_img_io, format='PNG')
         gradcam_img_bytes = gradcam_img_io.getvalue()  
     
-        conn = sqlite3.connect("src/components/view_record_main.db")
+        conn = sqlite3.connect(resource_path("src\\components\\view_record_main.db"))
         cur = conn.cursor()
 
         cur.execute(
