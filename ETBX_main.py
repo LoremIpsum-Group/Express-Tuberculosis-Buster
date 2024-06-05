@@ -22,7 +22,7 @@ SOFTWARE_VERSION = '1.0'
 
 class MainApp(MDApp):
     Config.set('kivy', 'exit_on_escape', '0')
-
+    Window.minimum_width, Window.minimum_height = (800, 600)
     def build(self):
             """
             Builds the user interface by creating and configuring the screen manager.

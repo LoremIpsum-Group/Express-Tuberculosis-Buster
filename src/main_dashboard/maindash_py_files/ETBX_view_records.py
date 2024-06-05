@@ -18,6 +18,15 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.properties import ListProperty, StringProperty
 from kivy.uix.recyclegridlayout import RecycleGridLayout
 
+from fpdf import FPDF 
+
+import io, os, pyzipper
+from PIL import Image
+
+from getpass import getpass
+
+import sqlite3
+
 from src.components.core_functions import (
     resource_path,
     FPDF,
@@ -176,7 +185,7 @@ class ViewRecords(Screen):
 
         button1 = Button(text='Export Result', background_color=(0, 0, 1, 1), background_normal='')
         button1.bind(on_release=lambda instance: self.export_result(search_input))
-        button1.bind(on_release=lambda instance: self.export_success())
+        button1.bind(on_release=lambda instance: self.export_success(search_input))
         button1.bind(on_release=lambda instance: self.close_popup(instance))
 
         button2 = Button(text='View Result', background_color=(0, 0, 1, 1), background_normal='')
@@ -191,7 +200,7 @@ class ViewRecords(Screen):
         self.popup.open()
 
    
-    def export_success(self):
+    def export_success(self, patient_ID):
         """
         Displays a popup message indicating successful export.
 
@@ -205,15 +214,25 @@ class ViewRecords(Screen):
         Returns:
         - None
         """
-        content = BoxLayout(orientation='vertical', padding=10)
+        content = FloatLayout()
         with content.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(size=content.size, pos=content.pos)
         content.bind(size=self._update_rect, pos=self._update_rect)
-        label = Label(text="Exported Successfully!", color=(0,0,1,1))
+        #label = Label(text="Exported Successfully here: \n" + resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'), color=(0,0,1,1))
+        label = Label(
+            text="Exported Successfully here: \n" + resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'),
+            color=(0,0,1,1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            size_hint=(1, None),  # Allow the label to expand horizontally
+            height=50,  # Or whatever height you want the label to have
+            text_size=(self.popup.width, None),  # Set the width of the text box to the width of the popup
+            halign='center',  # Center the text horizontally
+            valign='center'  # Center the text vertically
+        )
         self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
         close_button = Button(text='Close', background_color=(1, 0, 0, 1), background_normal='',
-            size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=lambda instance: self.close_popup(instance))
+            size_hint=(1, 0.2), pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=lambda instance: self.close_popup(instance))
         content.add_widget(label)
         content.add_widget(close_button)
         self.popup.open()
@@ -317,14 +336,34 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Original Image', 0, 1, 'C')
-        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30))
+        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Heatmap image', 0, 1, 'C')
-        pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30))
+        pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
-        pdf.output(resource_path(f'Exported-Result\\patient_results_{patient_ID}.pdf'))
+        pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
+        
+        # Create an encrypted zip file
+        secret_password = b'password'
+        with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
+            zf.setpassword(secret_password)
+            zf.setencryption(pyzipper.WZ_AES, nbits =128)
+            zf.write(f'Exported-Results\\patient_results_{patient_ID}.pdf')
+            zf.write(f'Exported-Results\\orig_image_{patient_ID}.jpg')
+            zf.write(f'Exported-Results\\preproc_image_{patient_ID}.jpg')
+            zf.write(f'Exported-Results\\gradcam_image_{patient_ID}.jpg')
+         
+        # Remove the unencrypted files
+        os.remove(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
+        os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
+        #os.remove(resource_path(f'Exported-Results\\Patient_{patient_ID}'))
+
+
+
 
     def close_popup(self, instance):
         """

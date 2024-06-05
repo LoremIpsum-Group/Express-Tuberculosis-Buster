@@ -110,8 +110,11 @@ class ScanResult(Screen):
             xray_orig = resource_path("dicom_image.png")
         else:
             xray_orig = image_path
-            
-        self.ids.res_img.source = xray_orig
+        
+        if is_dicom:
+            self.ids.res_img.source = self.img_string(image)
+        else:
+            self.ids.res_img.source = xray_orig
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
 
