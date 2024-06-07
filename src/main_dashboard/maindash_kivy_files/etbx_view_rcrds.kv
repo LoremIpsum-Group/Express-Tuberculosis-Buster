@@ -130,8 +130,10 @@
         BoxLayout:
             RecycleView:
                 viewclass: 'Button' 
-                data: [{'text': f"{str(x[3])}                        {str(x[2])}", 'on_release': lambda x=x: root.result_popup(x[1])} for x in root.data_items]
-                        
+                #data: [{'text': f"{str(x[3])}                        {str(x[2])}", 'on_release': lambda x=x: root.result_popup(x[1])} for x in root.data_items]
+                data: [{'text': f"{str(x[3])} {str(x[2])}", 'on_release': lambda x=x, i=i: root.result_popup(x[1], i)} for i, x in enumerate(root.data_items)]                        
+                #data: [{'text': f"{str(x[3])}                        {str(x[2])}", 'on_release': lambda x=x: root.record_clicked(x[1])} for x in root.data_items]
+
                 RecycleBoxLayout:
                     id: search_result_layout
                     cols: 1

@@ -121,7 +121,7 @@ class ViewRecords(Screen):
 
         conn.close()
                 
-    def record_clicked(self, search_input):
+    def record_clicked(self, search_input, index):
         """
         Handle the event when a record is clicked.
 
@@ -132,15 +132,22 @@ class ViewRecords(Screen):
         None
         """
 
-        for record in self.data_items:
-            if record[1] == search_input:
-                full_record = record
-                res_id = full_record[0]
+        # for record in self.data_items:
+        #     if record[1] == search_input:
+        #         full_record = record
+        #         res_id = full_record[0]
 
-                self.manager.get_screen('patient_result').update_result(int(res_id))
-                self.manager.current = 'patient_result'
-                break
-                    
+        #         self.manager.get_screen('patient_result').update_result(int(res_id))
+        #         self.manager.current = 'patient_result'
+        #         break
+        
+        records = [record for record in self.data_items if record[1] == search_input]
+        if index < len(records):
+            full_record = records[index]
+            res_id = full_record[0]
+
+            self.manager.get_screen('patient_result').update_result(int(res_id))
+            self.manager.current = 'patient_result'
     
     def error_popup(self, message):
         """
@@ -161,7 +168,7 @@ class ViewRecords(Screen):
         self.popup.open()
 
        
-    def result_popup(self, search_input):
+    def result_popup(self, search_input, index):
         """
         Displays a popup window with options for the user to choose from.
 
@@ -171,6 +178,8 @@ class ViewRecords(Screen):
         Returns:
             None
         """
+        record = self.data_items[index]
+
         content = FloatLayout()
         with content.canvas.before:
             Color(1, 1, 1, 1)
@@ -184,12 +193,12 @@ class ViewRecords(Screen):
         button_grid = GridLayout(cols=2, size_hint=(1, 0.2), pos_hint={'x': 0, 'y': 0}, padding=10, spacing=10)
 
         button1 = Button(text='Export Result', background_color=(0, 0, 1, 1), background_normal='')
-        button1.bind(on_release=lambda instance: self.export_result(search_input))
+        button1.bind(on_release=lambda instance: self.export_result(search_input, index))
         button1.bind(on_release=lambda instance: self.export_success(search_input))
         button1.bind(on_release=lambda instance: self.close_popup(instance))
 
         button2 = Button(text='View Result', background_color=(0, 0, 1, 1), background_normal='')
-        button2.bind(on_release=lambda instance: self.record_clicked(search_input))
+        button2.bind(on_release=lambda instance: self.record_clicked(search_input, index))
         button2.bind(on_release=lambda instance: self.close_popup(instance))
 
         button_grid.add_widget(button1)
@@ -237,7 +246,7 @@ class ViewRecords(Screen):
         content.add_widget(close_button)
         self.popup.open()
 
-    def export_result(self, search_input):
+    def export_result(self, search_input, index):
         """
         Export the result of a patient's record to a PDF file and save associated images.
 
@@ -256,47 +265,89 @@ class ViewRecords(Screen):
         c.execute(
             """
             SELECT PATIENT.patient_ID, PATIENT.first_name, PATIENT.last_name, PATIENT.sex, PATIENT.age, PATIENT.address, 
-            RESULTS.date_of_scan, RESULTS.result, RESULTS.percentage, RESULTS.notes, RESULTS.orig_image, RESULTS.preproc_image, RESULTS.grad_cam_image, RESULTS.misclassified
+            RESULTS.date_of_scan, RESULTS.result, RESULTS.percentage, RESULTS.notes, RESULTS.orig_image, RESULTS.preproc_image, RESULTS.grad_cam_image, RESULTS.misclassified, RESULTS.result_id
             FROM PATIENT
             JOIN RESULTS ON PATIENT.patient_ID = RESULTS.patient_id
             WHERE PATIENT.patient_ID = ?
             """,
-            (search_input,)
+            (int(search_input),)
         )
         records = c.fetchall()
         
-        if records:  
-            for record in records:
-                patient_ID = record[0]
-                first_name = record[1]
-                last_name = record[2]
-                sex = record[3]
-                age = record[4]
-                address = record[5]
-                date_of_scan = record[6]
-                result = record[7]
-                percentage = record[8]
-                notes = record[9]
-                misclassified = record [13]
+        # records = [record for record in self.data_items if record[1] == search_input]
+        # if index < len(records):
+        #     full_record = records[index]
+        #     patient_ID = full_record[0]
+        #     first_name = full_record[1]
+        #     last_name = full_record[2]
+        #     sex = full_record[3]
+        #     age = full_record[4]
+        #     address = full_record[5]
+        #     date_of_scan = full_record[6]
+        #     result = full_record[7]
+        #     percentage = full_record[8]
+        #     notes = full_record[9]
+        #     misclassified = full_record [13]
+
+        #default working 
+        # if records:  
+        #     for record in records:
+                # patient_ID = record[0]
+                # first_name = record[1]
+                # last_name = record[2]
+                # sex = record[3]
+                # age = record[4]
+                # address = record[5]
+                # date_of_scan = record[6]
+                # result = record[7]
+                # percentage = record[8]
+                # notes = record[9]
+                # misclassified = record [13]
+                #result_ID = record[14]
+
+        if records:
+            full_record = records[index]
+            patient_ID = full_record[0]
+            first_name = full_record[1]
+            last_name = full_record[2]
+            sex = full_record[3]
+            age = full_record[4]
+            address = full_record[5]
+            date_of_scan = full_record[6]
+            result = full_record[7]
+            percentage = full_record[8]
+            notes = full_record[9]
+            misclassified = full_record [13]
+            result_ID = full_record[14] #Ttry
+                
         if misclassified == True: 
             misclassified = "True"
         else:
             misclassified = "False"    
+
+        #os.makedirs(resource_path(f'Exported-Results\\orig_image_{patient_ID}\\result_id{result_ID}'), exist_ok=True)
+
         
-        orig_image_bytes  = record[10]
+        #orig_image_bytes  = record[10]
+        orig_image_bytes  = full_record[10]
         orig_image_stream = io.BytesIO(orig_image_bytes)
         orig_image = Image.open(orig_image_stream)
-        orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
+        #orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
+        orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
 
-        preproc_image_bytes = record[11]
+        #preproc_image_bytes = record[11]
+        preproc_image_bytes = full_record[11]
         preproc_image_stream = io.BytesIO(preproc_image_bytes)
         preproc_image = Image.open(preproc_image_stream)
-        preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
+        #preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
+        preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.jpg'))
 
-        gradcam_image_bytes = record[12]
+        #gradcam_image_bytes = record[12]
+        gradcam_image_bytes = full_record[12]
         gradcam_image_stream = io.BytesIO(gradcam_image_bytes)
         gradcam_image = Image.open(gradcam_image_stream)
-        gradcam_image.save(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
+        #gradcam_image.save(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
+        gradcam_image.save(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg'))
 
 
         '''
@@ -336,31 +387,49 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Original Image', 0, 1, 'C')
-        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
+        #pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Heatmap image', 0, 1, 'C')
-        pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
+        #pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
-        pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
-        
+        #pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
+        pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf'))
+       
         # Create an encrypted zip file
         secret_password = b'password'
-        with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
+        #with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
+        with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
+
             zf.setpassword(secret_password)
             zf.setencryption(pyzipper.WZ_AES, nbits =128)
-            zf.write(f'Exported-Results\\patient_results_{patient_ID}.pdf')
-            zf.write(f'Exported-Results\\orig_image_{patient_ID}.jpg')
-            zf.write(f'Exported-Results\\preproc_image_{patient_ID}.jpg')
-            zf.write(f'Exported-Results\\gradcam_image_{patient_ID}.jpg')
-         
+            #zf.write(f'Exported-Results\\patient_results_{patient_ID}.pdf')
+            zf.write(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf')
+
+            #zf.write(f'Exported-Results\\orig_image_{patient_ID}.jpg')
+            zf.write(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg')
+           
+            #zf.write(f'Exported-Results\\preproc_image_{patient_ID}.jpg')
+            zf.write(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.jpg')
+           
+            #zf.write(f'Exported-Results\\gradcam_image_{patient_ID}.jpg')
+            zf.write(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg')
+        
         # Remove the unencrypted files
-        os.remove(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
-        os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
-        os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
-        os.remove(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
-        #os.remove(resource_path(f'Exported-Results\\Patient_{patient_ID}'))
+        #os.remove(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
+        os.remove(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf'))
+       
+        #os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
+       
+        #os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.jpg'))
+
+        #os.remove(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg'))
 
 
 
