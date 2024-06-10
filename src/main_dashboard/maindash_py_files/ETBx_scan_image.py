@@ -69,7 +69,10 @@ class ScanImage(Screen):
         root.withdraw()  
         file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.dcm;*.dicom")])
         root.destroy()  
-        return resource_path(file_path)
+        if not file_path:
+            pass
+        else: 
+            return resource_path(file_path)
 
     def put_image(self, file_path):
         global dicom_file_path, is_dicom, dicom_image 
@@ -107,6 +110,9 @@ class ScanImage(Screen):
         Returns:
         None
         """
+        if resource_path(self.image.source) == resource_path("assets/jpg.png"):
+            self.show_warning_popup("Please load an image first.")
+            return
 
         if is_dicom:
             image_path = resource_path("dicom_image.png")
