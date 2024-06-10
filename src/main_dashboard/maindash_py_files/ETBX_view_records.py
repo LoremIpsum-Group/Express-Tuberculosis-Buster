@@ -23,6 +23,8 @@ from fpdf import FPDF
 import io, os, pyzipper
 from PIL import Image
 
+from cryptography.fernet import Fernet, InvalidToken #for encryption
+
 from getpass import getpass
 
 import sqlite3
@@ -34,6 +36,7 @@ from src.components.core_functions import (
     Image,
     sqlite3
 )
+
 
 Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_view_rcrds.kv"))
 class ViewRecords(Screen):
@@ -93,6 +96,13 @@ class ViewRecords(Screen):
         conn = sqlite3.connect(resource_path('src\\\components\\view_record_main.db'))
         c = conn.cursor()
         search_input = self.ids.search_input.text
+        
+
+        #testing the encryption
+        # with open("secret.key", "rb") as key_file:
+        #     key = key_file.read()
+        
+        # cipher_suite = Fernet(key)
 
         if not search_input:
             self.ids.search_result_layout.clear_widgets()
@@ -108,6 +118,7 @@ class ViewRecords(Screen):
             results = c.fetchall()
             self.ids.result_label.text = "Result"
             self.ids.date_label.text = "Date of Scan"
+            #start of test here
             if results:
                 for result in results:
                     self.data_items.append(result)
@@ -119,6 +130,40 @@ class ViewRecords(Screen):
                 self.ids.result_label.text = ""
                 self.ids.date_label.text = ""
 
+            # if results:
+            #     for result in results:
+            #         #self.data_items.append(result)
+            #         try:
+            #             result_id = result[0]
+            #             patient_id = result[1]
+            #             decrypted_date_of_scan = cipher_suite.decrypt(result[2]).decode()
+            #             decrypted_result = cipher_suite.decrypt(result[3]).decode()
+            #             decrypted_percentage = cipher_suite.decrypt(result[4]).decode()
+            #             decrypted_orig_image = cipher_suite.decrypt(result[5]).decode()
+            #             decrypted_preproc_image = cipher_suite.decrypt(result[6]).decode()
+            #             decrypted_grad_cam_image = cipher_suite.decrypt(result[7]).decode()
+            #             decrypted_notes = cipher_suite.decrypt(result[8]).decode()
+            #             decrypted_misclassified = cipher_suite.decrypt(result[9]).decode()
+
+                        
+                        
+
+
+            #             self.data_items.append(result_id, patient_id, decrypted_date_of_scan, decrypted_result, decrypted_percentage, 
+            #                    decrypted_orig_image, 
+            #                    decrypted_preproc_image, decrypted_grad_cam_image, decrypted_notes, decrypted_misclassified)
+            #         except InvalidToken:
+            #             print("Invalid token. Please check the token and try again.")
+            #         except Exception as e:
+            #             print("An error occurred: ", str(e))
+            #     self.current_patient_id = search_input
+            # else:
+            #     self.ids.search_result_layout.clear_widgets()
+            #     self.error_popup("No ID found")
+            #     self.ids.search_result.text = ""
+            #     self.ids.result_label.text = ""
+            #     self.ids.date_label.text = ""
+        #end of test
         conn.close()
                 
     def record_clicked(self, search_input, index):
@@ -333,7 +378,12 @@ class ViewRecords(Screen):
         orig_image_stream = io.BytesIO(orig_image_bytes)
         orig_image = Image.open(orig_image_stream)
         #orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
-        orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
+        
+        #raises an error when an image is 8 bit 
+        #orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
+
+
+        orig_image.convert('RGB').save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
 
         #preproc_image_bytes = record[11]
         preproc_image_bytes = full_record[11]
@@ -401,6 +451,7 @@ class ViewRecords(Screen):
        
         # Create an encrypted zip file
         secret_password = b'password'
+        
         #with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
         with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
 

@@ -7,20 +7,42 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Color, Rectangle
 from src.main_dashboard.maindash_py_files.ETBX_scan_results import scan_result
 
+from cryptography.fernet import Fernet #new 
+
 from src.components.core_functions import (
     resource_path,
     io,
     np,
     Image,
     sqlite3,
-    datetime
+    datetime,
+    os #new 
 )
+
 
 
 Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\save_new.kv"))
 class SaveNew(Screen): 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        # Generate a key and save it to a file
+        # if not os.path.exists("supersecret.key"):
+        #     key = Fernet.generate_key()
+        #     with open("supersecret.key", "wb") as key_file:
+        #         key_file.write(key)
+        # else:
+        #     with open("supersecret.key", "rb") as key_file:
+        #         key = key_file.read()
+
+
+        # if not os.path.exists("supersecret.key"):
+        #     key = Fernet.generate_key() 
+        #     with open("supersecret.key", "wb") as key_file:
+        #         key_file.write(key)
+        # else:
+        #     with open("supersecret.key", "rb") as key_file:
+        #         key = key_file.read()
 
         conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         cur = conn.cursor()
@@ -48,6 +70,15 @@ class SaveNew(Screen):
         self.close(instance)
         if not self.entries_valid():
             return 
+        
+        # #testing the encryption
+        # if not os.path.exists("supersecret.key"):
+        #     key = Fernet.generate_key() 
+        #     with open("supersecret.key", "wb") as key_file:
+        #         key_file.write(key)
+        # else:
+        #     with open("supersecret.key", "rb") as key_file:
+        #         key = key_file.read()
 
         patient_id = self.ids.patient_id.text 
         first_name = self.ids.first_name.text
@@ -63,6 +94,22 @@ class SaveNew(Screen):
         elif (self.ids.female.active):
             sex = 'Female'
 
+        # patient_id = self.ids.patient_id.text 
+        # first_name = self.ids.first_name.text.encode() #testing the encryption
+        # last_name = self.ids.last_name.text.encode() #.encode()#testing the encryption
+        # birthdate = self.ids.birthdate.text.encode() ##testing the encryption
+        # birthdate_str = birthdate.decode() # Decode birthdate back to a string
+        # current_date = datetime.datetime.now()
+        # age = str((current_date - datetime.datetime.strptime(birthdate_str, "%Y/%m/%d")).days // 365).encode()
+        # address = self.ids.address.text.encode()#testing the encryption
+        # scan_date = current_date.strftime("%Y-%m-%d").encode()
+
+        # if (self.ids.male.active):
+        #     sex = 'Male'.encode() #testing the encryption
+        # elif (self.ids.female.active):
+        #     sex = 'Female'.encode() #testing the encryption
+
+        #end of test
         with open(scan_result.orig_img, 'rb') as file:
             xray_orig = file.read()
 
@@ -90,6 +137,18 @@ class SaveNew(Screen):
             self.ids.patient_id.text = "Patient ID already exists!"
             self.ids.patient_id.error = True
             return 
+        
+        # cipher_suite = Fernet(key)
+
+        # #Encrypt the personal information
+        # encrypted_first_name = cipher_suite.encrypt(first_name)
+        # encrypted_last_name = cipher_suite.encrypt(last_name)
+        # encrypted_birthdate = cipher_suite.encrypt(birthdate)
+        # encrypted_sex = cipher_suite.encrypt(sex)
+        # encrypted_address = cipher_suite.encrypt(address)
+        # encrypted_age = cipher_suite.encrypt(age)
+
+
 
         cur.execute(
             f"""
@@ -109,6 +168,36 @@ class SaveNew(Screen):
              self.manager.get_screen('scan_result').ids.notes.text,
              self.manager.get_screen('scan_result').ids.misclassified.active)
         )
+
+        # cur.execute(
+        #     """
+        #     INSERT INTO PATIENT (patient_ID, first_name, last_name, sex, age, date_of_birth, address)
+        #     VALUES (?, ?, ?, ?, ?, ?, ?);
+        #     """,
+        # (patient_id, encrypted_first_name, encrypted_last_name, encrypted_sex, encrypted_age, encrypted_birthdate, encrypted_address)
+        # )
+
+
+        # encrypted_result = cipher_suite.encrypt(scan_result.results.encode())
+        # encrypted_percentage = cipher_suite.encrypt(str(scan_result.percentage).encode())
+        # encrypted_orig_image = cipher_suite.encrypt(xray_orig)
+        # encrypted_preproc_image = cipher_suite.encrypt(preproc_img_bytes)
+        # encrypted_gradcam_image = cipher_suite.encrypt(gradcam_img_bytes)
+        # encrypted_notes = cipher_suite.encrypt(self.manager.get_screen('scan_result').ids.notes.text.encode())
+        # encrypted_misclassified = cipher_suite.encrypt(str(self.manager.get_screen('scan_result').ids.misclassified.active).encode())
+
+        # cur.execute(
+        #     """
+        #     INSERT INTO RESULTS (patient_ID, date_of_scan, result, 
+        #         percentage, orig_image, preproc_image, grad_cam_image, notes, misclassified)
+        #     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        #     """,
+        #     (patient_id, scan_date, encrypted_result, encrypted_percentage, 
+        #     encrypted_orig_image, encrypted_preproc_image, encrypted_gradcam_image, 
+        #     encrypted_notes, encrypted_misclassified)
+        # )
+
+        #end of test
 
         if cur.lastrowid is not None:
             self.clear_fields() 
