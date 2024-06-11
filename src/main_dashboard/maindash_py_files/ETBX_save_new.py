@@ -281,14 +281,16 @@ class SaveNew(Screen):
     def entries_valid(self):
         valid = True 
         try:
-            datetime.datetime.strptime(self.ids.birthdate.text, "%Y/%m/%d")
+            birthdate = datetime.datetime.strptime(self.ids.birthdate.text, "%Y/%m/%d")
 
-            if not self.is_valid_age(self.ids.birthdate.text):
-                self.ids.birthdate.text = 'Must be 15+'
-                valid = False 
+            if not self.is_valid_age(birthdate):
+                self.ids.birthdate.text = 'Must be 15 and above'
+                self.ids.birthdate.error = True
+                valid = False
 
-            if not self.is_valid_year(self.ids.birthdate.text):
+            if not self.is_valid_year(birthdate):
                 self.ids.birthdate.text = "Year must not be lesser than 1900"
+                self.ids.birthdate.error = True
                 valid = False
                 
             if not self.ids.patient_id.text.isdigit():
@@ -297,10 +299,12 @@ class SaveNew(Screen):
                 valid = False 
 
             if not self.ids.first_name.text:
+                self.ids.first_name.text = "Required"
                 self.ids.first_name.error = True
                 valid = False
 
             if not self.ids.last_name.text:
+                self.ids.last_name.text = "Required"
                 self.ids.last_name.error = True
                 valid = False
 
@@ -319,13 +323,13 @@ class SaveNew(Screen):
         """
             Checks if birthdate is 15 years or older 
         """
-        return ((datetime.datetime.now() - datetime.datetime.strptime(birthdate, "%Y/%m/%d")).days // 365) >= 15
+        return ((datetime.datetime.now() - birthdate).days // 365) >= 15
     
     def is_valid_year(self, birthdate):
         """
         Checks if year is not lesser than 1900
         """
-        return datetime.datetime.strptime(birthdate, "%Y/%m/%d").year >= 1900
+        return birthdate.year >= 1900
     
 
     def _update_rect(self, instance, value):
