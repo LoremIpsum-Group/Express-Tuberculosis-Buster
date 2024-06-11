@@ -290,6 +290,7 @@ class ViewRecords(Screen):
         content.add_widget(label)
         content.add_widget(close_button)
         self.popup.open()
+        
 
     def export_result(self, search_input, index):
         """
@@ -406,7 +407,7 @@ class ViewRecords(Screen):
         with the record.
         '''
         pdf.set_font('times', 'B', 20)
-        pdf.cell(0, 10, '[Hospital Name]', ln=True, align='C')
+        #pdf.cell(0, 10, '[Hospital Name]', ln=True, align='C')
         pdf.cell(0, 10, 'Report of Tuberculosis Screening', ln=True, align='C')
         pdf.ln(20)  
 
@@ -450,12 +451,21 @@ class ViewRecords(Screen):
         pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf'))
        
         # Create an encrypted zip file
-        secret_password = b'password'
+        #secret_password = b'password'
         
-        #with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
+        #encrypted password
+        # with open('hashed_word.txt', 'r') as file:
+        #     hashed_password, salt = file.read().split(':')
+        #     secret_password = bytes.fromhex(hashed_password)
+        #     print("password: " , secret_password)
+
+        with open(resource_path('src\main_dashboard\encrypted_word.txt'),'r') as file:
+            encrypted_word = file.read()
+            decrypted_word = ''.join(chr((ord(char) - 97 - 3) % 26 + 97) for char in encrypted_word).encode()
+
         with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
 
-            zf.setpassword(secret_password)
+            zf.setpassword(decrypted_word)
             zf.setencryption(pyzipper.WZ_AES, nbits =128)
             #zf.write(f'Exported-Results\\patient_results_{patient_ID}.pdf')
             zf.write(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf')
