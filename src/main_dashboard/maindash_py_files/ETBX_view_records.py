@@ -374,31 +374,24 @@ class ViewRecords(Screen):
         #os.makedirs(resource_path(f'Exported-Results\\orig_image_{patient_ID}\\result_id{result_ID}'), exist_ok=True)
 
         
-        #orig_image_bytes  = record[10]
         orig_image_bytes  = full_record[10]
         orig_image_stream = io.BytesIO(orig_image_bytes)
         orig_image = Image.open(orig_image_stream)
-        #orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
         
         #raises an error when an image is 8 bit 
-        #orig_image.save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
 
 
-        orig_image.convert('RGB').save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
+        orig_image.convert('RGB').save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png'))
 
-        #preproc_image_bytes = record[11]
         preproc_image_bytes = full_record[11]
         preproc_image_stream = io.BytesIO(preproc_image_bytes)
         preproc_image = Image.open(preproc_image_stream)
-        #preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
-        preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.jpg'))
+        preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.png'))
 
-        #gradcam_image_bytes = record[12]
         gradcam_image_bytes = full_record[12]
         gradcam_image_stream = io.BytesIO(gradcam_image_bytes)
         gradcam_image = Image.open(gradcam_image_stream)
-        #gradcam_image.save(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
-        gradcam_image.save(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg'))
+        gradcam_image.save(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'))
 
 
         '''
@@ -438,16 +431,13 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Original Image', 0, 1, 'C')
-        #pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
-        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Heatmap image', 0, 1, 'C')
-        #pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
-        pdf.image(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg'), x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
-        #pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
         pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf'))
        
         # Create an encrypted zip file
@@ -467,30 +457,22 @@ class ViewRecords(Screen):
 
             zf.setpassword(decrypted_word)
             zf.setencryption(pyzipper.WZ_AES, nbits =128)
-            #zf.write(f'Exported-Results\\patient_results_{patient_ID}.pdf')
             zf.write(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf')
 
-            #zf.write(f'Exported-Results\\orig_image_{patient_ID}.jpg')
-            zf.write(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg')
+            zf.write(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png')
            
-            #zf.write(f'Exported-Results\\preproc_image_{patient_ID}.jpg')
-            zf.write(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.jpg')
+            zf.write(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.png')
            
-            #zf.write(f'Exported-Results\\gradcam_image_{patient_ID}.jpg')
-            zf.write(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg')
+            zf.write(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png')
         
         # Remove the unencrypted files
-        #os.remove(resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'))
         os.remove(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf'))
        
-        #os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}.jpg'))
-        os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png'))
        
-        #os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}.jpg'))
-        os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.png'))
 
-        #os.remove(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}.jpg'))
-        os.remove(resource_path(f'Exported-Results\\gradcam_image_{patient_ID}_result_id{result_ID}.jpg'))
+        os.remove(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'))
 
 
 
