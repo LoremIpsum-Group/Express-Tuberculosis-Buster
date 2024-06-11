@@ -18,7 +18,7 @@ from src.components.core_functions.resource_path import resource_path
 
 from kivymd.app import MDApp
 
-SOFTWARE_VERSION = '0.2-Beta'
+SOFTWARE_VERSION = '0.3-Beta'
 
 class MainApp(MDApp):
     Config.set('kivy', 'exit_on_escape', '0')
@@ -63,7 +63,7 @@ class MainApp(MDApp):
 
         from src.components.core_functions import load_model_efficientNet, load_model_unet
 
-        self.model_classifier = load_model_efficientNet(resource_path('assets\\ml-model\\efficientnetB3_V0_7_12.h5'))
+        self.model_classifier = load_model_efficientNet(resource_path('assets\\ml-model\\efficientnetB3_V0_7_15.h5'))
         self.model_segmentation = load_model_unet(resource_path('assets\\ml-model\\unet_V0_1_7.h5'))
 
         scan_result_screen = self.screen_manager.get_screen('scan_result')

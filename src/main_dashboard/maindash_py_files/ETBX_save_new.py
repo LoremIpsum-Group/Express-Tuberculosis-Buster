@@ -235,6 +235,9 @@ class SaveNew(Screen):
             background_color=(0, 0, 1, 1), background_normal='', 
             size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
+        if os.path.isfile(resource_path("dicom_image.png")):
+            # Remove the file
+            os.remove(resource_path("dicom_image.png"))
         self.popup.open()
 
     def close_popup(self, instance):
