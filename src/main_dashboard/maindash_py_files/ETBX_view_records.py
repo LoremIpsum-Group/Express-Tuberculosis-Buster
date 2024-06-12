@@ -275,7 +275,7 @@ class ViewRecords(Screen):
         content.bind(size=self._update_rect, pos=self._update_rect)
         #label = Label(text="Exported Successfully here: \n" + resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'), color=(0,0,1,1))
         label = Label(
-            text="Exported Successfully here: \n" + resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'),
+            text="Exported Successfully here: \n" + resource_path(f'Exported-Results'),
             color=(0,0,1,1),
             pos_hint={'center_x': 0.5, 'center_y': 0.5},
             size_hint=(1, None),  # Allow the label to expand horizontally
