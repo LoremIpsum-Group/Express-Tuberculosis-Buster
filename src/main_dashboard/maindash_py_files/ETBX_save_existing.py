@@ -15,7 +15,8 @@ from src.components.core_functions import (
     np,
     Image,
     sqlite3,
-    datetime
+    datetime,
+    os
 )
 
 Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\save_existing.kv"))
@@ -162,6 +163,9 @@ class SaveExisting(Screen):
             background_color=(0, 0, 1, 1), background_normal='',
             size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=self.close_popup))
         self.popup = Popup(title='Success', content=content, size_hint=(0.4, 0.4), auto_dismiss=False)
+        if os.path.isfile(resource_path("dicom_image.png")):
+            # Remove the file
+            os.remove(resource_path("dicom_image.png"))
         self.popup.open()
     
 

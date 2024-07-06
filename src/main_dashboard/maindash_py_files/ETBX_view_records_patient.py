@@ -11,7 +11,8 @@ from src.components.core_functions import (
     plt,
     np,
     Image,
-    base64
+    base64,
+    cv2
 )
 
 class ScanResultData: 
@@ -245,12 +246,25 @@ class PatientResult(Screen):
         - None
         """
         # base64_decoded = base64.b64decode(orig_img)
+        #displaying inverse xray if the image is in 8 bit
+        #image = Image.open(io.BytesIO(orig_image_bytes))
         image = Image.open(io.BytesIO(orig_image_bytes))
+        if image.mode != 'L':
+            # Convert the image to 8-bit grayscale
+            image = image.convert('L')
+
         image_np_orig = np.array(image)
 
         # base64_decoded1 = base64.b64decode(gradcam_img)
+        #image = Image.open(io.BytesIO(orig_image_bytes))
+        #image1 = Image.open(io.BytesIO(gradcam_image_bytes))
         image1 = Image.open(io.BytesIO(gradcam_image_bytes))
+
         image_np_grad = np.array(image1)
+
+        image_np_orig = cv2.resize(
+        image_np_orig, (512, 512), interpolation=cv2.INTER_CUBIC
+        )
 
         xray_full_app(image_np_orig, image_np_grad)
         pass

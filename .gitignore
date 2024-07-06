@@ -4,3 +4,4 @@ __pycache__/
 *view_record_main.db
 *build/
 *dist/
+*spec

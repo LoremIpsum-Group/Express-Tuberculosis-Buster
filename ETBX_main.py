@@ -22,7 +22,7 @@ SOFTWARE_VERSION = '1.0'
 
 class MainApp(MDApp):
     Config.set('kivy', 'exit_on_escape', '0')
-
+    Window.minimum_width, Window.minimum_height = (800, 600)
     def build(self):
             """
             Builds the user interface by creating and configuring the screen manager.
@@ -63,7 +63,7 @@ class MainApp(MDApp):
 
         from src.components.core_functions import load_model_efficientNet, load_model_unet
 
-        self.model_classifier = load_model_efficientNet(resource_path('assets\\ml-model\\efficientnetB3_V0_7_11.h5'))
+        self.model_classifier = load_model_efficientNet(resource_path('assets\\ml-model\\efficientnetB3_V0_7_15.h5'))
         self.model_segmentation = load_model_unet(resource_path('assets\\ml-model\\unet_V0_1_7.h5'))
 
         scan_result_screen = self.screen_manager.get_screen('scan_result')
