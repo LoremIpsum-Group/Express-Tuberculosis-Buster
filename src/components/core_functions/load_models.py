@@ -1,4 +1,4 @@
-from components.core_functions.dependencies_loading import keras, tf, load_model
+from src.components.core_functions.dependencies_loading import keras, tf, load_model
 
 def load_model_efficientNet(path):
     model = load_model(path)

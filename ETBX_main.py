@@ -2,26 +2,27 @@ from kivy.uix.screenmanager import ScreenManager, NoTransition
 from kivy.core.window import Window
 from kivy.config import Config
 from kivy.clock import Clock
+from kivymd.icon_definitions import md_icons
 
-from main_dashboard.maindash_py_files.ETBX_view_records_patient import PatientResult  
-from main_dashboard.maindash_py_files.ETBX_main_dashboard import MainDashboard
-from main_dashboard.maindash_py_files.ETBX_loading_screen import LoadingScreen 
-from main_dashboard.maindash_py_files.ETBX_save_existing import SaveExisting
-from main_dashboard.maindash_py_files.ETBX_view_records import ViewRecords  
-from main_dashboard.maindash_py_files.ETBX_scan_results import ScanResult
-from main_dashboard.maindash_py_files.ETBx_scan_image import ScanImage   
-from main_dashboard.maindash_py_files.ETBX_save_new import SaveNew
+from src.main_dashboard.maindash_py_files.ETBX_loading_screen import LoadingScreen
+from src.onboarding_portal.ETBX_login_final import LoginScreen
+from src.main_dashboard.maindash_py_files.ETBX_main_dashboard import MainDashboard
+from src.main_dashboard.maindash_py_files.ETBX_scan_results import ScanResult
+from src.main_dashboard.maindash_py_files.ETBX_save_existing import SaveExisting
+from src.main_dashboard.maindash_py_files.ETBx_scan_image import ScanImage
+from src.main_dashboard.maindash_py_files.ETBX_save_new import SaveNew
+from src.main_dashboard.maindash_py_files.ETBX_view_records import ViewRecords
+from src.main_dashboard.maindash_py_files.ETBX_view_records_patient import PatientResult
 
-
-from onboarding_portal.ETBX_login_final import LoginScreen
+from src.components.core_functions.resource_path import resource_path
 
 from kivymd.app import MDApp
 
-
+SOFTWARE_VERSION = '1.0'
 
 class MainApp(MDApp):
     Config.set('kivy', 'exit_on_escape', '0')
-
+    Window.minimum_width, Window.minimum_height = (800, 600)
     def build(self):
             """
             Builds the user interface by creating and configuring the screen manager.
@@ -31,6 +32,7 @@ class MainApp(MDApp):
             """
             
             Window.maximize()
+            self.title = "Express Tuberculosis Buster v" + SOFTWARE_VERSION 
             self.screen_manager = ScreenManager(transition=NoTransition())
 
             self.screen_manager.add_widget(LoadingScreen(name='loading'))
@@ -59,10 +61,10 @@ class MainApp(MDApp):
             None
         """
 
-        from components.core_functions import load_model_efficientNet, load_model_unet
+        from src.components.core_functions import load_model_efficientNet, load_model_unet
 
-        self.model_classifier = load_model_efficientNet(r'assets\ml-model\efficientnetB3_V0_7_11.h5')
-        self.model_segmentation = load_model_unet(r'assets\ml-model\unet_V0_1_7.h5')
+        self.model_classifier = load_model_efficientNet(resource_path('assets\\ml-model\\efficientnetB3_V0_7_15.h5'))
+        self.model_segmentation = load_model_unet(resource_path('assets\\ml-model\\unet_V0_1_7.h5'))
 
         scan_result_screen = self.screen_manager.get_screen('scan_result')
         scan_result_screen.model_classifier = self.model_classifier

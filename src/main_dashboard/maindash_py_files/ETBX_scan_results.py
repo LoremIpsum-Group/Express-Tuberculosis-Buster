@@ -7,12 +7,11 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Color, Rectangle
-from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
-from main_dashboard.maindash_py_files.ETBx_scan_image import is_dicom, dicom_file
+from src.main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
+from src.main_dashboard.maindash_py_files.ETBx_scan_image import is_dicom, dicom_file
 
-
-from components.core_functions import (
-    check_image,
+from src.components.core_functions import (
+    resource_path,
     crop_resize_image,
     segment_imageV2,
     check_segmented_img,
@@ -32,9 +31,6 @@ from components.core_functions import (
     dicom_processor as dcmp
 )
 
-
-import sqlite3
-
 class ScanResultData:
     def __init__(self):
         self.results = None
@@ -47,7 +43,7 @@ class ScanResultData:
 
 scan_result = ScanResultData()
 
-Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_res.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_scan_res.kv"))
 
 class ScanResult(Screen):
     def __init__(self, **kwargs):
@@ -55,7 +51,7 @@ class ScanResult(Screen):
         self.model_classifier = None
         self.model_segmentation = None
 
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """ 
@@ -85,13 +81,14 @@ class ScanResult(Screen):
         3. Encode the bytes string into base64 format. Base64 encoding is a way of converting binary data into text format, which is needed because `img.source` expects a string.
         4. Convert the string into a data URL by adding the prefix 'data:image/png;base64,'. A data URL is a URI scheme that allows you to include data in-line in web pages as if they were external resources.
         """
+        # Convert numpy array to PIL Image
         with io.BytesIO() as output:
             image.save(output, format="PNG")
             contents = output.getvalue()
 
         img_data = base64.b64encode(contents).decode('ascii')
         return 'data:image/png;base64,' + img_data
-    
+
     def update_result(self, image_path, is_dicom):
         """
         Updates the scan result with the provided image path.
@@ -102,27 +99,28 @@ class ScanResult(Screen):
         Returns:
             None 
         """
-        
-    
+
         global xray_orig, xray_orig_resized, superimposed_img, masked_image
-        
+
         if is_dicom:
             image = dcmp.extract_image(dicom_file.file_path) # np.ndarray
             image = cv2.resize(image, (512, 512))
             image = Image.fromarray((image). astype(np.uint8))
-            image.save("dicom_image.png")
-            xray_orig = "dicom_image.png"
+            image.save(resource_path("dicom_image.png"))
+            xray_orig = resource_path("dicom_image.png")
         else:
             xray_orig = image_path
-            
-        self.ids.res_img.source = xray_orig
+
+        if is_dicom:
+            self.ids.res_img.source = self.img_string(image)
+        else:
+            self.ids.res_img.source = xray_orig
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
 
         #! START Core functionalities
         # * Cropping and resizing image
-     
-     
+
         cropped_img = crop_resize_image(xray_orig)
         # * Segmentation part
         xray_orig_resized, masked_image, mask_result = segment_imageV2(
@@ -201,7 +199,8 @@ class ScanResult(Screen):
         instance.text_color = white
 
         if instance == self.ids.x_ray:
-            self.ids.res_img.source = xray_orig
+            image = Image.fromarray(xray_orig_resized)
+            self.ids.res_img.source = self.img_string(image)
         elif instance == self.ids.grad_cam:
             # img = Image.fromarray((superimposed_img).astype(np.uint8))
             img = superimposed_img
@@ -283,7 +282,9 @@ class ScanResult(Screen):
         self.ids.pre_proc.text_color = blue
         self.ids.grad_cam.md_bg_color = white
         self.ids.grad_cam.text_color = blue
-
+        if os.path.isfile(resource_path("dicom_image.png")):
+            # Remove the file
+            os.remove(resource_path("dicom_image.png"))
         self.manager.current = 'scan_img'
         self.popup.dismiss()
 
@@ -332,4 +333,3 @@ class ScanResult(Screen):
             title="", content=content, auto_dismiss=False, size_hint=(0.4, 0.4)
         )
         self.popup.open()
-

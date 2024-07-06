@@ -2,8 +2,15 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from tkinter import filedialog
 import tkinter as tk
+# Temporary for popup
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
 
-from components.core_functions import (
+from src.components.core_functions import (
+    resource_path, 
+    check_image,
     Image,
     io,
     base64,
@@ -22,15 +29,7 @@ class DicomFile:
 
 dicom_file = DicomFile()
 
-# Temporary for popup
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.popup import Popup
-from kivy.uix.boxlayout import BoxLayout
-
-from components.core_functions import check_image
-
-Builder.load_file("main_dashboard/maindash_kivy_files/etbx_scan_img.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_scan_img.kv"))
 class ScanImage(Screen):
     def __init__(self, **kwargs):
         super(ScanImage, self).__init__(**kwargs)
@@ -43,16 +42,17 @@ class ScanImage(Screen):
         """
         file_path = self.file_dialog()
         if file_path:
+            file_path = resource_path(file_path)
             self.put_image(file_path)
 
             if self.is_dicom_file(file_path):
                 image = dcmp.extract_image(file_path) # np.ndarray
                 image = cv2.resize(image, (512, 512))
                 image = Image.fromarray((image). astype(np.uint8))
-                if os.path.isfile("dicom_image.png"): 
-                    os.remove("dicom_image.png")
-                image.save("dicom_image.png")
-                faulty_img = check_image("dicom_image.png")
+                if os.path.isfile(resource_path("dicom_image.png")): 
+                    os.remove(resource_path("dicom_image.png"))
+                image.save(resource_path("dicom_image.png"))
+                faulty_img = check_image(resource_path("dicom_image.png"))
             else:    
                 faulty_img = check_image(file_path)
 
@@ -69,7 +69,10 @@ class ScanImage(Screen):
         root.withdraw()  
         file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.dcm;*.dicom")])
         root.destroy()  
-        return file_path
+        if not file_path:
+            pass
+        else: 
+            return resource_path(file_path)
 
     def put_image(self, file_path):
         global dicom_file_path, is_dicom, dicom_image 
@@ -107,12 +110,16 @@ class ScanImage(Screen):
         Returns:
         None
         """
+        if resource_path(self.image.source) == resource_path("assets/jpg.png"):
+            self.show_warning_popup("Please load an image first.")
+            return
 
         if is_dicom:
-            image_path = "dicom_image.png"
+            image_path = resource_path("dicom_image.png")
         else:
-            image_path = self.image.source
+            image_path = resource_path(self.image.source)
         self.manager.current = 'scan_result'
+        print(image_path)
         self.manager.get_screen('scan_result').update_result(image_path, is_dicom)
 
     def loading_screen(self, dt):

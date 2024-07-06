@@ -2,18 +2,17 @@ from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivymd.uix.button import MDRaisedButton   
 from kivy.properties import NumericProperty
-from main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
+from src.main_dashboard.maindash_py_files.ETBX_full_view import xray_full_app
 
-
-
-from components.core_functions import (
-
+from src.components.core_functions import (
+    resource_path,
     sqlite3,
     io,
     plt,
     np,
     Image,
-    base64
+    base64,
+    cv2
 )
 
 class ScanResultData: 
@@ -32,7 +31,7 @@ class ScanResultData:
 
 scan_result = ScanResultData() 
 
-Builder.load_file("main_dashboard/maindash_kivy_files/etbx_view_rcrds_patient.kv")
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_view_rcrds_patient.kv"))
 
 class PatientResult(Screen):
     """
@@ -52,7 +51,7 @@ class PatientResult(Screen):
         
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """ 
@@ -115,7 +114,7 @@ class PatientResult(Screen):
         Returns:
             None
         """
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         
 
@@ -247,12 +246,25 @@ class PatientResult(Screen):
         - None
         """
         # base64_decoded = base64.b64decode(orig_img)
+        #displaying inverse xray if the image is in 8 bit
+        #image = Image.open(io.BytesIO(orig_image_bytes))
         image = Image.open(io.BytesIO(orig_image_bytes))
+        if image.mode != 'L':
+            # Convert the image to 8-bit grayscale
+            image = image.convert('L')
+
         image_np_orig = np.array(image)
 
         # base64_decoded1 = base64.b64decode(gradcam_img)
+        #image = Image.open(io.BytesIO(orig_image_bytes))
+        #image1 = Image.open(io.BytesIO(gradcam_image_bytes))
         image1 = Image.open(io.BytesIO(gradcam_image_bytes))
+
         image_np_grad = np.array(image1)
+
+        image_np_orig = cv2.resize(
+        image_np_orig, (512, 512), interpolation=cv2.INTER_CUBIC
+        )
 
         xray_full_app(image_np_orig, image_np_grad)
         pass

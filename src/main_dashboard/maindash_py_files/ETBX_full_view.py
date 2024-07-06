@@ -2,6 +2,8 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
 
+from src.components.core_functions import resource_path
+
 class FullScreenApp:
     def __init__(self, root, image1_path, gradCamIm): 
         """
@@ -59,7 +61,7 @@ class FullScreenApp:
         self.bottom_frame.grid(row=1, column=0, columnspan = 2, sticky="s")
 
         # Load an image
-        self.image = Image.open("assets/gradientImage2.png")
+        self.image = Image.open(resource_path("assets\\gradientImage2.png"))
         self.photo = ImageTk.PhotoImage(self.image)
 
         # Add image to a label

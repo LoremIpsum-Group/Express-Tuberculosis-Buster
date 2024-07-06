@@ -71,7 +71,7 @@ def check_image(image_path):
 
     """
     FAULTY_IMG = False
-    message= "The input looking good so far."
+    message= "The image color appears to be within acceptable ranges."
     # Load the image
     image = cv2.imread(image_path)
 
@@ -87,21 +87,19 @@ def check_image(image_path):
     threshold_white = 235
 
     if mean_pixel_value < threshold_black:
-        print("Image is likely black.")
-        message = "Image is likely black."
+
+        message = "The image appears to be mostly black"
         FAULTY_IMG = True
     elif mean_pixel_value > threshold_white:
-        print("Image is likely white.")
-        message = "Image is likely white."
+        message = "The image appears to be mostly white"
         FAULTY_IMG = True
-    elif not np.isclose(mean_normalized_value, 0.17, atol=0.40):
+    elif not np.isclose(mean_normalized_value, 0.17, atol=0.30):
         print(
             "Image migth be darker or brighter than expected. Segmentation might be affected."
         )
         message = "Image migth be darker or brighter than expected.\nSegmentation might be affected."
     else:
-        print("Image color is not plain black or white.")
-
+        pass
     print("\n\n---End of Checking input image---\n")
     return FAULTY_IMG, message
 
@@ -188,8 +186,8 @@ def check_segmented_img(segmented_img, mask_created):
     num_components = len(np.unique(labels)) - 1
 
     if num_components > 4:
-        print("Warning: The segmented image might have 'pebble-like' artifacts, image most likely faulty 0w0")
-        message = "Warning: The segmented image might \nhave 'pebble-like' artifacts,image \nmost likely faulty 0w0"
+        print("Warning: The segmented image might have 'pebble-like' artifacts, image most likely faulty")
+        message = "Warning: The segmented image might \nhave 'pebble-like' artifacts,image \nmost likely faulty"
         return True, message
 
     #! Code below checks if produced masked image is blank, indicates issue with applying mask itself. Can be used as error catching

@@ -20,12 +20,25 @@ from kivy.uix.recyclegridlayout import RecycleGridLayout
 
 from fpdf import FPDF 
 
-import io
+import io, os, pyzipper
 from PIL import Image
+
+from cryptography.fernet import Fernet, InvalidToken #for encryption
+
+from getpass import getpass
 
 import sqlite3
 
-Builder.load_file("main_dashboard/maindash_kivy_files/etbx_view_rcrds.kv")
+from src.components.core_functions import (
+    resource_path,
+    FPDF,
+    io,
+    Image,
+    sqlite3
+)
+
+
+Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_view_rcrds.kv"))
 class ViewRecords(Screen):
 
     data_items = ListProperty([]) 
@@ -34,7 +47,7 @@ class ViewRecords(Screen):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """ 
@@ -80,9 +93,16 @@ class ViewRecords(Screen):
         - None
         """
         self.data_items.clear()
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\\components\\view_record_main.db'))
         c = conn.cursor()
         search_input = self.ids.search_input.text
+        
+
+        #testing the encryption
+        # with open("secret.key", "rb") as key_file:
+        #     key = key_file.read()
+        
+        # cipher_suite = Fernet(key)
 
         if not search_input:
             self.ids.search_result_layout.clear_widgets()
@@ -98,6 +118,7 @@ class ViewRecords(Screen):
             results = c.fetchall()
             self.ids.result_label.text = "Result"
             self.ids.date_label.text = "Date of Scan"
+            #start of test here
             if results:
                 for result in results:
                     self.data_items.append(result)
@@ -109,9 +130,43 @@ class ViewRecords(Screen):
                 self.ids.result_label.text = ""
                 self.ids.date_label.text = ""
 
+            # if results:
+            #     for result in results:
+            #         #self.data_items.append(result)
+            #         try:
+            #             result_id = result[0]
+            #             patient_id = result[1]
+            #             decrypted_date_of_scan = cipher_suite.decrypt(result[2]).decode()
+            #             decrypted_result = cipher_suite.decrypt(result[3]).decode()
+            #             decrypted_percentage = cipher_suite.decrypt(result[4]).decode()
+            #             decrypted_orig_image = cipher_suite.decrypt(result[5]).decode()
+            #             decrypted_preproc_image = cipher_suite.decrypt(result[6]).decode()
+            #             decrypted_grad_cam_image = cipher_suite.decrypt(result[7]).decode()
+            #             decrypted_notes = cipher_suite.decrypt(result[8]).decode()
+            #             decrypted_misclassified = cipher_suite.decrypt(result[9]).decode()
+
+                        
+                        
+
+
+            #             self.data_items.append(result_id, patient_id, decrypted_date_of_scan, decrypted_result, decrypted_percentage, 
+            #                    decrypted_orig_image, 
+            #                    decrypted_preproc_image, decrypted_grad_cam_image, decrypted_notes, decrypted_misclassified)
+            #         except InvalidToken:
+            #             print("Invalid token. Please check the token and try again.")
+            #         except Exception as e:
+            #             print("An error occurred: ", str(e))
+            #     self.current_patient_id = search_input
+            # else:
+            #     self.ids.search_result_layout.clear_widgets()
+            #     self.error_popup("No ID found")
+            #     self.ids.search_result.text = ""
+            #     self.ids.result_label.text = ""
+            #     self.ids.date_label.text = ""
+        #end of test
         conn.close()
                 
-    def record_clicked(self, search_input):
+    def record_clicked(self, search_input, index):
         """
         Handle the event when a record is clicked.
 
@@ -122,15 +177,22 @@ class ViewRecords(Screen):
         None
         """
 
-        for record in self.data_items:
-            if record[1] == search_input:
-                full_record = record
-                res_id = full_record[0]
+        # for record in self.data_items:
+        #     if record[1] == search_input:
+        #         full_record = record
+        #         res_id = full_record[0]
 
-                self.manager.get_screen('patient_result').update_result(int(res_id))
-                self.manager.current = 'patient_result'
-                break
-                    
+        #         self.manager.get_screen('patient_result').update_result(int(res_id))
+        #         self.manager.current = 'patient_result'
+        #         break
+        
+        records = [record for record in self.data_items if record[1] == search_input]
+        if index < len(records):
+            full_record = records[index]
+            res_id = full_record[0]
+
+            self.manager.get_screen('patient_result').update_result(int(res_id))
+            self.manager.current = 'patient_result'
     
     def error_popup(self, message):
         """
@@ -151,7 +213,7 @@ class ViewRecords(Screen):
         self.popup.open()
 
        
-    def result_popup(self, search_input):
+    def result_popup(self, search_input, index):
         """
         Displays a popup window with options for the user to choose from.
 
@@ -161,6 +223,8 @@ class ViewRecords(Screen):
         Returns:
             None
         """
+        record = self.data_items[index]
+
         content = FloatLayout()
         with content.canvas.before:
             Color(1, 1, 1, 1)
@@ -174,12 +238,12 @@ class ViewRecords(Screen):
         button_grid = GridLayout(cols=2, size_hint=(1, 0.2), pos_hint={'x': 0, 'y': 0}, padding=10, spacing=10)
 
         button1 = Button(text='Export Result', background_color=(0, 0, 1, 1), background_normal='')
-        button1.bind(on_release=lambda instance: self.export_result(search_input))
-        button1.bind(on_release=lambda instance: self.export_success())
+        button1.bind(on_release=lambda instance: self.export_result(search_input, index))
+        button1.bind(on_release=lambda instance: self.export_success(search_input))
         button1.bind(on_release=lambda instance: self.close_popup(instance))
 
         button2 = Button(text='View Result', background_color=(0, 0, 1, 1), background_normal='')
-        button2.bind(on_release=lambda instance: self.record_clicked(search_input))
+        button2.bind(on_release=lambda instance: self.record_clicked(search_input, index))
         button2.bind(on_release=lambda instance: self.close_popup(instance))
 
         button_grid.add_widget(button1)
@@ -190,7 +254,7 @@ class ViewRecords(Screen):
         self.popup.open()
 
    
-    def export_success(self):
+    def export_success(self, patient_ID):
         """
         Displays a popup message indicating successful export.
 
@@ -204,20 +268,31 @@ class ViewRecords(Screen):
         Returns:
         - None
         """
-        content = BoxLayout(orientation='vertical', padding=10)
+        content = FloatLayout()
         with content.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(size=content.size, pos=content.pos)
         content.bind(size=self._update_rect, pos=self._update_rect)
-        label = Label(text="Exported Successfully!", color=(0,0,1,1))
+        #label = Label(text="Exported Successfully here: \n" + resource_path(f'Exported-Results\\patient_results_{patient_ID}.pdf'), color=(0,0,1,1))
+        label = Label(
+            text="Exported Successfully here: \n" + resource_path(f'Exported-Results'),
+            color=(0,0,1,1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            size_hint=(1, None),  # Allow the label to expand horizontally
+            height=50,  # Or whatever height you want the label to have
+            text_size=(self.popup.width, None),  # Set the width of the text box to the width of the popup
+            halign='center',  # Center the text horizontally
+            valign='center'  # Center the text vertically
+        )
         self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
         close_button = Button(text='Close', background_color=(1, 0, 0, 1), background_normal='',
-            size_hint_y=0.2, pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=lambda instance: self.close_popup(instance))
+            size_hint=(1, 0.2), pos_hint={'center_x': 0.50, 'center_y': 0.10}, on_press=lambda instance: self.close_popup(instance))
         content.add_widget(label)
         content.add_widget(close_button)
         self.popup.open()
+        
 
-    def export_result(self, search_input):
+    def export_result(self, search_input, index):
         """
         Export the result of a patient's record to a PDF file and save associated images.
 
@@ -231,52 +306,92 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 16)
 
-        conn = sqlite3.connect('src/components/view_record_main.db')
+        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
         c = conn.cursor()
         c.execute(
             """
             SELECT PATIENT.patient_ID, PATIENT.first_name, PATIENT.last_name, PATIENT.sex, PATIENT.age, PATIENT.address, 
-            RESULTS.date_of_scan, RESULTS.result, RESULTS.percentage, RESULTS.notes, RESULTS.orig_image, RESULTS.preproc_image, RESULTS.grad_cam_image, RESULTS.misclassified
+            RESULTS.date_of_scan, RESULTS.result, RESULTS.percentage, RESULTS.notes, RESULTS.orig_image, RESULTS.preproc_image, RESULTS.grad_cam_image, RESULTS.misclassified, RESULTS.result_id
             FROM PATIENT
             JOIN RESULTS ON PATIENT.patient_ID = RESULTS.patient_id
             WHERE PATIENT.patient_ID = ?
             """,
-            (search_input,)
+            (int(search_input),)
         )
         records = c.fetchall()
         
-        if records:  
-            for record in records:
-                patient_ID = record[0]
-                first_name = record[1]
-                last_name = record[2]
-                sex = record[3]
-                age = record[4]
-                address = record[5]
-                date_of_scan = record[6]
-                result = record[7]
-                percentage = record[8]
-                notes = record[9]
-                misclassified = record [13]
+        # records = [record for record in self.data_items if record[1] == search_input]
+        # if index < len(records):
+        #     full_record = records[index]
+        #     patient_ID = full_record[0]
+        #     first_name = full_record[1]
+        #     last_name = full_record[2]
+        #     sex = full_record[3]
+        #     age = full_record[4]
+        #     address = full_record[5]
+        #     date_of_scan = full_record[6]
+        #     result = full_record[7]
+        #     percentage = full_record[8]
+        #     notes = full_record[9]
+        #     misclassified = full_record [13]
+
+        #default working 
+        # if records:  
+        #     for record in records:
+                # patient_ID = record[0]
+                # first_name = record[1]
+                # last_name = record[2]
+                # sex = record[3]
+                # age = record[4]
+                # address = record[5]
+                # date_of_scan = record[6]
+                # result = record[7]
+                # percentage = record[8]
+                # notes = record[9]
+                # misclassified = record [13]
+                #result_ID = record[14]
+
+        if records:
+            full_record = records[index]
+            patient_ID = full_record[0]
+            first_name = full_record[1]
+            last_name = full_record[2]
+            sex = full_record[3]
+            age = full_record[4]
+            address = full_record[5]
+            date_of_scan = full_record[6]
+            result = full_record[7]
+            percentage = full_record[8]
+            notes = full_record[9]
+            misclassified = full_record [13]
+            result_ID = full_record[14] #Ttry
+                
         if misclassified == True: 
             misclassified = "True"
         else:
             misclassified = "False"    
+
+        #os.makedirs(resource_path(f'Exported-Results\\orig_image_{patient_ID}\\result_id{result_ID}'), exist_ok=True)
+
         
-        orig_image_bytes  = record[10]
+        orig_image_bytes  = full_record[10]
         orig_image_stream = io.BytesIO(orig_image_bytes)
         orig_image = Image.open(orig_image_stream)
-        orig_image.save(f'Exported-Results/orig_image_{patient_ID}.jpg')
+        
+        #raises an error when an image is 8 bit 
 
-        preproc_image_bytes = record[11]
+
+        orig_image.convert('RGB').save(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png'))
+
+        preproc_image_bytes = full_record[11]
         preproc_image_stream = io.BytesIO(preproc_image_bytes)
         preproc_image = Image.open(preproc_image_stream)
-        preproc_image.save(f'Exported-Results/preproc_image_{patient_ID}.jpg')
+        preproc_image.save(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.png'))
 
-        gradcam_image_bytes = record[12]
+        gradcam_image_bytes = full_record[12]
         gradcam_image_stream = io.BytesIO(gradcam_image_bytes)
         gradcam_image = Image.open(gradcam_image_stream)
-        gradcam_image.save(f'Exported-Results/gradcam_image_{patient_ID}.jpg')
+        gradcam_image.save(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'))
 
 
         '''
@@ -285,7 +400,7 @@ class ViewRecords(Screen):
         with the record.
         '''
         pdf.set_font('times', 'B', 20)
-        pdf.cell(0, 10, '[Hospital Name]', ln=True, align='C')
+        #pdf.cell(0, 10, '[Hospital Name]', ln=True, align='C')
         pdf.cell(0, 10, 'Report of Tuberculosis Screening', ln=True, align='C')
         pdf.ln(20)  
 
@@ -301,7 +416,7 @@ class ViewRecords(Screen):
 
         pdf.cell(95, 10, f'Result: {result}')
         pdf.cell(95, 10, f'Model Prediction %: {percentage}', ln=True)
-        pdf.cell(0, 10, f'Misclassification: {misclassified}', ln=True)
+        pdf.cell(0, 10, f'Did system Misclassify: {misclassified}', ln=True)
         pdf.ln(5)  
 
         pdf.cell(0, 10, 'Notes:', ln=True)
@@ -316,14 +431,51 @@ class ViewRecords(Screen):
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
         pdf.cell(0, 20, 'Original Image', 0, 1, 'C')
-        pdf.image(f'Exported-Results/orig_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.image(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
         pdf.add_page()
         pdf.set_font('times', 'B', 20)
-        pdf.cell(0, 20, 'Grad-CAM Image', 0, 1, 'C')
-        pdf.image(f'Exported-Results/gradcam_image_{patient_ID}.jpg', x=0, y=30, w=pdf.w, h=pdf.h-30)
+        pdf.cell(0, 20, 'Heatmap image', 0, 1, 'C')
+        pdf.image(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'), x=0, y=30, w=pdf.w, h=pdf.h-30)
 
-        pdf.output(f'Exported-Results/patient_results_{patient_ID}.pdf')
+        pdf.output(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf'))
+       
+        # Create an encrypted zip file
+        #secret_password = b'password'
+        
+        #encrypted password
+        # with open('hashed_word.txt', 'r') as file:
+        #     hashed_password, salt = file.read().split(':')
+        #     secret_password = bytes.fromhex(hashed_password)
+        #     print("password: " , secret_password)
+
+        with open(resource_path('src\main_dashboard\encrypted_word.txt'),'r') as file:
+            encrypted_word = file.read()
+            decrypted_word = ''.join(chr((ord(char) - 97 - 3) % 26 + 97) for char in encrypted_word).encode()
+
+        with pyzipper.AESZipFile(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.zip'), 'w', compression=pyzipper.ZIP_LZMA) as zf:
+
+            zf.setpassword(decrypted_word)
+            zf.setencryption(pyzipper.WZ_AES, nbits =128)
+            zf.write(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf')
+
+            zf.write(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png')
+           
+            zf.write(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.png')
+           
+            zf.write(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png')
+        
+        # Remove the unencrypted files
+        os.remove(resource_path(f'Exported-Results\\patient_results_{patient_ID}_result_id{result_ID}.pdf'))
+       
+        os.remove(resource_path(f'Exported-Results\\orig_image_{patient_ID}_result_id{result_ID}.png'))
+       
+        os.remove(resource_path(f'Exported-Results\\preproc_image_{patient_ID}_result_id{result_ID}.png'))
+
+        os.remove(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'))
+
+
+
 
     def close_popup(self, instance):
         """
