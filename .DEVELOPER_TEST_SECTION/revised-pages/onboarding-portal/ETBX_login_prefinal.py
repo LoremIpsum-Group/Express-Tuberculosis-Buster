@@ -49,16 +49,20 @@ class LoginScreen(Screen):
         else:
             self.show_popup('Please enter all the fields')
 
+        #Reason why this is here is to ensure that what happens at the end of login everytime is clearing the input fields
+        self.ids.username_input.text = ''
+        self.ids.password_input.text = ''
+
 
     def forgot_password(self):
         """
         Clears the username and password input fields and displays a popup with contact information for password recovery.
-
+        Put the clearing of the credentials here too when "contact developer" is clicked
         returns:
         None
-        """
-        self.ids.username_input.clear_widgets()
-        self.ids.password_input.clear_widgets()
+        """        
+        self.ids.username_input.text = ''
+        self.ids.password_input.text = ''        
         self.forgot_password_popup('Please contact: Venz Salvatierra (ETBX-Developer)\nContact Number: 09773503492 \nEmail:202110530@fit.edu.ph')
 
     
