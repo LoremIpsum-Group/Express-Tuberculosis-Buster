@@ -33,9 +33,11 @@
 
             Label:
                 pos_hint : {'center_x': 0.5 , 'center_y' : 0.8}
-                text: "LOGIN"
+                text: "[b]USER LOGIN[/b]"
+                color: 0, 0, 1, 1
                 font_size: 25
-                color : 0, 0, 0, 1 
+                markup: True
+                
                 
         
             MDTextField:
@@ -73,6 +75,12 @@
                 size_hint: 0.8, 0.1
                 pos_hint : {'center_x': 0.5 , 'center_y' : 0.4}
                 on_press: root.login_button()
+
+            MDIcon:
+                icon: 'account-circle-outline'
+                color: 0, 0, 1, 1
+                font_size: 150
+                pos_hint: {'center_x': 0.5, 'center_y': 0.9}
 
             
     
