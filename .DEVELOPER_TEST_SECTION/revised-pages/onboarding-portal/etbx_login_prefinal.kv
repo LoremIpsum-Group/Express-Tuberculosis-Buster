@@ -1,0 +1,78 @@
+#:kivy 2.3.0
+<MDTextField>:
+    multiline: False
+    size_hint_x : 0.8
+    pos_hint: {'center_x' : 0.5, 'center_y' : 0.4}
+    mode: "rectangle"
+
+<LoginTextButton@MDTextButton+HoverBehavior>:
+    color: (0, 0, 0, 1)
+    on_enter: self.color = 0, 0, 1, 1 
+    on_leave: self.color = 0, 0, 0, 1
+
+<LoginScreen>:
+    BoxLayout:
+        orientation: "horizontal"
+        FloatLayout:
+            canvas.before:
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: "assets/xray.png"
+            Label:
+                text: "[b]Welcome \nto [i][color=#0000ff]ETBx[/i][/b]"
+                font_size: 70
+                color: 1, 1, 1, 1
+                bold: True
+                markup: True
+
+        FloatLayout:
+            
+            spacing: 20
+            padding: 20
+
+            Label:
+                pos_hint : {'center_x': 0.5 , 'center_y' : 0.8}
+                text: "LOGIN"
+                font_size: 25
+                color : 0, 0, 0, 1 
+                
+        
+            MDTextField:
+                id: username_input
+                pos_hint : {'center_x': 0.5 , 'center_y' : 0.7}
+                hint_text: "Username"
+                icon_left: "email"
+            
+
+            MDTextField:
+                id: password_input
+                pos_hint : {'center_x': 0.5 , 'center_y' : 0.6}
+                hint_text: "Password"
+                icon_left: "lock" 
+                password: True
+    
+            MDIconButton:
+                icon: "eye-off"
+                theme_text_color: "Hint"
+                pos_hint: {'center_x': 0.85, 'center_y': 0.596}
+                on_release:
+                    self.icon = "eye" if self.icon == "eye-off" else "eye-off"
+                    password_input.password = False if password_input.password is True else True
+        
+            LoginTextButton:
+                id: forgot_password_button
+                text: 'Contact Developer'
+                pos_hint : {'center_x': 0.735 , 'center_y' : 0.535}
+                on_press: root.forgot_password()
+            
+            Button:
+                text: "Login"
+                background_normal : ''
+                background_color: 0, 128/255, 1, 1
+                size_hint: 0.8, 0.1
+                pos_hint : {'center_x': 0.5 , 'center_y' : 0.4}
+                on_press: root.login_button()
+
+            
+    
