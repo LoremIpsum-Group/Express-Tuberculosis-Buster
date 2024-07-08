@@ -11,7 +11,8 @@ from ETBX_loading_screen import LoadingScreen
 from ETBX_login_prefinal import LoginScreen
 from ETBX_main_dashboard import MainDashboard
 from ETBx_scan_image import ScanImage
-from ETBX_view_records import ViewRecords 
+from ETBX_view_records import ViewRecords
+from ETBX_scan_results import ScanResult
 
 class TestApp(MDApp):
     def build(self):
@@ -24,10 +25,11 @@ class TestApp(MDApp):
         self.screen_manager.add_widget(LoginScreen(name="login"))
         self.screen_manager.add_widget(MainDashboard(name="main_menu"))
         self.screen_manager.add_widget(ScanImage(name="scan_img"))
+        self.screen_manager.add_widget(ScanResult(name="scan_result"))
         self.screen_manager.add_widget(ViewRecords(name="view_rec"))
 
         return self.screen_manager
-    
+
     def transition_to_login(self, *args):
         # Transition to the login screen after simulating loading
         self.screen_manager.current = 'login'

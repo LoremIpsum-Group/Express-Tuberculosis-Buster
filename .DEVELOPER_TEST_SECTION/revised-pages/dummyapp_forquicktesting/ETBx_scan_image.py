@@ -110,17 +110,17 @@ class ScanImage(Screen):
         Returns:
         None
         """
-        if resource_path(self.image.source) == resource_path("assets/jpg.png"):
-            self.show_warning_popup("Please load an image first.")
-            return
+        # if resource_path(self.image.source) == resource_path("assets/jpg.png"):
+        #     self.show_warning_popup("Please load an image first.")
+        #     return
 
-        if is_dicom:
-            image_path = resource_path("dicom_image.png")
-        else:
-            image_path = resource_path(self.image.source)
+        # if is_dicom:
+        #     image_path = resource_path("dicom_image.png")
+        # else:
+        #     image_path = resource_path(self.image.source)
         self.manager.current = 'scan_result'
-        print(image_path)
-        self.manager.get_screen('scan_result').update_result(image_path, is_dicom)
+        # print(image_path)
+        # self.manager.get_screen('scan_result').update_result(image_path, is_dicom)
 
     def loading_screen(self, dt):
         """
