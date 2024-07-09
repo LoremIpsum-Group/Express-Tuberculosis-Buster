@@ -28,7 +28,7 @@
             
             # Actual Percentage
             Color:
-                rgba: root.percentage_color 
+                rgba: root.percentage_color
             
             RoundedRectangle:
                 pos: self.x + self.width * 0.58, self.y + self.height * 0.63
@@ -37,9 +37,10 @@
    
         Label:
             text: 'Scan Results for Patient '
-            font_size: 24
+            font_size: 30
+            bold: True
             color: [0, 0, 1, 1]
-            pos_hint: {'center_x': 0.15, 'center_y': 0.9}
+            pos_hint: {'center_x': 0.169, 'center_y': 0.90}
 
         Label:
             text: 'Original X-Ray, & Heatmap Results'
@@ -72,20 +73,32 @@
             text: "TB Positive: 89%"
             bold: True
             color: [0, 0, 0, 1]
-            font_size: 26
-            pos_hint: {"center_x": 0.67, "center_y": 0.70}  
+            font_size: 30
+            pos_hint: {"center_x": 0.64, "center_y": 0.76}  
+
+        Label:
+            id: result_rcmdtn
+            text: "Confidence Percent Message"
+            color: [0, 0, 0, 1]
+            font_size: 23
+            pos_hint: {"center_x": 0.66, "center_y": 0.70}  
+         
 
         BoxLayout: 
             orientation: 'horizontal'
             size_hint: 0.10, 0.10
-            pos_hint: {'center_x': 0.83, 'center_y': 0.70}
-            
-            Label:
-                text: 'Misclassified'
-                color: 0, 0, 1, 1
+            pos_hint: {'center_x': 0.90, 'center_y': 0.70}
+
             CheckBox:
                 id: misclassified
                 color: 0, 0, 0, 1
+                size_hint_x: None
+                width: '35dp' 
+
+            Label:
+                text: 'Misclassified'
+                color: 0, 0, 1, 1
+                size_hint_x: None
 
         TextInput:
             id: notes
@@ -98,7 +111,7 @@
             orientation: 'horizontal'
             spacing: 20
             size_hint: 0.20, 0.20
-            pos_hint: {'center_x': 0.28, 'center_y': 0.15}
+            pos_hint: {'center_x': 0.30, 'center_y': 0.15}
 
             MDRectangleFlatButton:
                 id: x_ray
@@ -128,7 +141,7 @@
             spacing: 20
             orientation: 'horizontal'
             size_hint: 0.2 , 0.2 
-            pos_hint: {'center_x': 0.7, 'center_y': 0.29} 
+            pos_hint: {'center_x': 0.71, 'center_y': 0.29} 
 
             MDRectangleFlatButton:
                 text: 'Save to Existing Patient'
