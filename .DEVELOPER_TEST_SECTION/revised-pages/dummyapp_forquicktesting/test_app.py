@@ -20,7 +20,7 @@ class TestApp(MDApp):
         self.screen_manager = ScreenManager(transition=NoTransition())
         self.screen_manager.add_widget(LoadingScreen(name="loading"))
 
-        Clock.schedule_once(self.transition_to_login, 5)  # 5 seconds delay to simulate loading stuff
+        Clock.schedule_once(self.transition_to_login, 1)  # 5 seconds delay to simulate loading stuff
 
         self.screen_manager.add_widget(LoginScreen(name="login"))
         self.screen_manager.add_widget(MainDashboard(name="main_menu"))

@@ -90,11 +90,37 @@ class ScanResult(Screen):
         predicted_score = 50  # Arbitrary score
         superimposed_img = cropped_img  # Dummy GradCAM
 
-        bar_color = (1, 0.5, 0, 1)
+        bar_color = None
+        sys_suggest = None
+        x1 = None
+        x2 = None
+        if (predicted_score <= 25):
+            bar_color = (0, 1, 0, 1)
+            sys_suggest = "System does not see manifestations"
+            x1 = .67
+            x2 = .68
+        elif (predicted_score <= 49):
+            bar_color = (1, 1, 0, 1)
+            sys_suggest = "Suggested for further screening."
+            x1 = .67
+            x2 = .67
+        elif (predicted_score <= 74):
+            bar_color = (1, 0.5, 0, 1)
+            sys_suggest = "Visible signs, further screening highly suggested"
+            x1 = .65
+            x2 = .72
+        else:
+            bar_color = (1, 0, 0, 1)
+            sys_suggest = "TB signs evident, immediate attention suggested."
+            x1 = .65
+            x2 = .715
+
         self.percentage = int(predicted_score)
         self.percentage_color = bar_color
-        self.ids.result_classnPerc.text = predicted_class + ": " + str(predicted_score)
-
+        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score)
+        self.ids.result_classnPerc.pos_hint = {"center_x": x1, "center_y": 0.76}
+        self.ids.result_rcmdtn.text = sys_suggest
+        self.ids.result_rcmdtn.pos_hint = {"center_x": x2, "center_y": 0.70}
         scan_result.results = predicted_class
         scan_result.percentage = predicted_score
         scan_result.orig_img = xray_orig

@@ -45,6 +45,8 @@
                 pos_hint : {'center_x': 0.5 , 'center_y' : 0.7}
                 hint_text: "Username"
                 icon_left: "email"
+                write_tab: False
+                multiline: False
             
 
             MDTextField:
@@ -53,6 +55,9 @@
                 hint_text: "Password"
                 icon_left: "lock" 
                 password: True
+                write_tab: False
+                multiline: False
+                on_text_validate: root.login_button()
     
             MDIconButton:
                 icon: "eye-off"
