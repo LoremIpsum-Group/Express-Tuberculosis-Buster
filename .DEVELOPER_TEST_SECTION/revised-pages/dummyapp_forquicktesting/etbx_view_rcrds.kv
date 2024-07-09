@@ -3,7 +3,6 @@
 #     on_enter: self.color = 0.8, 0.2, 1, 1
 #     on_leave: self.color = 0, 0, 0, 1
 
-
 <ViewRecords>:
     name: "main_menu"
     data_items: [] 
@@ -102,7 +101,7 @@
         id: main_area
         orientation: 'horizontal'
         size_hint_x: 0.75
-        pos_hint: {'x':0.3, 'y':0.8}
+        pos_hint: {'x':0.3, 'y':0.81}
         canvas.before:
             Color: 
                 rgba: 1, 1, 1, 1
@@ -116,8 +115,6 @@
             #height: '30dp'
             padding: {'10dp', '20dp'}  # Apply padding only to the top and bottom
             #pos_hint: {'x':0.5, 'y':0.5}
-
-
 
             canvas.before:
                 Color: 
@@ -156,10 +153,10 @@
     FloatLayout:
         Label:
             font_size: 26
-            color: [0,0,1,1]
+            color: [192/255, 192/255, 192/255, 1 ]
            
-            pos_hint: {'center_x': 0.44, 'center_y': 0.90}
-            text: "[b]Records sorted by date in descending order[/b]"
+            pos_hint: {'center_x': 0.44, 'center_y': 0.80}
+            text: "[i]Records sorted by date in descending order[/i]"
             markup: True 
 
             
@@ -170,7 +167,7 @@
             color: [0,0,1,1] 
             font_size: 32
             bold: True
-            pos_hint: {'center_x': 0.60, 'center_y': 0.75}
+            pos_hint: {'center_x': 0.60, 'center_y': 0.72}
             
         
 
@@ -181,21 +178,21 @@
             color: [0,0,1,1]
             font_size: 28
             bold: True
-            pos_hint: {'center_x': 0.54, 'center_y': 0.67}
+            pos_hint: {'center_x': 0.54, 'center_y': 0.63}
             
         Label:
             id: date_label
             color: [0,0,1,1]
             font_size: 28
             bold: True
-            pos_hint: {'center_x': 0.64, 'center_y': 0.67}
+            pos_hint: {'center_x': 0.64, 'center_y': 0.63}
             
     
     BoxLayout:
         #id: search_result_layout
         orientation: "vertical"
         size_hint: 0.2, 0.5  
-        pos_hint: {'x': 0.50, 'y': 0.12}  
+        pos_hint: {'x': 0.50, 'y': 0.08}  
         
 
         BoxLayout:
@@ -225,3 +222,5 @@
 
       
       
+
+

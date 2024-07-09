@@ -108,6 +108,8 @@ class ViewRecords(Screen):
             self.ids.search_result_layout.clear_widgets()
             self.error_popup("Please fill-in the ID number of the patient")
             self.ids.search_result.text = ""
+            self.ids.result_label.text = ""
+            self.ids.date_label.text = ""
         elif not search_input.isdigit():
             self.ids.search_result_layout.clear_widgets()
             self.error_popup("Please enter a valid ID number")
