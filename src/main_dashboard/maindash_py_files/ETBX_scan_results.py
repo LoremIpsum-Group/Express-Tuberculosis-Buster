@@ -157,32 +157,38 @@ class ScanResult(Screen):
         sys_suggest = None
         x1 = None
         x2 = None
+        fsize = None
         if (predicted_score <= 25):
             bar_color = (0, 1, 0, 1)
-            sys_suggest = "System does not see manifestations"
-            x1 = .67
-            x2 = .68
+            sys_suggest = "System sees little to no manifestations"
+            x1 = .675
+            x2 = .685
+            fsize = 23
         elif (predicted_score <= 49):
             bar_color = (1, 1, 0, 1)
             sys_suggest = "Suggested for further screening."
-            x1 = .67
+            x1 = .675
             x2 = .67
+            fsize = 23
         elif (predicted_score <= 74):
             bar_color = (1, 0.5, 0, 1)
             sys_suggest = "Visible signs, further screening highly suggested"
-            x1 = .65
-            x2 = .72
+            x1 = .655
+            x2 = .702
+            fsize = 21
         else:
             bar_color = (1, 0, 0, 1)
             sys_suggest = "TB signs evident, immediate attention suggested."
-            x1 = .65
-            x2 = .715
+            x1 = .655
+            x2 = .70
+            fsize = 21
 
         self.percentage = int(predicted_score)
         self.percentage_color = bar_color
-        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score)
+        self.ids.result_classnPerc.text = predicted_class + ": " +str(predicted_score) + "%"
         self.ids.result_classnPerc.pos_hint = {"center_x": x1, "center_y": 0.76}
         self.ids.result_rcmdtn.text = sys_suggest
+        self.ids.result_rcmdtn.font_size = fsize
         self.ids.result_rcmdtn.pos_hint = {"center_x": x2, "center_y": 0.70}
         scan_result.results = predicted_class
         scan_result.percentage = predicted_score
@@ -253,7 +259,7 @@ class ScanResult(Screen):
 
         inner_content = BoxLayout(orientation='horizontal', spacing=10, padding=10, size_hint_y=0.3)
         confirm_btn = Button(text='Confirm', background_color=(0, 0, 1, 1), background_normal='', on_press=self.confirm)
-        cancel_btn = Button(text='Cancel', background_color=(0, 0, 1, 1), background_normal='', on_press=self.close_popup)
+        cancel_btn = Button(text='Cancel', background_color=(1, 0, 0, 1), background_normal='', on_press=self.close_popup)
         inner_content.add_widget(confirm_btn)
         inner_content.add_widget(cancel_btn)
         content.add_widget(inner_content)

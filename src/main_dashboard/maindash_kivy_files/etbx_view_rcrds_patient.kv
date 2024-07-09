@@ -9,8 +9,8 @@
     Image:
         id: res_img
         size_hint: .45, .65
-        pos_hint: {'center_x': 0.30,'center_y': 0.47}  
-        
+        pos_hint: {'center_x': 0.30,'center_y': 0.47}
+
     FloatLayout:
 
         canvas.before:
@@ -23,7 +23,7 @@
             
             # Actual Percentage
             Color:
-                rgba: root.percentage_color 
+                rgba: root.percentage_color
             
             RoundedRectangle:
                 pos: self.x + self.width * 0.58, self.y + self.height * 0.63
@@ -33,9 +33,10 @@
         Label:
             #text: 'Scan Results for Patient: '
             id: patient_id_text
-            font_size: 24
+            font_size: 30
             color: [0, 0, 1, 1]
-            pos_hint: {'center_x': 0.15, 'center_y': 0.9}
+            bold: True
+            pos_hint: {'center_x': 0.176, 'center_y': 0.9}
 
         Label:
             text: 'Original X-Ray, & Grad-Cam Results'
@@ -43,96 +44,89 @@
             color: [0, 0, 0, 1] 
             pos_hint: {'center_x': 0.166, 'center_y': 0.85}
     
-        # # Test
-        # Image:
-        #     id: res_img
-        #     size_hint: .50, .80
-        #     pos_hint: {'center_x': 0.2,'center_y':0.60}  
-
-
-        # Label: 
-        #     id: result_class
-        #     text: 'Lorem'
-        #     color: [0,0,0,1]
-        #     font_size: self.width* .020
-        #     pos_hint: {'center_x':0.8,'center_y':0.6}
-        # Label: 
-        #     id: result_perc
-        #     text: 'Ipsum'
-        #     color: [0,0,0,1]
-        #     font_size: self.width* .020
-        #     pos_hint: {'center_x':0.8,'center_y':0.55}   
 
         Label:
             id: result_classnPerc
             text: "TB Positive: 89%"
             bold: True
             color: [0, 0, 0, 1]
-            font_size: 26
-            pos_hint: {"center_x": 0.63, "center_y": 0.70} 
-            
+            font_size: 30
+            pos_hint: {"center_x": 0.64, "center_y": 0.76}  
+
+        Label:
+            id: result_rcmdtn
+            text: "Confidence Percent Message"
+            color: [0, 0, 0, 1]
+            font_size: 23
+            pos_hint: {"center_x": 0.66, "center_y": 0.70}  
+         
+
         BoxLayout: 
             orientation: 'horizontal'
             size_hint: 0.10, 0.10
-            pos_hint: {'center_x': 0.80, 'center_y': 0.70}
-            
-            Label:
-                text: 'Misclassified'
-                color: 0, 0, 1, 1
+            pos_hint: {'center_x': 0.89, 'center_y': 0.70}
+
             CheckBox:
                 id: misclassified
-                color: 0, 0, 0, 1 
-                disabled: True
+                color: 0, 0, 0, 1
+                size_hint_x: None
+                width: '45dp' 
+
+            Label:
+                text: 'Misclassified'
+                font_size: 20
+                color: 0, 0, 1, 1
+                size_hint_x: None
 
         TextInput:
             id: notes
             multiline: True
             size_hint: .35, .35
             pos_hint: {'center_x': 0.755, 'center_y': 0.43}
-            disabled: True  
 
         
         BoxLayout:
             orientation: 'horizontal'
             spacing: 20
             size_hint: 0.20, 0.20
-            pos_hint: {'center_x': 0.28, 'center_y': 0.15}
+            pos_hint: {'center_x': 0.285, 'center_y': 0.15}
 
             MDRectangleFlatButton:
                 id: x_ray
-                text: 'X-ray'
-                size_hint_x: 0.6
+                text: '[b]X-ray[/b]'
+                font_size: 22
                 on_press: root.change_img(self)
             
             MDRectangleFlatButton:
                 id: pre_proc
-                text: 'Isolated Lung'
-                size_hint_x: 0.6
+                text: '[b]Isolated Lung[/b]'
+                font_size: 22
                 on_press: root.change_img(self)
             
             MDRectangleFlatButton:
                 id: grad_cam
-                text: 'Grad-Cam'
-                size_hint_x: 0.6
+                text: '[b]Heatmap[/b]'
+                font_size: 22
                 on_press: root.change_img(self)
         
         MDRectangleFlatButton:
-            text: 'Back'
-            size_hint_x: 0.06
+            text: '[b]Back[/b]'
             pos_hint: {'center_x':0.95,'center_y':0.95}
-            on_press: root.manager.current = 'view_rec'
+            font_size: 22
+            on_press: root.back_button()
+            line_color: 1, 0, 0, 1
+            md_bg_color: 1, 0, 0, 1
+            text_color: 1, 1, 1, 1
         
 
         BoxLayout:
             spacing: 20
             orientation: 'horizontal'
             size_hint: 0.2 , 0.2 
-            pos_hint: {'center_x': 0.75, 'center_y': 0.29} 
-
-
-
+            pos_hint: {'center_x': 0.75, 'center_y': 0.27} 
             MDRectangleFlatButton:
-                text: 'Full View Image'
-                size_hint_x: 0.06    
+                text: '[b]Full View Image[/b]'
+                size_hint_x: 0.06   
+                font_size: 22 
                 on_press: root.full_view()
         

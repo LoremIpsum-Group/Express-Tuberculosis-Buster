@@ -11,11 +11,6 @@
         size_hint: .45, .65
         pos_hint: {'center_x': 0.30,'center_y': 0.47}
 
-    # Image:
-    #     source:  'assets/gradientImage.png'
-    #     size_hint: .40, .1 
-    #     pos_hint: {'center_x': .75, 'center_y': 0.1}
-
     FloatLayout:
 
         canvas.before:
@@ -47,26 +42,6 @@
             font_size: 22
             color: [0, 0, 0, 1]
             pos_hint: {'center_x': 0.166, 'center_y': 0.85}
-    
-        # # Test
-        # Image:
-        #     id: res_img
-        #     size_hint: .50, .80
-        #     pos_hint: {'center_x': 0.2,'center_y':0.60}  
-
-
-        # Label: 
-        #     id: result_class
-        #     text: 'Lorem'
-        #     color: [0,0,0,1]
-        #     font_size: self.width* .020
-        #     pos_hint: {'center_x':0.8,'center_y':0.6}
-        # Label: 
-        #     id: result_perc
-        #     text: 'Ipsum'
-        #     color: [0,0,0,1]
-        #     font_size: self.width* .020
-        #     pos_hint: {'center_x':0.8,'center_y':0.55}   
 
         Label:
             id: result_classnPerc
@@ -87,16 +62,17 @@
         BoxLayout: 
             orientation: 'horizontal'
             size_hint: 0.10, 0.10
-            pos_hint: {'center_x': 0.90, 'center_y': 0.70}
+            pos_hint: {'center_x': 0.89, 'center_y': 0.70}
 
             CheckBox:
                 id: misclassified
                 color: 0, 0, 0, 1
                 size_hint_x: None
-                width: '35dp' 
+                width: '45dp' 
 
             Label:
                 text: 'Misclassified'
+                font_size: 20
                 color: 0, 0, 1, 1
                 size_hint_x: None
 
@@ -111,51 +87,53 @@
             orientation: 'horizontal'
             spacing: 20
             size_hint: 0.20, 0.20
-            pos_hint: {'center_x': 0.30, 'center_y': 0.15}
+            pos_hint: {'center_x': 0.285, 'center_y': 0.15}
 
             MDRectangleFlatButton:
                 id: x_ray
-                text: 'X-ray'
-                size_hint_x: 0.6
+                text: '[b]X-ray[/b]'
+                font_size: 22
                 on_press: root.change_img(self)
             
             MDRectangleFlatButton:
                 id: pre_proc
-                text: 'Isolated Lung'
-                size_hint_x: 0.6
+                text: '[b]Isolated Lung[/b]'
+                font_size: 22
                 on_press: root.change_img(self)
             
             MDRectangleFlatButton:
                 id: grad_cam
-                text: 'Heatmap'
-                size_hint_x: 0.6
+                text: '[b]Heatmap[/b]'
+                font_size: 22
                 on_press: root.change_img(self)
         
         MDRectangleFlatButton:
-            text: 'Back'
-            size_hint_x: 0.06
+            text: '[b]Back[/b]'
             pos_hint: {'center_x':0.95,'center_y':0.95}
+            font_size: 22
             on_press: root.back_button()
+            line_color: 1, 0, 0, 1
+            md_bg_color: 1, 0, 0, 1
+            text_color: 1, 1, 1, 1
         
         BoxLayout:
             spacing: 20
             orientation: 'horizontal'
             size_hint: 0.2 , 0.2 
-            pos_hint: {'center_x': 0.71, 'center_y': 0.29} 
+            pos_hint: {'center_x': 0.68, 'center_y': 0.27} 
 
             MDRectangleFlatButton:
-                text: 'Save to Existing Patient'
-                size_hint_x: 0.06
+                text: '[b]Save to Existing Patient[/b]'
+                font_size: 22
                 on_press: root.manager.current = 'save_existing'
             
             MDRectangleFlatButton:
-                text: 'Save to New Patient'
-                size_hint_x: 0.06
+                text: '[b]Save to New Patient[/b]'
+                font_size: 22
                 on_press: root.manager.current = 'save_new'
 
-
             MDRectangleFlatButton:
-                text: 'Full View'
-                size_hint_x: 0.06    
+                text: '[b]Full View[/b]'
+                font_size: 22    
                 on_press: root.full_view()
         
