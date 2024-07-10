@@ -474,6 +474,31 @@ class ViewRecords(Screen):
 
         os.remove(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'))
 
+    def logout(self, instance):
+        self.popup.dismiss()
+        self.manager.current = 'login'
+
+    def logout_popup(self):
+        """
+        Displays a popup with a given message and a close button.
+
+        Parameters:
+        - message (str): The message to be displayed in the popup.
+
+        Returns:
+        None
+        """
+        content = BoxLayout(orientation='vertical')
+        label = Label(text="Are you sure you want to logout?")
+        confirm_button = Button(text="Confirm", on_press=self.logout)
+        close_button = Button(text='Close', on_press=self.close_popup)
+        content.add_widget(label)
+        content.add_widget(confirm_button)
+
+        content.add_widget(close_button)
+        self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
+        self.popup.open()
+        
 
 
 

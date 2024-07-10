@@ -4,7 +4,7 @@
 <ScanImage>:
     name: "main_menu"
 
-    BoxLayout:
+    FloatLayout:
         id: "nav_bar"
         orientation: "vertical"
         size_hint_x: 0.25 # This makes the BoxLayout take up 25% of its parent's width
@@ -22,20 +22,36 @@
         Button:
             markup: True
             text: '[b]Upload Image[/b]'
-            size_hint_x: 0.5
+            font_size: '25sp'
+            size_hint_x: 0.8
             size_hint_y: None
-            pos_hint: {'x':0.50, "y": 1}     
+            pos_hint: {'center_x':0.60, "center_y": 0.6}
             color: [0,0,1,1]     
             background_normal: ''
             background_down: ''  
-          
             on_touch_down: if self.collide_point(*args[1].pos): root.manager.current = 'scan_img'
 
         Button:
             markup: True
             text: '[b]View Record[/b]'
+            font_size: '25sp'
              
-            pos_hint: {'x':0.5, 'y':0.6}
+            pos_hint: {'center_x':0.60, 'y': 0.4}
+            color: [1,1,1,1]
+            background_normal: ''
+            background_down: ''
+            background_color: 0, 0, 1, 1
+            size_hint_x: 0.8
+            size_hint_y: None           
+            on_press:
+                root.manager.current = 'view_rec'
+        
+        Button:
+            markup: True
+            text: '[b]Logout[/b]'
+            font_size: '25sp'
+             
+            pos_hint: {'center_x':0.60, 'center_y':0.05}
             color: [1,1,1,1]
             background_normal: ''
             background_down: ''
@@ -43,7 +59,38 @@
             size_hint_x: 0.5
             size_hint_y: None           
             on_press:
-                root.manager.current = 'view_rec'
+                root.logout_popup()
+        
+        MDIcon:
+            icon: "file-upload-outline"
+            color : 0, 0, 1, 1
+            font_size: 50
+            pos_hint: {'center_x': 0.30, 'center_y': 0.6}
+            
+        MDIcon: 
+            icon: "archive-search-outline" 
+            color: 1, 1, 1, 1 
+            font_size: 50
+            pos_hint: {'center_x': 0.30, 'center_y': 0.45}
+
+        MDIcon:
+            icon: "logout"
+            color : 1, 1, 1, 1
+            font_size: 50
+            pos_hint: {'center_x':0.40, 'center_y':0.05}
+        
+
+        Label:
+            text: "[b]Express\nTuberculosis\nBuster[/b]"
+            font_size: 30
+            pos_hint: {'center_x': 0.60, 'center_y': 0.80}
+            color: [1,1,1,1]
+            markup: True
+
+        Image:
+            source: "ETBX.ico"
+            size_hint: 0.15, 0.15 
+            pos_hint: {'center_x': 0.30, 'center_y': 0.80}
 
        
     BoxLayout:
@@ -76,7 +123,7 @@
                     text: "[i]Supported Formats: jpg, jpeg, png, DICOM\nDigital image must be of minimum size of 512x512 pixels[/i]"
                     markup: True
                     font_size: 26
-                    pos_hint: {'center_x': 0.32,'center_y': 0.87}
+                    pos_hint: {'center_x': 0.26,'center_y': 0.87}
                     color: 192/255, 192/255, 192/255, 1    
                 Image:
                     id: image
@@ -90,20 +137,31 @@
                     # allow_stretch: True
                     # keep_ratio: True
                 Image:
-                    size_hint: .03, .03
-                    pos_hint: {'center_x': 0.76,'center_y': 0.60}
+                    size_hint: .05, .05
+                    pos_hint: {'center_x': 0.71,'center_y': 0.40}
                     source: "assets/jpg.png"
-                Button:
-                    text: "Upload Image"
-                    size_hint: .13, .05
-                    pos_hint: {'center_x': 0.84,'center_y': 0.60}
-                    background_normal: ''
-                    background_color: 0, 128/255, 1, 1
-                    on_press: root.load_image()
+
+                MDIcon: 
+                    icon: 'image-sync-outline'
+                    color: 0, 0, 0, 1
+                    font_size: 50
+                    pos_hint: {'center_x': 0.712, 'center_y': 0.32}
 
                 MDRectangleFlatButton:
-                    text: "[b]Process Image[/b]"
+                    text: "[b]1. Upload Image[/b]"
+                    font_size: 30
+                    size_hint: 0.19, 0.06
+                    pos_hint: {'center_x': 0.83,'center_y': 0.40}
+                    background_normal: ''
+                    background_color: 0, 128/255, 1, 1
+                    markup: True
+                    on_press: root.load_image()
+                    
+
+                MDRectangleFlatButton:
+                    text: "[b]2. Process Image[/b]"
                     font_size: 30
                     size_hint: .18, .06
                     pos_hint: {'center_x': 0.83,'center_y': 0.32}
+                    markup: True
                     on_press: root.process_image()

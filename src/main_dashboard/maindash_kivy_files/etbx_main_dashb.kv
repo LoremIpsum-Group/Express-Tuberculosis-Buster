@@ -5,7 +5,7 @@
 <MainDashboard>:
     name: "main_menu"
 
-    BoxLayout:
+    FloatLayout:
         id: "nav_bar"
         orientation: "vertical"
         size_hint_x: 0.25 # This makes the BoxLayout take up 25% of its parent's width
@@ -23,8 +23,8 @@
         Button:
             markup: True
             text: '[b]Upload Image[/b]'
-                    
-            pos_hint: {'x':0.5, "y": 1}     
+            font_size: '25sp'   
+            pos_hint: {'center_x':0.60, "center_y": 0.6}     
             color: [1,1,1,1] 
             background_normal: ''
             background_down: ''
@@ -37,8 +37,9 @@
         Button:
             markup: True
             text: '[b]View Record[/b]'
+            font_size: '25sp'
          
-            pos_hint: {'x':0.5, 'y':0.6}
+            pos_hint: {'center_x':0.60, 'y': 0.4}
             color: [1,1,1,1]
             background_normal: ''
             background_down: ''
@@ -48,6 +49,51 @@
             on_press:
                 root.manager.current = 'view_rec'
         
+        Button: 
+            markup: True
+            text: '[b]Logout[/b]'
+            font_size: '25sp'
+         
+            pos_hint: {'center_x':0.60, 'center_y':0.05}
+            color: [1,1,1,1]
+            background_normal: ''
+            background_down: ''
+            background_color: 0, 0, 1, 1
+            size_hint_x: 0.5
+            size_hint_y: None           
+            on_press:
+                root.manager.current = 'login'
+        
+        MDIcon:
+            icon: "file-upload-outline"
+            color : 1, 1, 1, 1
+            font_size: 50
+            pos_hint: {'center_x': 0.30, 'center_y': 0.6}
+            
+        MDIcon: 
+            icon: "archive-search-outline" 
+            color: 1, 1, 1, 1 
+            font_size: 50
+            pos_hint: {'center_x': 0.30, 'center_y': 0.45}
+
+        MDIcon:
+            icon: "logout"
+            color : 1, 1, 1, 1
+            font_size: 50
+            pos_hint: {'center_x': 0.40, 'center_y': 0.05}
+    
+        Label:
+            text: "[b]Express\nTuberculosis\nBuster[/b]"
+            font_size: 30
+            pos_hint: {'center_x': 0.60, 'center_y': 0.80}
+            color: [1,1,1,1]
+            markup: True
+
+        Image:
+            source: "ETBX.ico"
+            size_hint: 0.15, 0.15 
+            pos_hint: {'center_x': 0.30, 'center_y': 0.80}
+
         
 
         # HoverLabel:

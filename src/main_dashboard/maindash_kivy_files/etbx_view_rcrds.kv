@@ -3,12 +3,11 @@
 #     on_enter: self.color = 0.8, 0.2, 1, 1
 #     on_leave: self.color = 0, 0, 0, 1
 
-
 <ViewRecords>:
     name: "main_menu"
     data_items: [] 
 
-    BoxLayout:
+    FloatLayout:
         id: "nav_bar"
         orientation: "vertical"
         size_hint_x: 0.25 # This makes the BoxLayout take up 25% of its parent's width
@@ -26,11 +25,12 @@
         
         Button:
             markup: True
-            text: '[b]Upload Image[/b]'         
-            pos_hint: {'x':0.50, 'y': 1}
+            text: '[b]Upload Image[/b]'     
+            font_size: '25sp'    
+            pos_hint: {'center_x':0.60, "center_y": 0.6}
             color: [1, 1, 1, 1]
             background_color: (0,0,1,1)
-            size_hint_x: 0.5
+            size_hint_x: 0.8
             size_hint_y: None
             background_normal: ''
             background_down: ''
@@ -41,20 +41,67 @@
         Button:
             markup: True
             text: '[b]View Record[/b]'
-            pos_hint: {'x':0.50, 'y':0.6}
+            font_size: '25sp'
+            pos_hint: {'center_x':0.60, 'y': 0.4}
             color: [0, 0, 1, 1]
-            size_hint_x: 0.5
+            size_hint_x: 0.8
             size_hint_y: None
             background_normal: ''
             background_down: ''
             on_press:
                 root.manager.current = 'view_rec'    
+        
+        Button:
+            markup: True
+            text: '[b]Logout[/b]'
+            font_size: '25sp'
+            pos_hint: {'center_x':0.60, 'center_y':0.05}
+            color: [1, 1, 1, 1]
+            background_color: (0,0,1,1)
+            size_hint_x: 0.5
+            size_hint_y: None
+            background_normal: ''
+            background_down: ''
+            on_press:
+                root.logout_popup() 
+        
+        MDIcon:
+            icon: "file-upload-outline"
+            color : 1, 1, 1, 1
+            font_size: 50
+            pos_hint: {'center_x': 0.30, 'center_y': 0.6}
+            
+        MDIcon: 
+            icon: "archive-search-outline" 
+            color: 0, 0, 1, 1 
+            font_size: 50
+            pos_hint: {'center_x': 0.30, 'center_y': 0.45}
+
+        MDIcon:
+            icon: "logout"
+            color : 1, 1, 1, 1
+            font_size: 50
+            pos_hint: {'center_x':0.40, 'center_y':0.05}
+        
+
+        Label:
+            text: "[b]Express\nTuberculosis\nBuster[/b]"
+            font_size: 30
+            pos_hint: {'center_x': 0.60, 'center_y': 0.80}
+            color: [1,1,1,1]
+            markup: True
+
+        Image:
+            source: "ETBX.ico"
+            size_hint: 0.15, 0.15 
+            pos_hint: {'center_x': 0.30, 'center_y': 0.80}
+            
                     
     BoxLayout:
         id: main_area
         orientation: 'horizontal'
         size_hint_x: 0.75
-        pos_hint: {'x':0.25, 'y':0.8}
+        pos_hint: {'x':0.3, 'y':0.81}
         canvas.before:
             Color: 
                 rgba: 1, 1, 1, 1
@@ -65,8 +112,9 @@
         BoxLayout:
             id: search_section
             size_hint_y: None
-            height: '80dp'
+            #height: '30dp'
             padding: {'10dp', '20dp'}  # Apply padding only to the top and bottom
+            #pos_hint: {'x':0.5, 'y':0.5}
 
             canvas.before:
                 Color: 
@@ -77,8 +125,13 @@
             TextInput:
                 id: search_input
                 multiline: False
+                font_size: 30
                 hint_text: 'Enter patient id here'
-                height: '30dp'  # Set a specific height for the TextInput
+                height: '40dp'  
+                width: 400  
+                size_hint_x: None  
+                size_hint_y: None
+                #pos_hint: {'center_x': 0.98,'center_y': 0.60}
                 write_tab: False
                 multiline: False
             
@@ -87,11 +140,25 @@
                 id: search_button
                 markup: True
                 text: "[b]Search[/b]"
-                font_size: 15
-                height: '30dp'
+                font_size: 30
+                height: '40dp'
+                width: '100dp'
+                size_hint: None, None
+                #pos_hint: {'center_x': 0.90,'center_y': 0.60}
                 background_normal: '' 
                 background_color: [0,0,1,1]
                 on_press: root.search_button()
+    
+    #label for order of search result 
+    FloatLayout:
+        Label:
+            font_size: 26
+            color: [192/255, 192/255, 192/255, 1 ]
+           
+            pos_hint: {'center_x': 0.44, 'center_y': 0.80}
+            text: "[i]Records sorted by date in descending order[/i]"
+            markup: True 
+
             
     #result layout
     FloatLayout:
@@ -100,7 +167,7 @@
             color: [0,0,1,1] 
             font_size: 32
             bold: True
-            pos_hint: {'center_x': 0.59, 'center_y': 0.75}
+            pos_hint: {'center_x': 0.60, 'center_y': 0.72}
             
         
 
@@ -111,33 +178,34 @@
             color: [0,0,1,1]
             font_size: 28
             bold: True
-            pos_hint: {'center_x': 0.54, 'center_y': 0.67}
+            pos_hint: {'center_x': 0.54, 'center_y': 0.63}
             
         Label:
             id: date_label
             color: [0,0,1,1]
             font_size: 28
             bold: True
-            pos_hint: {'center_x': 0.64, 'center_y': 0.67}
+            pos_hint: {'center_x': 0.64, 'center_y': 0.63}
             
     
     BoxLayout:
         #id: search_result_layout
         orientation: "vertical"
         size_hint: 0.2, 0.5  
-        pos_hint: {'x': 0.5, 'y': 0.12}  
+        pos_hint: {'x': 0.50, 'y': 0.08}  
+        
 
         BoxLayout:
             RecycleView:
                 viewclass: 'Button' 
                 #data: [{'text': f"{str(x[3])}                        {str(x[2])}", 'on_release': lambda x=x: root.result_popup(x[1])} for x in root.data_items]
-                data: [{'text': f"{str(x[3])} {str(x[2])}", 'on_release': lambda x=x, i=i: root.result_popup(x[1], i)} for i, x in enumerate(root.data_items)]                        
+                data: [{'text': f"{str(x[3])}   :   {str(x[2])}", 'on_release': lambda x=x, i=i: root.result_popup(x[1], i)} for i, x in enumerate(root.data_items)]                        
                 #data: [{'text': f"{str(x[3])}                        {str(x[2])}", 'on_release': lambda x=x: root.record_clicked(x[1])} for x in root.data_items]
 
                 RecycleBoxLayout:
                     id: search_result_layout
                     cols: 1
-                    default_size: dp(2000), dp(80)
+                    default_size: None, dp(80)
                     default_size_hint: 1, None
                     size_hint_y: None
                     height: self.minimum_height
@@ -154,3 +222,5 @@
 
       
       
+
+
