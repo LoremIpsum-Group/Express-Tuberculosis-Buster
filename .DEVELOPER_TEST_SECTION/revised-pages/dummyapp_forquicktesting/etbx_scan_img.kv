@@ -81,9 +81,9 @@
         
 
         Label:
-            text: "[b]ETBx[/b]"
+            text: "[b]Express\nTuberculosis\nBuster[/b]"
             font_size: 30
-            pos_hint: {'center_x': 0.49, 'center_y': 0.80}
+            pos_hint: {'center_x': 0.60, 'center_y': 0.80}
             color: [1,1,1,1]
             markup: True
 
@@ -123,7 +123,7 @@
                     text: "[i]Supported Formats: jpg, jpeg, png, DICOM\nDigital image must be of minimum size of 512x512 pixels[/i]"
                     markup: True
                     font_size: 26
-                    pos_hint: {'center_x': 0.32,'center_y': 0.87}
+                    pos_hint: {'center_x': 0.26,'center_y': 0.87}
                     color: 192/255, 192/255, 192/255, 1    
                 Image:
                     id: image
@@ -137,20 +137,31 @@
                     # allow_stretch: True
                     # keep_ratio: True
                 Image:
-                    size_hint: .03, .03
-                    pos_hint: {'center_x': 0.76,'center_y': 0.60}
+                    size_hint: .05, .05
+                    pos_hint: {'center_x': 0.71,'center_y': 0.40}
                     source: "assets/jpg.png"
-                Button:
-                    text: "Upload Image"
-                    size_hint: .13, .05
-                    pos_hint: {'center_x': 0.84,'center_y': 0.60}
-                    background_normal: ''
-                    background_color: 0, 128/255, 1, 1
-                    on_press: root.load_image()
+
+                MDIcon: 
+                    icon: 'image-sync-outline'
+                    color: 0, 0, 0, 1
+                    font_size: 50
+                    pos_hint: {'center_x': 0.712, 'center_y': 0.32}
 
                 MDRectangleFlatButton:
-                    text: "[b]Process Image[/b]"
+                    text: "[b]1. Upload Image[/b]"
+                    font_size: 30
+                    size_hint: 0.19, 0.06
+                    pos_hint: {'center_x': 0.83,'center_y': 0.40}
+                    background_normal: ''
+                    background_color: 0, 128/255, 1, 1
+                    markup: True
+                    on_press: root.load_image()
+                    
+
+                MDRectangleFlatButton:
+                    text: "[b]2. Process Image[/b]"
                     font_size: 30
                     size_hint: .18, .06
                     pos_hint: {'center_x': 0.83,'center_y': 0.32}
+                    markup: True
                     on_press: root.process_image()
