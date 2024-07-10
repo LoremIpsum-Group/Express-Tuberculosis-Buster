@@ -70,19 +70,22 @@
                 id: misclassified
                 color: 0, 0, 0, 1
                 size_hint_x: None
-                width: '45dp' 
+                width: '45dp'
+                disabled: True
 
             Label:
                 text: 'Misclassified'
                 font_size: 20
                 color: 0, 0, 1, 1
                 size_hint_x: None
+            
 
         TextInput:
             id: notes
             multiline: True
             size_hint: .35, .35
             pos_hint: {'center_x': 0.755, 'center_y': 0.43}
+            disabled: True
 
         
         BoxLayout:

@@ -4,6 +4,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 
+
 class LoadingScreen(Screen):
     def __init__(self, **kwargs):
         super(LoadingScreen, self).__init__(**kwargs)
