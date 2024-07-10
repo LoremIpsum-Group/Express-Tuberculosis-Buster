@@ -306,3 +306,6 @@ class PatientResult(Screen):
 
         xray_full_app(image_np_orig, image_np_grad)
         pass
+
+    def back_button(self):
+        self.manager.current = 'view_rec'
