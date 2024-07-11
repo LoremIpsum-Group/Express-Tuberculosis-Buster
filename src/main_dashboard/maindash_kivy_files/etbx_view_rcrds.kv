@@ -102,12 +102,6 @@
         orientation: 'horizontal'
         size_hint_x: 0.75
         pos_hint: {'x':0.3, 'y':0.81}
-        canvas.before:
-            Color: 
-                rgba: 1, 1, 1, 1
-            Rectangle:
-                size: self.size
-                pos: self.pos
                 
         BoxLayout:
             id: search_section
@@ -116,12 +110,6 @@
             padding: {'10dp', '20dp'}  # Apply padding only to the top and bottom
             #pos_hint: {'x':0.5, 'y':0.5}
 
-            canvas.before:
-                Color: 
-                    rgba: 1, 1, 1, 1
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
             TextInput:
                 id: search_input
                 multiline: False
