@@ -96,19 +96,19 @@
             size_hint: 0.15, 0.15 
             pos_hint: {'center_x': 0.30, 'center_y': 0.80}
             
-                    
+              
     BoxLayout:
         id: main_area
         orientation: 'horizontal'
         size_hint_x: 0.75
-        pos_hint: {'x':0.3, 'y':0.81}
-                
+        pos_hint: {'x':0.3, 'y':0.79}    
+
         BoxLayout:
             id: search_section
             size_hint_y: None
             #height: '30dp'
             padding: {'10dp', '20dp'}  # Apply padding only to the top and bottom
-            #pos_hint: {'x':0.5, 'y':0.5}
+
 
             TextInput:
                 id: search_input
@@ -141,11 +141,17 @@
     FloatLayout:
         Label:
             font_size: 26
-            color: [192/255, 192/255, 192/255, 1 ]
-           
-            pos_hint: {'center_x': 0.44, 'center_y': 0.80}
+            color: [192/255, 192/255, 192/255, 1]
+            pos_hint: {'center_x': 0.435, 'center_y': 0.775}
             text: "[i]Records sorted by date in descending order[/i]"
             markup: True 
+        Label:
+            text: "[b]View Records[/b]"
+            markup: True
+            font_size: 35
+            pos_hint: {'center_x': 0.365,'center_y': 0.91}
+            color: 0, 0, 1, 1  
+            
 
             
     #result layout
