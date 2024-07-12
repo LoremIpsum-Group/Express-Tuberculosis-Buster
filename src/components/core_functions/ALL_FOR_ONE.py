@@ -206,10 +206,10 @@ def check_segmented_img(segmented_img, mask_created):
     if np.allclose(mask_created, 0) or np.allclose(segmented_img, 0):
         print("Mask is blank. Image is faulty!.")
         message = "Mask is blank. Image is faulty!."
-        return True, message
+        return True, message, num_components
 
     print("\n\n---End of simple checking of the segmented image---\n")
-    return False, message
+    return False, message, num_components
 
 
 # ---- END OF PREPROCESSING STUFF----#
