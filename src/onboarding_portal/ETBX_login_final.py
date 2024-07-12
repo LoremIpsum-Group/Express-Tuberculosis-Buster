@@ -70,12 +70,20 @@ class LoginScreen(Screen):
             login_successful = stored_username == hashed_input_username and stored_password == hashed_input_password
 
             if login_successful:
+                self.ids.username_input.text = ''
+                self.ids.password_input.text = ''
                 self.manager.current = 'main_menu'
                 print("Login Successful")
             else:
+                self.ids.username_input.text = ''
+                self.ids.password_input.text = ''
                 self.show_popup('Invalid Username or Password')
         else:
+            #Reason why this is here is to ensure that what happens at the end of login everytime is clearing the input fields
+            self.ids.username_input.text = ''
+            self.ids.password_input.text = ''
             self.show_popup('Please enter all the fields')
+
 
 
     def forgot_password(self):
@@ -85,8 +93,9 @@ class LoginScreen(Screen):
         returns:
         None
         """
-        self.ids.username_input.clear_widgets()
-        self.ids.password_input.clear_widgets()
+        #Reason why this is here is to ensure that what happens at the end of login everytime is clearing the input fields
+        self.ids.username_input.text = ''
+        self.ids.password_input.text = ''
         self.forgot_password_popup('Please contact: Venz Salvatierra (ETBX-Developer)\nContact Number: 09773503492 \nEmail:202110530@fit.edu.ph')
 
     
