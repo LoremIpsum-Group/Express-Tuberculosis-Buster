@@ -150,6 +150,10 @@ class ScanResult(Screen):
             )
             print(f"heatmap shape and datatype: {heatmap.shape} | {heatmap.dtype}")
             superimposed_img = superimpose_heatmap(masked_image, heatmap)
+        #! QUICK PATCH FOR CHECKING IF IMAGE IS FAULTY (EITHER DUE TO BAD INPUT OR BAD SEGMENTATION)
+        if segment_bad[2] >4:
+            predicted_class = "IMG faulty"
+            predicted_score = 0
 
         #! END Core Functionalities
 
@@ -159,8 +163,12 @@ class ScanResult(Screen):
         x2 = None
         fsize = None
         if (predicted_score <= 25):
-            bar_color = (0, 1, 0, 1)
-            sys_suggest = "System sees little to no manifestations"
+            #! QUICK PATCH FOR CHECKING IF IMAGE IS FAULTY (EITHER DUE TO BAD INPUT OR BAD SEGMENTATION)
+            if segment_bad[2] >4:
+                sys_suggest = "Image unsuitable for classification"
+            else:
+                sys_suggest = "System sees little to no manifestations"
+            bar_color = (0, 1, 0, 1)            
             x1 = .675
             x2 = .685
             fsize = 23

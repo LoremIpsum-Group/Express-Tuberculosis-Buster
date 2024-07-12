@@ -83,20 +83,22 @@ def check_image(image_path):
     normalized_img = (gray_image - 127.0) / 127.0
     mean_normalized_value = np.mean(normalized_img)
     # Define threshold values for different colors
-    threshold_black = 20
-    threshold_white = 235
+    threshold_black = 50
+    threshold_white = 220
+
+    print(image.shape[0], image.shape[1])
+    if image.shape[0] < 512 or image.shape[1] < 512:
+        message = "The image size is smaller than the minimum required size of 512x512 pixels."
+        FAULTY_IMG = True
+        return FAULTY_IMG, message
 
     if mean_pixel_value < threshold_black:
-
         message = "The image appears to be mostly black"
         FAULTY_IMG = True
     elif mean_pixel_value > threshold_white:
         message = "The image appears to be mostly white"
         FAULTY_IMG = True
-    elif not np.isclose(mean_normalized_value, 0.17, atol=0.30):
-        print(
-            "Image migth be darker or brighter than expected. Segmentation might be affected."
-        )
+    elif not np.isclose(mean_normalized_value, 0.17, atol=0.15):
         message = "Image migth be darker or brighter than expected.\nSegmentation might be affected."
     else:
         pass
@@ -185,10 +187,12 @@ def check_segmented_img(segmented_img, mask_created):
     # Count the number of unique labels (excluding the background label 0)
     num_components = len(np.unique(labels)) - 1
 
-    if num_components > 4:
-        print("Warning: The segmented image might have 'pebble-like' artifacts, image most likely faulty")
+    if num_components > 2:
         message = "Warning: The segmented image might \nhave 'pebble-like' artifacts,image \nmost likely faulty"
-        return True, message
+        return True, message, num_components
+    elif num_components >4:       
+        message = "Warning: The segmented image has \nmany 'pebble-like' artifacts,image \nmost likely faulty"
+        return True, message, num_components
 
     #! Code below checks if produced masked image is blank, indicates issue with applying mask itself. Can be used as error catching
     #! Technically repetetive, if mask is blank, then masked image is blank duh
