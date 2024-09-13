@@ -18,7 +18,7 @@ from src.components.core_functions.resource_path import resource_path
 
 from kivymd.app import MDApp
 
-SOFTWARE_VERSION = '1.1'
+SOFTWARE_VERSION = '1.2'
 
 class MainApp(MDApp):
     Config.set('kivy', 'exit_on_escape', '0')
