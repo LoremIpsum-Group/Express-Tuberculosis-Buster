@@ -1,50 +1,21 @@
-from kivy.uix.screenmanager import Screen
-from kivy.lang import Builder
+from kivymd.app import MDApp 
+from kivymd.uix.behaviors import HoverBehavior
+from kivymd.uix.textfield import MDTextField
+from kivy.uix.screenmanager import ScreenManager, Screen 
+
 
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
-import os
 
-from src.components.core_functions.resource_path import resource_path
-import hashlib
+from kivy.lang import Builder
 
-
-Builder.load_file(resource_path('src\\onboarding_portal\\onboarding_kivy_files\\etbx_login_final.kv'))
-
-def hash_string(string, salt):
-        hashed_string = hashlib.sha256(string.encode() + salt).hexdigest()
-        return hashed_string
+Builder.load_file("etbx_login_prefinal.kv")
 class LoginScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
-    # def generate_salt():
-    #     return os.urandom(16)
-
-    # def hash_string(string, salt):
-    #     hashed_string = hashlib.sha256(string.encode() + salt).hexdigest()
-    #     return hashed_string
-
-    # def read_credentials_from_file(self, file_path):
-    #     with open(file_path, 'r') as file:
-    #         username = file.readline().strip()
-    #         password = file.readline().strip()
-    #     return username, password
-
-    # def verify_login(username, password, user_input_username, user_input_password):
-    #     salt_username = username[username.find(':')+1:]  
-    #     salt_password = password[password.find(':')+1:]  
-    #     hashed_input_username = hash_string(user_input_username, salt_username.encode())
-    #     hashed_input_password = hash_string(user_input_password, salt_password.encode())
-    #     return username.startswith(hashed_input_username) and password.startswith(hashed_input_password)
-
-    #file_path = "password.txt"
-
-    #stored_username, stored_password = read_credentials_from_file(file_path)
-
-
+    
     def login_button(self):
         """
         Handles the login button click event.
@@ -60,42 +31,38 @@ class LoginScreen(Screen):
 
         if username_input != '' and password_input != '':
             #with open("password.txt", 'r') as file:
-            with open(resource_path("src\onboarding_portal\introduction.txt"), 'r') as file:
-                stored_username, stored_salt_username = file.readline().strip().split(':')
-                stored_password, stored_salt_password = file.readline().strip().split(':')
+            # with open(resource_path("src\onboarding_portal\introduction.txt"), 'r') as file:
+            #     stored_username, stored_salt_username = file.readline().strip().split(':')
+            #     stored_password, stored_salt_password = file.readline().strip().split(':')
 
-            hashed_input_username = hash_string(username_input, bytes.fromhex(stored_salt_username))
-            hashed_input_password = hash_string(password_input, bytes.fromhex(stored_salt_password))
+            # hashed_input_username = hash_string(username_input, bytes.fromhex(stored_salt_username))
+            # hashed_input_password = hash_string(password_input, bytes.fromhex(stored_salt_password))
 
-            login_successful = stored_username == hashed_input_username and stored_password == hashed_input_password
+
+            login_successful = True
 
             if login_successful:
-                self.ids.username_input.text = ''
-                self.ids.password_input.text = ''
                 self.manager.current = 'main_menu'
                 print("Login Successful")
             else:
-                self.ids.username_input.text = ''
-                self.ids.password_input.text = ''
                 self.show_popup('Invalid Username or Password')
         else:
-            #Reason why this is here is to ensure that what happens at the end of login everytime is clearing the input fields
-            self.ids.username_input.text = ''
-            self.ids.password_input.text = ''
             self.show_popup('Please enter all the fields')
 
+        #Reason why this is here is to ensure that what happens at the end of login everytime is clearing the input fields
+        self.ids.username_input.text = ''
+        self.ids.password_input.text = ''
 
 
     def forgot_password(self):
         """
         Clears the username and password input fields and displays a popup with contact information for password recovery.
-
+        Put the clearing of the credentials here too when "contact developer" is clicked
         returns:
         None
-        """
-        #Reason why this is here is to ensure that what happens at the end of login everytime is clearing the input fields
+        """        
         self.ids.username_input.text = ''
-        self.ids.password_input.text = ''
+        self.ids.password_input.text = ''        
         self.forgot_password_popup('Please contact: Venz Salvatierra (ETBX-Developer)\nContact Number: 09773503492 \nEmail:202110530@fit.edu.ph')
 
     

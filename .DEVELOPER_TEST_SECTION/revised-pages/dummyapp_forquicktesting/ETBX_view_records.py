@@ -29,16 +29,16 @@ from getpass import getpass
 
 import sqlite3
 
-from src.components.core_functions import (
-    resource_path,
-    FPDF,
-    io,
-    Image,
-    sqlite3
-)
+# from src.components.core_functions import (
+#     resource_path,
+#     FPDF,
+#     io,
+#     Image,
+#     sqlite3
+# )
 
 
-Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_view_rcrds.kv"))
+Builder.load_file("etbx_view_rcrds.kv")
 class ViewRecords(Screen):
 
     data_items = ListProperty([]) 
@@ -47,28 +47,28 @@ class ViewRecords(Screen):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
-        c = conn.cursor()
-        c.execute(
-            """ 
-            CREATE TABLE IF NOT EXISTS RESULTS (
-                result_id INTEGER PRIMARY KEY, 
-                patient_id INTEGER, 
-                date_of_scan TEXT NOT NULL, 
-                result TEXT NOT NULL,
-                percentage REAL, 
-                orig_image BLOB NOT NULL, 
-                preproc_image BLOB NOT NULL, 
-                grad_cam_image BLOB NOT NULL, 
-                notes TEXT, 
-                misclassified BOOLEAN,
-                FOREIGN KEY(patient_id) REFERENCES PATIENT(patient_id)
-            )
-        """
-        )
+        # conn = sqlite3.connect(resource_path('src\\components\\view_record_main.db'))
+        # c = conn.cursor()
+        # c.execute(
+        #     """ 
+        #     CREATE TABLE IF NOT EXISTS RESULTS (
+        #         result_id INTEGER PRIMARY KEY, 
+        #         patient_id INTEGER, 
+        #         date_of_scan TEXT NOT NULL, 
+        #         result TEXT NOT NULL,
+        #         percentage REAL, 
+        #         orig_image BLOB NOT NULL, 
+        #         preproc_image BLOB NOT NULL, 
+        #         grad_cam_image BLOB NOT NULL, 
+        #         notes TEXT, 
+        #         misclassified BOOLEAN,
+        #         FOREIGN KEY(patient_id) REFERENCES PATIENT(patient_id)
+        #     )
+        # """
+        # )
 
-        conn.commit()
-        conn.close()
+        # conn.commit()
+        # conn.close()
     
     def search_button(self):
         """
@@ -108,6 +108,8 @@ class ViewRecords(Screen):
             self.ids.search_result_layout.clear_widgets()
             self.error_popup("Please fill-in the ID number of the patient")
             self.ids.search_result.text = ""
+            self.ids.result_label.text = ""
+            self.ids.date_label.text = ""
         elif not search_input.isdigit():
             self.ids.search_result_layout.clear_widgets()
             self.error_popup("Please enter a valid ID number")
@@ -193,6 +195,32 @@ class ViewRecords(Screen):
 
             self.manager.get_screen('patient_result').update_result(int(res_id))
             self.manager.current = 'patient_result'
+
+    
+    def logout(self, instance):
+        self.popup.dismiss()
+        self.manager.current = 'login'
+
+    def logout_popup(self):
+        """
+        Displays a popup with a given message and a close button.
+
+        Parameters:
+        - message (str): The message to be displayed in the popup.
+
+        Returns:
+        None
+        """
+        content = BoxLayout(orientation='vertical')
+        label = Label(text="Are you sure you want to logout?")
+        confirm_button = Button(text="Confirm", on_press=self.logout)
+        close_button = Button(text='Close', on_press=self.close_popup)
+        content.add_widget(label)
+        content.add_widget(confirm_button)
+        
+        content.add_widget(close_button)
+        self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
+        self.popup.open()
     
     def error_popup(self, message):
         """
@@ -474,31 +502,6 @@ class ViewRecords(Screen):
 
         os.remove(resource_path(f'Exported-Results\\heatmap_{patient_ID}_result_id{result_ID}.png'))
 
-    def logout(self, instance):
-        self.popup.dismiss()
-        self.manager.current = 'login'
-
-    def logout_popup(self):
-        """
-        Displays a popup with a given message and a close button.
-
-        Parameters:
-        - message (str): The message to be displayed in the popup.
-
-        Returns:
-        None
-        """
-        content = BoxLayout(orientation='vertical')
-        label = Label(text="Are you sure you want to logout?")
-        confirm_button = Button(text="Confirm", on_press=self.logout)
-        close_button = Button(text='Close', on_press=self.close_popup)
-        content.add_widget(label)
-        content.add_widget(confirm_button)
-
-        content.add_widget(close_button)
-        self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
-        self.popup.open()
-        
 
 
 

@@ -165,23 +165,61 @@ class PatientResult(Screen):
         self.ids.x_ray.md_bg_color = (0.1, 0.5, .9, 1)
         self.ids.x_ray.text_color = (1, 1, 1, 1)
 
-
         bar_color = None
+        sys_suggest = None
+        x1 = None
+        x2 = None
+        fsize = None
         if (percent <= 25):
             bar_color = (0, 1, 0, 1)
+            sys_suggest = "System sees little to no manifestations"
+            x1 = .675
+            x2 = .685
+            fsize = 23
         elif (percent <= 49):
             bar_color = (1, 1, 0, 1)
+            sys_suggest = "Suggested for further screening."
+            x1 = .675
+            x2 = .67
+            fsize = 23
         elif (percent <= 74):
             bar_color = (1, 0.5, 0, 1)
+            sys_suggest = "Visible signs, further screening highly suggested"
+            x1 = .655
+            x2 = .702
+            fsize = 21
         else:
             bar_color = (1, 0, 0, 1)
+            sys_suggest = "TB signs evident, immediate attention suggested."
+            x1 = .655
+            x2 = .70
+            fsize = 21
 
         self.percentage = int(percent)
         self.percentage_color = bar_color
-        self.ids.result_classnPerc.text =  classification + ": " + str(percent)
+        self.ids.result_classnPerc.text = classification + ": " +str(percent) + "%"
+        self.ids.result_classnPerc.pos_hint = {"center_x": x1, "center_y": 0.76}
+        self.ids.result_rcmdtn.text = sys_suggest
+        self.ids.result_rcmdtn.font_size = fsize
+        self.ids.result_rcmdtn.pos_hint = {"center_x": x2, "center_y": 0.70}
         self.ids.patient_id_text.text = 'Scan Results for Patient: ' + str(patient_id)
         self.ids.notes.text = note
         self.ids.misclassified.active = misclassifier
+
+        # bar_color = None
+        # if (percent <= 25):
+        #     bar_color = (0, 1, 0, 1)
+        # elif (percent <= 49):
+        #     bar_color = (1, 1, 0, 1)
+        # elif (percent <= 74):
+        #     bar_color = (1, 0.5, 0, 1)
+        # else:
+        #     bar_color = (1, 0, 0, 1)
+
+        # self.percentage = int(percent)
+        # self.percentage_color = bar_color
+        # self.ids.result_classnPerc.text =  classification + ": " + str(percent)
+
 
         # scan_result.percentage = percent
         # scan_result.orig_img = xray_orig
@@ -268,3 +306,6 @@ class PatientResult(Screen):
 
         xray_full_app(image_np_orig, image_np_grad)
         pass
+
+    def back_button(self):
+        self.manager.current = 'view_rec'

@@ -8,17 +8,17 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 
-from src.components.core_functions import (
-    resource_path, 
-    check_image,
-    Image,
-    io,
-    base64,
-    np,
-    cv2,
-    dicom_processor as dcmp,
-    os
-)
+# from src.components.core_functions import (
+#     resource_path, 
+#     check_image,
+#     Image,
+#     io,
+#     base64,
+#     np,
+#     cv2,
+#     dicom_processor as dcmp,
+#     os
+# )
 
 is_dicom = None 
 dicom_image = None 
@@ -29,7 +29,7 @@ class DicomFile:
 
 dicom_file = DicomFile()
 
-Builder.load_file(resource_path("src\\main_dashboard\\maindash_kivy_files\\etbx_scan_img.kv"))
+Builder.load_file('etbx_scan_img.kv')
 class ScanImage(Screen):
     def __init__(self, **kwargs):
         super(ScanImage, self).__init__(**kwargs)
@@ -110,17 +110,17 @@ class ScanImage(Screen):
         Returns:
         None
         """
-        if resource_path(self.image.source) == resource_path("assets/jpg.png"):
-            self.show_warning_popup("Please load an image first.")
-            return
+        # if resource_path(self.image.source) == resource_path("assets/jpg.png"):
+        #     self.show_warning_popup("Please load an image first.")
+        #     return
 
-        if is_dicom:
-            image_path = resource_path("dicom_image.png")
-        else:
-            image_path = resource_path(self.image.source)
+        # if is_dicom:
+        #     image_path = resource_path("dicom_image.png")
+        # else:
+        #     image_path = resource_path(self.image.source)
         self.manager.current = 'scan_result'
-        print(image_path)
-        self.manager.get_screen('scan_result').update_result(image_path, is_dicom)
+        # print(image_path)
+        # self.manager.get_screen('scan_result').update_result(image_path, is_dicom)
 
     def loading_screen(self, dt):
         """
@@ -166,7 +166,7 @@ class ScanImage(Screen):
             title="", content=content, auto_dismiss=False, size_hint=(0.4, 0.4)
         )
         self.popup.open()
-
+    
     def logout(self, instance):
         self.popup.dismiss()
         self.manager.current = 'login'
@@ -192,7 +192,7 @@ class ScanImage(Screen):
         self.popup = Popup(title='', content=content, auto_dismiss=False, size_hint=(0.4, 0.4))
         self.popup.open()
         
-
+   
     def close_popup(self, instance):
         """
         Closes the popup window.
